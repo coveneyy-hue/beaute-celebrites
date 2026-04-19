@@ -2653,9 +2653,12 @@ function renderSettings(){
         <button class="btn" id="import-data">📥 Importer</button>
         <button class="btn btn-danger" id="clear-all">🗑️ Tout effacer</button>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
         <button class="btn" id="clear-uploaded-photos">🧹 Vider photos</button>
         <button class="btn" id="compress-uploads">🗜️ Compresser photos</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr;gap:8px">
+        <button class="btn" id="find-dupes">🔍 Détecter les doublons</button>
       </div>
       <input id="import-file" type="file" accept="application/json,.json" hidden>
     </div>`;
