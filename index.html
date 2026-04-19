@@ -108,8 +108,6 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .badge-style{background:rgba(16,185,129,.12);color:var(--victor-hi);border:1px solid rgba(16,185,129,.3)}
 .badge-muse{background:linear-gradient(90deg,rgba(245,158,11,.18),rgba(251,113,133,.18));color:var(--amber-hi);border:1px solid rgba(245,158,11,.4)}
 
-.row-note{text-align:center;font-size:18px;font-weight:800;color:var(--amber);letter-spacing:-.02em}
-.row-note.dim{color:var(--text-4);font-size:15px}
 .row-elo{text-align:center;font-size:13px;font-weight:700;color:var(--text-2)}
 .row-elo small{display:block;color:var(--text-4);font-size:10px;font-weight:600;margin-top:1px}
 
@@ -191,27 +189,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 
 .hint{font-size:12px;color:var(--text-3);padding:10px 12px;background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.15);border-radius:10px;display:flex;align-items:center;gap:8px;margin-bottom:14px}
 
-.ventilation{margin:14px 0;padding:14px;background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius)}
-.vent-title{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
-.vent-section{margin-top:12px}
-.vent-section-label{font-size:12px;font-weight:700;color:var(--text-2);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
-.vent-section-label .vw{font-size:10px;font-weight:700;color:var(--text-3);background:var(--bg-3);padding:2px 7px;border-radius:999px}
-.slider-row{display:grid;grid-template-columns:1fr 50px;gap:10px;align-items:center;padding:6px 0}
-.slider-label{font-size:13px;color:var(--text);display:flex;align-items:center;gap:6px;min-width:0}
-.slider-label .lbl-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.crit-info-btn{flex:none;width:18px;height:18px;border-radius:50%;background:var(--bg-3);color:var(--text-3);display:grid;place-items:center;font-size:11px;font-weight:800;border:1px solid var(--border);transition:all .12s}
-.crit-info-btn:active{transform:scale(.9)}
-.crit-info-btn.is-on{background:var(--amber);color:#0B0F1E;border-color:var(--amber)}
-.crit-info{grid-column:1/-1;margin-top:6px;padding:10px 12px;background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.18);border-radius:10px;font-size:12.5px;color:var(--text-2);line-height:1.45}
-.crit-info .crit-ex{margin-top:6px;color:var(--amber);font-size:12px;display:flex;gap:6px;align-items:flex-start}
-.crit-info .crit-ex::before{content:"✨";flex:none}
-.slider-value{text-align:right;font-size:14px;font-weight:800;color:var(--amber)}
-.slider{grid-column:1/-1;margin-top:2px;-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:3px;background:var(--bg-3);outline:none}
-.slider::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:linear-gradient(180deg,var(--amber-hi),var(--amber));border:2px solid var(--bg);box-shadow:0 2px 6px rgba(245,158,11,.4);cursor:pointer}
-.slider::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:linear-gradient(180deg,var(--amber-hi),var(--amber));border:2px solid var(--bg);cursor:pointer}
 
-.formula-display{background:var(--bg-3);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-top:10px;font-size:12px;color:var(--text-2);text-align:center;font-family:ui-monospace,Consolas,monospace}
-.formula-display .n{color:var(--amber);font-weight:800}
 
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .form-grid .full{grid-column:1/-1}
@@ -391,10 +369,6 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .stat-section{margin-bottom:22px}
 .stat-section h3{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3);margin-bottom:10px}
 
-.histogram{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;height:80px;align-items:end}
-.hist-bar{background:linear-gradient(180deg,var(--amber),var(--amber-hi));border-radius:3px 3px 0 0;min-height:2px;position:relative}
-.hist-bar::after{content:attr(data-v);position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:700;color:var(--text-3)}
-.hist-axis{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;margin-top:4px;font-size:10px;color:var(--text-3);text-align:center}
 
 .top-list{display:flex;flex-direction:column;gap:6px}
 .top-item{display:flex;align-items:center;gap:10px;padding:8px;background:var(--bg-2);border:1px solid var(--border);border-radius:10px}
@@ -447,11 +421,6 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .user-card .info .un{font-size:14px;font-weight:700}
 .user-card .info .us{font-size:11.5px;color:var(--text-3);margin-top:2px}
 
-.weight-row{display:grid;grid-template-columns:110px 1fr 52px;gap:10px;align-items:center;margin-bottom:8px}
-.weight-row label{font-size:13px;font-weight:700;color:var(--text-2)}
-.weight-row .val{text-align:right;font-size:13px;font-weight:800;color:var(--amber)}
-.weight-total{margin-top:8px;padding:8px;background:var(--bg-2);border:1px solid var(--border);border-radius:8px;text-align:center;font-size:12px;font-weight:700;color:var(--text-2)}
-.weight-total.bad{color:var(--coral);border-color:rgba(251,113,133,.3)}
 
 .tour-opts{display:grid;gap:6px;background:var(--bg-2);border:1px solid var(--border);padding:4px;border-radius:10px}
 .tour-opts.c3{grid-template-columns:1fr 1fr 1fr}
@@ -775,42 +744,6 @@ const USERS = [
   { id:'julie',   name:'Julie',   color:'#A855F7', hi:'#C084FC', initial:'J' },
   { id:'yannick', name:'Yannick', color:'#06B6D4', hi:'#22D3EE', initial:'Y' },
 ];
-const TECH_CRITERIA = [
-  { key:'symetrie',  label:'Symétrie et harmonie',
-    desc:"Équilibre global du visage : proportions régulières, moitiés gauche/droite bien accordées, rapport œil/nez/bouche harmonieux.",
-    ex:"Henry Cavill, Charlize Theron — visages quasi parfaitement symétriques, souvent cités comme références académiques." },
-  { key:'structure', label:'Structure du visage',
-    desc:"Qualité des traits osseux : mâchoire définie, pommettes saillantes, front, arcades. Un visage \"sculpté\" qui accroche la lumière.",
-    ex:"Angelina Jolie, Michael B. Jordan — pommettes et mâchoires iconiques, structure forte immédiatement reconnaissable." },
-  { key:'regard',    label:'Regard',
-    desc:"Intensité, couleur, profondeur et expressivité des yeux. Un regard qui capte la caméra et transmet une émotion sans parler.",
-    ex:"Zendaya, Timothée Chalamet — regards souvent décrits comme hypnotiques, capables de porter un plan entier." },
-  { key:'sourire',   label:'Sourire',
-    desc:"Qualité du sourire : dentition, courbure naturelle, chaleur qu'il dégage. Un sourire qui illumine le visage entier.",
-    ex:"Julia Roberts, Jacob Elordi — sourires emblématiques, associés à leur image de marque." },
-  { key:'photogenie',label:'Photogénie',
-    desc:"Capacité à être magnifié(e) par l'objectif. Certaines personnes sont plus belles en photo qu'en vrai — le visage \"aime\" la caméra.",
-    ex:"Margot Robbie, Paul Mescal — réputés pour être encore plus frappants en photo et au cinéma qu'en personne." },
-  { key:'charisme',  label:'Présence et charisme',
-    desc:"Aura à l'écran ou en personne : ce magnétisme qui fait qu'on ne regarde que cette personne dans une pièce ou un plan.",
-    ex:"Denzel Washington, Cate Blanchett — présence écrasante, impossibles à ignorer dès qu'ils entrent dans le cadre." },
-  { key:'style',     label:'Style et allure',
-    desc:"Élégance, port, goût vestimentaire, façon de se tenir et de se déplacer. Le \"chic\" global, au-delà des traits.",
-    ex:"Tilda Swinton, Ryan Gosling — icônes de style à part entière, reconnus autant pour leur allure que pour leur visage." },
-  { key:'pic',       label:'Pic de forme',
-    desc:"Évaluation du sommet physique de la personne, tous âges confondus. Pas son état actuel, mais son meilleur moment.",
-    ex:"Brad Pitt fin années 90 (Fight Club), Monica Bellucci début 2000s — pics de forme devenus des références absolues." },
-];
-const BEAUTY_TAGS = [
-  { k:'coup',     label:'Coup de cœur',        cls:'badge-coup',     ic:'heart' },
-  { k:'regard',   label:'Regard magnétique',   cls:'badge-regard',   ic:'eye' },
-  { k:'sourire',  label:'Sourire lumineux',    cls:'badge-sourire',  ic:'smile' },
-  { k:'photo',    label:'Photogénie rare',     cls:'badge-photo',    ic:'camera' },
-  { k:'charisme', label:'Charisme magnétique', cls:'badge-charisme', ic:'spark' },
-  { k:'style',    label:'Style iconique',      cls:'badge-style',    ic:'star' },
-  { k:'muse',     label:'Muse absolue',        cls:'badge-muse',     ic:'crown' },
-];
-const DEFAULT_WEIGHTS = { technique:0.40, coup:0.35, pref:0.25 };
 const STORAGE_KEY = 'classeur-beaute-v1';
 const TMDB_IMG = 'https://image.tmdb.org/t/p/w500';
 
@@ -1055,20 +988,10 @@ function wireCardPhotoControls(container, ctx, photoIdxMap, onChange){
     input.click();
   }));
 }
-const ICONS = {
-  heart:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.6-9.5-9.4C1 8.3 2.7 5 6 5c2 0 3.3 1 4 2.2C10.7 6 12 5 14 5c3.3 0 5 3.3 3.5 6.6C19 16.4 12 21 12 21Z"/></svg>',
-  eye:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2.5 12s3-7 9.5-7 9.5 7 9.5 7-3 7-9.5 7S2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3"/></svg>',
-  smile:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01" stroke-linecap="round"/></svg>',
-  camera:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8h4l2-3h6l2 3h4v11H3V8Z"/><circle cx="12" cy="13" r="3.5"/></svg>',
-  spark:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2 6 6 2-6 2-2 6-2-6-6-2 6-2 2-6z"/></svg>',
-  star:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 7 7 .8-5.3 4.9 1.6 7.1L12 18.3 5.7 21.8l1.6-7.1L2 9.8 9 9z"/></svg>',
-  crown:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 7l4 4 6-7 6 7 4-4v11H2V7z"/></svg>',
-};
 
 /* ============ STATE ============ */
 const state = {
   people: [],
-  ratings: {},
   favorites: {},
   elo: {},
   duels: {},
@@ -1076,7 +999,6 @@ const state = {
   tournaments: {},
   settings: {
     currentUser: 'lily',
-    weights: { ...DEFAULT_WEIGHTS },
     tmdbKey: '',
     sortBy: 'elo',
     filter: 'all',
@@ -1095,8 +1017,6 @@ const $$ = (s,r=document)=>Array.from(r.querySelectorAll(s));
 function uid(){ return 'p_'+Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4); }
 function getUser(id){ return USERS.find(u=>u.id===id)||USERS[0]; }
 function esc(s){ if(s==null) return ''; return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function fmt(n){ return (n==null||Number.isNaN(n))?'-':Number(n).toFixed(2); }
-function icon(n){ return ICONS[n]||''; }
 function toast(msg,kind=''){ const t=$('#toast'); t.textContent=msg; t.className='show '+kind; clearTimeout(toast._tm); toast._tm=setTimeout(()=>{t.className='';},2400); }
 
 /* ====== Data management helpers ====== */
@@ -1130,33 +1050,16 @@ function computeStorageStats(){
   return { bytes, kb, mb, pct, uploaded, quotaMB };
 }
 function ensureBuckets(u){
-  if(!state.ratings[u]) state.ratings[u]={};
   if(!state.favorites[u]) state.favorites[u]={};
   if(!state.elo[u]) state.elo[u]={};
   if(!state.duels[u]) state.duels[u]=0;
   if(!state.duelHistory[u]) state.duelHistory[u]=[];
   if(!state.tournaments[u]) state.tournaments[u]=[];
 }
-function getRating(u,p){ return state.ratings[u]?.[p]||null; }
-function techMean(r){
-  if(!r?.technique) return null;
-  const v=TECH_CRITERIA.map(c=>r.technique[c.key]).filter(x=>typeof x==='number');
-  return v.length?v.reduce((a,b)=>a+b,0)/v.length:null;
-}
-function computeNoteForRating(r,w){
-  if(!r) return null;
-  const wt=w||state.settings.weights;
-  const t=techMean(r);
-  const c=typeof r.coup==='number'?r.coup:null;
-  const p=typeof r.pref==='number'?r.pref:null;
-  if(t==null&&c==null&&p==null) return null;
-  let s=0,ws=0;
-  if(t!=null){s+=t*wt.technique;ws+=wt.technique;}
   if(c!=null){s+=c*wt.coup;ws+=wt.coup;}
   if(p!=null){s+=p*wt.pref;ws+=wt.pref;}
   return ws?s/ws:null;
 }
-function computeNote(u,p){ return computeNoteForRating(getRating(u,p)); }
 function getElo(u,p){ return state.elo[u]?.[p]??1500; }
 function getHeadToHeadWins(u,a,b){
   const hist = state.duelHistory[u]||[];
@@ -1180,7 +1083,7 @@ function updateElo(u,w,l,K=32){
 /* ============ STORAGE ============ */
 function saveState(){
   try{ localStorage.setItem(STORAGE_KEY, JSON.stringify({
-    people:state.people, ratings:state.ratings, favorites:state.favorites,
+    people:state.people, favorites:state.favorites,
     elo:state.elo, duels:state.duels, duelHistory:state.duelHistory,
     tournaments:state.tournaments, settings:state.settings,
   })); return true; }catch(e){
@@ -1197,8 +1100,7 @@ function loadState(){
     const d=JSON.parse(r);
     Object.assign(state,d);
     USERS.forEach(u=>ensureBuckets(u.id));
-    state.settings=Object.assign({currentUser:'lily',weights:{...DEFAULT_WEIGHTS},tmdbKey:'',sortBy:'elo',filter:'all',query:'',consultSort:'elo',compareA:'lily',compareB:'victor'},state.settings||{});
-    state.settings.weights=Object.assign({...DEFAULT_WEIGHTS},state.settings.weights||{});
+    state.settings=Object.assign({currentUser:'lily',tmdbKey:'',sortBy:'elo',filter:'all',query:'',consultSort:'elo',compareA:'lily',compareB:'victor'},state.settings||{});
   }catch(e){ console.warn(e); }
 }
 
@@ -1508,7 +1410,6 @@ function sortPeople(list){
   else c.sort((a,b)=>getElo(u,b.id)-getElo(u,a.id));
   return c;
 }
-function getBadge(r){ return r?.tag ? BEAUTY_TAGS.find(t=>t.k===r.tag) : null; }
 function renderList(){
   const body=$('#list-body');
   const u=state.settings.currentUser;
@@ -2105,7 +2006,6 @@ Tenter l'ajout quand même ?`;
     saveState(); renderList(); renderDetails(); toast('Photo supprimée','ok');
   });
 }
-function refreshFormula(){}
 function saveDetails(){
   closeAllModals();
 }
@@ -2116,7 +2016,6 @@ function removePersonFromBank(pid){
   if(!p) return null;
   state.people = state.people.filter(x => x.id !== pid);
   USERS.forEach(u => {
-    if(state.ratings[u.id])   delete state.ratings[u.id][pid];
     if(state.favorites[u.id]) delete state.favorites[u.id][pid];
     if(state.elo[u.id])       delete state.elo[u.id][pid];
   });
@@ -2781,17 +2680,6 @@ function renderSettings(){
       </div>
     `;
   }
-  $$('#settings-body .slider[data-wk]').forEach(s=>s.addEventListener('input',e=>{
-    const k=e.target.getAttribute('data-wk');
-    state.settings.weights[k]=parseFloat(e.target.value);
-    renderSettings();
-  }));
-  $$('#settings-body [data-wp]').forEach(b=>b.addEventListener('click',()=>{
-    const [t,c,p]=b.getAttribute('data-wp').split('-').map(Number);
-    state.settings.weights={ technique:t/100, coup:c/100, pref:p/100 };
-    saveState(); renderSettings();
-    toast('Pondération mise à jour','ok');
-  }));
   $$('#settings-body [data-switch]').forEach(b=>b.addEventListener('click',()=>{
     state.settings.currentUser=b.getAttribute('data-switch');
     saveState(); renderHeader(); renderList(); renderSettings();
@@ -2821,7 +2709,7 @@ function renderSettings(){
   // ==== Export complet (avec photos uploadées) ====
   $('#export-data').addEventListener('click',()=>{
     const payload = {
-      people:state.people, ratings:state.ratings, favorites:state.favorites,
+      people:state.people, favorites:state.favorites,
       elo:state.elo, duels:state.duels, duelHistory:state.duelHistory,
       tournaments:state.tournaments, settings:state.settings,
       exportedAt:Date.now(), v:2, kind:'full'
@@ -2843,7 +2731,7 @@ function renderSettings(){
     });
     const removed = countUploadedPhotos();
     const payload = {
-      people:lightPeople, ratings:state.ratings, favorites:state.favorites,
+      people:lightPeople, favorites:state.favorites,
       elo:state.elo, duels:state.duels, duelHistory:state.duelHistory,
       tournaments:state.tournaments, settings:state.settings,
       exportedAt:Date.now(), v:2, kind:'light'
@@ -2959,8 +2847,8 @@ function renderSettings(){
     if(!confirm('Vraiment tout effacer ?')) return;
     localStorage.removeItem(STORAGE_KEY);
     Object.assign(state,{
-      people:[], ratings:{}, favorites:{}, elo:{}, duels:{}, duelHistory:{}, tournaments:{},
-      settings:{ currentUser:'lily', weights:{...DEFAULT_WEIGHTS}, tmdbKey:'', sortBy:'elo', filter:'all', query:'', consultSort:'elo', compareA:'lily', compareB:'victor' }
+      people:[], favorites:{}, elo:{}, duels:{}, duelHistory:{}, tournaments:{},
+      settings:{ currentUser:'lily', tmdbKey:'', sortBy:'elo', filter:'all', query:'', consultSort:'elo', compareA:'lily', compareB:'victor' }
     });
     USERS.forEach(u=>ensureBuckets(u.id));
     saveState(); renderHeader(); renderList(); renderSettings();
@@ -2986,11 +2874,10 @@ function openImportDialog(d, filename){
 
   // Detect which source users have data in the file
   const srcUsers = USERS.filter(u => {
-    const r = d.ratings?.[u.id];
     const f = d.favorites?.[u.id];
     const el = d.elo?.[u.id];
     const du = d.duels?.[u.id];
-    return (r && Object.keys(r).length) || (f && Object.values(f||{}).some(Boolean)) || (el && Object.keys(el).length) || du;
+    return (f && Object.values(f||{}).some(Boolean)) || (el && Object.keys(el).length) || du;
   });
 
   // Count local existing people by tmdbId/wikiId/name so we can show how many are new
@@ -3028,7 +2915,6 @@ function openImportDialog(d, filename){
       Pour chaque utilisateur trouvé dans le fichier, choisis à quel utilisateur local assigner ses notes, favoris, ELO, duels et tournois. Choisis "Ignorer" pour ne rien importer.
     </div>
     ${srcUsers.length?srcUsers.map(src=>{
-      const nR = Object.keys(d.ratings?.[src.id]||{}).length;
       const nF = Object.values(d.favorites?.[src.id]||{}).filter(Boolean).length;
       const nD = d.duels?.[src.id]||0;
       return `<div class="import-user-row">
@@ -3037,7 +2923,7 @@ function openImportDialog(d, filename){
             <span class="dot" style="background:${src.color}"></span>
             ${esc(src.name)}
           </div>
-          <div class="import-user-meta">${nR}n · ${nF}♥ · ${nD}d</div>
+          <div class="import-user-meta">${nF}♥ · ${nD}d</div>
         </div>
         <select data-src-user="${src.id}">
           <option value="__skip__">— Ignorer —</option>
@@ -3153,7 +3039,6 @@ function applyImport(){
       const dstU = map[srcU];
       ensureBuckets(dstU);
 
-      const srcRatings = remapKeys(d.ratings?.[srcU] || {});
       const srcFavs    = remapKeys(d.favorites?.[srcU] || {});
       const srcElo     = remapKeys(d.elo?.[srcU] || {});
       const srcDuels   = d.duels?.[srcU] || 0;
@@ -3161,7 +3046,6 @@ function applyImport(){
       const srcTours   = d.tournaments?.[srcU] || [];
 
       if(mode === 'replace-user'){
-        state.ratings[dstU]   = srcRatings;
         state.favorites[dstU] = srcFavs;
         state.elo[dstU]       = srcElo;
         state.duels[dstU]     = srcDuels;
@@ -3169,7 +3053,6 @@ function applyImport(){
         state.tournaments[dstU] = srcTours;
       } else {
         // merge (source wins per-person for ratings/favorites/elo)
-        Object.assign(state.ratings[dstU],   srcRatings);
         Object.assign(state.favorites[dstU], srcFavs);
         Object.assign(state.elo[dstU],       srcElo);
         state.duels[dstU] = (state.duels[dstU]||0) + srcDuels;
@@ -3183,16 +3066,13 @@ function applyImport(){
     Object.keys(map).forEach(srcU=>{
       const dstU = map[srcU];
       ensureBuckets(dstU);
-      const srcRatings = d.ratings?.[srcU] || {};
       const srcFavs    = d.favorites?.[srcU] || {};
       const srcElo     = d.elo?.[srcU] || {};
       if(mode === 'replace-user'){
-        state.ratings[dstU]   = {...srcRatings};
         state.favorites[dstU] = {...srcFavs};
         state.elo[dstU]       = {...srcElo};
         state.duels[dstU]     = d.duels?.[srcU] || 0;
       } else {
-        Object.assign(state.ratings[dstU],   srcRatings);
         Object.assign(state.favorites[dstU], srcFavs);
         Object.assign(state.elo[dstU],       srcElo);
         state.duels[dstU] = (state.duels[dstU]||0) + (d.duels?.[srcU]||0);
@@ -3325,7 +3205,6 @@ function renderDupesBody(){
   </div>`);
 
   pendingDupes.forEach((g, gi) => {
-    const ratedCount = (p) => USERS.reduce((n,u) => n + (computeNote(u.id,p.id)!=null ? 1 : 0), 0);
     const duelCount = (p) => USERS.reduce((n,u) => {
       const h = state.duelHistory[u.id] || [];
       return n + h.filter(d => d.winnerId===p.id || d.loserId===p.id).length;
@@ -3348,7 +3227,6 @@ function renderDupesBody(){
                       : decision === 'delete' ? '<span class="dupe-badge delete">🗑 Suppr.</span>'
                       : '';
           const photos = p.photos?.length || (p.mainPhoto?1:0);
-          const rated = ratedCount(p);
           const duels = duelCount(p);
           return `<div class="dupe-card ${cls}" data-gi="${gi}" data-pid="${esc(p.id)}">
             <div class="dupe-photo">
@@ -3358,7 +3236,7 @@ function renderDupesBody(){
             <div class="dupe-info">
               <div class="di-name">${esc(p.name)}</div>
               <div class="di-meta">${p.gender==='F'?'♀':p.gender==='M'?'♂':'?'}${p.birthday?' · '+p.birthday:''}${p.tmdbId?' · TMDb':''}${p.wikiId?' · Wiki':''}</div>
-              <div class="di-stats">${photos}📷 · ${rated}📝 · ${duels}⚔</div>
+              <div class="di-stats">${photos}📷 · ${duels}⚔</div>
             </div>
           </div>`;
         }).join('')}
@@ -3427,13 +3305,6 @@ function applyDupesDecisions(){
       // Migrate ratings, favorites, elo, duel history (per-user)
       USERS.forEach(u => {
         const uid = u.id;
-        // Ratings: keep keeper's if present, else adopt victim's
-        if(state.ratings[uid]){
-          if(state.ratings[uid][did] != null && state.ratings[uid][keepId] == null){
-            state.ratings[uid][keepId] = state.ratings[uid][did];
-          }
-          delete state.ratings[uid][did];
-        }
         // Favorites: OR them
         if(state.favorites[uid]){
           if(state.favorites[uid][did]) state.favorites[uid][keepId] = true;
