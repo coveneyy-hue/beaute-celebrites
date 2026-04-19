@@ -299,6 +299,30 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .import-checkbox .ic-text strong{color:var(--text)}
 .import-checkbox .ic-text .ic-sub{font-size:11.5px;color:var(--text-4);margin-top:2px}
 
+.dupes-summary{padding:12px 14px;background:var(--bg-2);border:1px solid var(--border);border-radius:10px;margin-bottom:14px;font-size:13px;line-height:1.5;color:var(--text-2)}
+.dupes-summary strong{color:var(--amber)}
+.dupes-group{background:var(--bg-2);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:12px}
+.dupes-group-title{font-size:13px;font-weight:800;color:var(--text);margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.dupes-group-reason{font-size:11px;color:var(--text-4);margin-bottom:10px;line-height:1.4}
+.dupes-group-actions{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.dupes-group-actions button{padding:5px 10px;border-radius:8px;background:var(--bg-3);border:1px solid var(--border);color:var(--text-2);font-size:11px;font-weight:700}
+.dupes-group-actions button.is-on{background:rgba(251,191,36,.15);color:var(--amber);border-color:rgba(251,191,36,.5)}
+.dupes-candidates{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.dupe-card{position:relative;background:var(--bg-3);border:2px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer;transition:border-color .15s}
+.dupe-card:active{transform:scale(.97)}
+.dupe-card.is-keep{border-color:var(--victor-hi);box-shadow:0 0 0 2px rgba(16,185,129,.25)}
+.dupe-card.is-delete{opacity:.5;border-color:rgba(239,68,68,.6)}
+.dupe-photo{aspect-ratio:2/3;background:var(--bg-3);position:relative}
+.dupe-photo img{width:100%;height:100%;object-fit:cover;object-position:center 15%}
+.dupe-photo .dp-placeholder{width:100%;height:100%;display:grid;place-items:center;color:var(--text-4);font-size:22px}
+.dupe-info{padding:6px 8px;font-size:11px;line-height:1.3}
+.dupe-info .di-name{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dupe-info .di-meta{color:var(--text-4);font-size:10px;margin-top:2px}
+.dupe-info .di-stats{color:var(--text-3);font-size:10px;margin-top:3px}
+.dupe-badge{position:absolute;top:6px;right:6px;padding:3px 7px;border-radius:999px;font-size:9.5px;font-weight:800;z-index:1;letter-spacing:.02em}
+.dupe-badge.keep{background:var(--victor-hi);color:#0B0F1E}
+.dupe-badge.delete{background:#EF4444;color:#fff}
+
 .duel-arena{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
 .duel-card{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;transition:transform .15s,border-color .15s;text-align:left;width:100%}
 .duel-card:active{transform:scale(.98);border-color:var(--amber)}
@@ -719,6 +743,20 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
     <div class="modal-footer">
       <button class="btn btn-ghost" data-close>Annuler</button>
       <button class="btn btn-primary" id="import-confirm">Importer</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modal-dupes">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div><div class="modal-title">Doublons</div><div class="modal-sub">Choisis la version à conserver</div></div>
+      <button class="modal-close" data-close><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="modal-body" id="dupes-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" data-close>Fermer</button>
+      <button class="btn btn-primary" id="dupes-apply">Appliquer les choix</button>
     </div>
   </div>
 </div>
@@ -3023,6 +3061,10 @@ function renderSettings(){
       <div style="font-size:11px;color:var(--text-4);margin-bottom:10px;line-height:1.4">
         <strong>Vider photos</strong> supprime toutes les photos uploadées depuis ce téléphone (garde les URLs TMDb/Wikidata).
       </div>
+      <button class="btn btn-block" id="find-dupes" style="margin-bottom:8px">🔍 Détecter les doublons</button>
+      <div style="font-size:11px;color:var(--text-4);margin-bottom:10px;line-height:1.4">
+        <strong>Détecter les doublons</strong> cherche les personnes en double (même TMDb, Wikidata ou nom) et te laisse choisir quelle version garder.
+      </div>
       <input type="file" id="import-file" accept=".json" style="display:none">
       <button class="btn btn-danger btn-block" id="reset-data">⚠️ Tout effacer</button>
     </div>
@@ -3237,6 +3279,7 @@ function renderSettings(){
     saveState(); renderHeader(); renderList(); renderSettings();
     toast('Données effacées','ok');
   });
+  $('#find-dupes').addEventListener('click', openDupesDialog);
 }
 
 /* ============ SMART IMPORT ============ */
@@ -3482,6 +3525,274 @@ function applyImport(){
   toast('Import terminé ✓','ok');
 }
 
+/* ============ DEDUPLICATE ============ */
+// Map: groupKey -> array of pidDecisions, where each decision is 'keep' | 'delete' | 'skip' (default 'skip')
+let pendingDupes = null;
+
+// Find groups of duplicates. Each group has a reason and a list of people.
+function findDuplicateGroups(){
+  const groups = [];
+  const byTmdb = new Map();
+  const byWiki = new Map();
+  const byName = new Map();
+
+  state.people.forEach(p => {
+    if(p.tmdbId){
+      const k = 't:'+p.tmdbId;
+      if(!byTmdb.has(k)) byTmdb.set(k,[]);
+      byTmdb.get(k).push(p);
+    }
+    if(p.wikiId){
+      const k = 'w:'+p.wikiId;
+      if(!byWiki.has(k)) byWiki.set(k,[]);
+      byWiki.get(k).push(p);
+    }
+    const n = (p.name||'').toLowerCase().trim();
+    if(n){
+      if(!byName.has(n)) byName.set(n,[]);
+      byName.get(n).push(p);
+    }
+  });
+
+  // Collect IDs already placed in a group so we don't duplicate across reasons
+  const seen = new Set();
+  const addGroup = (reason, people) => {
+    // Filter out people already in a previous (higher-priority) group
+    const fresh = people.filter(p => !seen.has(p.id));
+    if(fresh.length < 2) return;
+    fresh.forEach(p => seen.add(p.id));
+    groups.push({ reason, people: fresh });
+  };
+
+  // Priority: TMDb > Wiki > Name (more reliable signals first)
+  byTmdb.forEach((arr, k) => {
+    if(arr.length >= 2) addGroup(`Même TMDb (${k.slice(2)})`, arr);
+  });
+  byWiki.forEach((arr, k) => {
+    if(arr.length >= 2) addGroup(`Même Wikidata (${k.slice(2)})`, arr);
+  });
+  byName.forEach((arr, name) => {
+    if(arr.length >= 2){
+      // Only add name-based groups when at least one person isn't already tagged
+      // (often name collisions between two pop-up homonyms are already resolved by TMDb)
+      addGroup(`Même nom : ${arr[0].name}`, arr);
+    }
+  });
+
+  return groups;
+}
+
+// "Quality score" to suggest a default "keep" pick: most photos, then most metadata, then oldest
+function personQualityScore(p){
+  let s = 0;
+  s += (p.photos?.length || 0) * 3;
+  s += p.mainPhoto ? 2 : 0;
+  s += p.bio ? 2 : 0;
+  s += p.birthday ? 1 : 0;
+  s += p.profession ? 1 : 0;
+  s += p.nationality ? 1 : 0;
+  s += p.tmdbId ? 2 : 0;
+  s += p.wikiId ? 1 : 0;
+  // Favor older entries (smaller addedAt) as tiebreaker
+  s -= (p.addedAt || 0) / 1e15;
+  return s;
+}
+
+function openDupesDialog(){
+  const groups = findDuplicateGroups();
+  const body = $('#dupes-body');
+  const footerApply = $('#dupes-apply');
+
+  if(!groups.length){
+    pendingDupes = null;
+    body.innerHTML = '<div class="empty-state" style="padding:30px"><div class="big">✨</div><h3>Aucun doublon</h3><p>Ta banque est propre !</p></div>';
+    footerApply.style.display = 'none';
+    openModal('modal-dupes');
+    return;
+  }
+
+  // Decisions: by default, the best-quality person in each group is "keep", others are "skip"
+  pendingDupes = groups.map(g => {
+    const sorted = g.people.slice().sort((a,b)=>personQualityScore(b)-personQualityScore(a));
+    return {
+      reason: g.reason,
+      people: sorted,
+      decisions: Object.fromEntries(sorted.map((p,i) => [p.id, i===0 ? 'keep' : 'skip']))
+    };
+  });
+  footerApply.style.display = '';
+  renderDupesBody();
+  openModal('modal-dupes');
+}
+
+function renderDupesBody(){
+  const body = $('#dupes-body');
+  const totalDupes = pendingDupes.reduce((n,g) => n + g.people.length - 1, 0);
+
+  const html = [];
+  html.push(`<div class="dupes-summary">
+    <strong>${pendingDupes.length}</strong> groupe${pendingDupes.length>1?'s':''} de doublons · 
+    <strong>${totalDupes}</strong> doublon${totalDupes>1?'s':''} à nettoyer maximum<br>
+    <span style="font-size:11.5px;color:var(--text-4)">Pour chaque groupe, choisis quelle version conserver. Les photos et notes des supprimés sont <strong>fusionnées</strong> dans la version conservée.</span>
+  </div>`);
+
+  pendingDupes.forEach((g, gi) => {
+    const ratedCount = (p) => USERS.reduce((n,u) => n + (computeNote(u.id,p.id)!=null ? 1 : 0), 0);
+    const duelCount = (p) => USERS.reduce((n,u) => {
+      const h = state.duelHistory[u.id] || [];
+      return n + h.filter(d => d.winnerId===p.id || d.loserId===p.id).length;
+    }, 0);
+
+    html.push(`<div class="dupes-group" data-gi="${gi}">
+      <div class="dupes-group-title">
+        <span>${esc(g.people[0].name)}</span>
+        <span style="font-size:11px;color:var(--text-4);font-weight:500">${g.people.length} versions</span>
+      </div>
+      <div class="dupes-group-reason">${esc(g.reason)}</div>
+      <div class="dupes-group-actions">
+        <button type="button" data-gaction="skip-all" data-gi="${gi}">Ignorer ce groupe</button>
+      </div>
+      <div class="dupes-candidates">
+        ${g.people.map(p => {
+          const decision = g.decisions[p.id];
+          const cls = decision === 'keep' ? 'is-keep' : decision === 'delete' ? 'is-delete' : '';
+          const badge = decision === 'keep' ? '<span class="dupe-badge keep">✓ Gardé</span>'
+                      : decision === 'delete' ? '<span class="dupe-badge delete">🗑 Suppr.</span>'
+                      : '';
+          const photos = p.photos?.length || (p.mainPhoto?1:0);
+          const rated = ratedCount(p);
+          const duels = duelCount(p);
+          return `<div class="dupe-card ${cls}" data-gi="${gi}" data-pid="${esc(p.id)}">
+            <div class="dupe-photo">
+              ${p.mainPhoto?`<img loading="lazy" src="${esc(p.mainPhoto)}" onerror="this.parentNode.innerHTML='<div class=\\'dp-placeholder\\'>?</div>'">`:`<div class="dp-placeholder">?</div>`}
+              ${badge}
+            </div>
+            <div class="dupe-info">
+              <div class="di-name">${esc(p.name)}</div>
+              <div class="di-meta">${p.gender==='F'?'♀':p.gender==='M'?'♂':'?'}${p.birthday?' · '+p.birthday:''}${p.tmdbId?' · TMDb':''}${p.wikiId?' · Wiki':''}</div>
+              <div class="di-stats">${photos}📷 · ${rated}📝 · ${duels}⚔</div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`);
+  });
+
+  body.innerHTML = html.join('');
+
+  // Tap a card → cycle its decision: skip → keep → delete → skip (with constraint: only 1 keep per group)
+  $$('#dupes-body .dupe-card').forEach(el => el.addEventListener('click', () => {
+    const gi = parseInt(el.getAttribute('data-gi'));
+    const pid = el.getAttribute('data-pid');
+    const group = pendingDupes[gi];
+    const current = group.decisions[pid];
+    let next;
+    if(current === 'skip') next = 'keep';
+    else if(current === 'keep') next = 'delete';
+    else next = 'skip';
+    // If we set to 'keep', any other 'keep' in this group becomes 'delete' (only one keeper)
+    if(next === 'keep'){
+      Object.keys(group.decisions).forEach(id => {
+        if(id !== pid && group.decisions[id] === 'keep') group.decisions[id] = 'delete';
+      });
+    }
+    group.decisions[pid] = next;
+    renderDupesBody();
+  }));
+
+  // Per-group "skip all" resets decisions to skip
+  $$('#dupes-body [data-gaction="skip-all"]').forEach(btn => btn.addEventListener('click', () => {
+    const gi = parseInt(btn.getAttribute('data-gi'));
+    const group = pendingDupes[gi];
+    Object.keys(group.decisions).forEach(id => group.decisions[id] = 'skip');
+    renderDupesBody();
+  }));
+}
+
+function applyDupesDecisions(){
+  if(!pendingDupes || !pendingDupes.length){ closeAllModals(); return; }
+
+  let mergedCount = 0, deletedCount = 0;
+
+  pendingDupes.forEach(group => {
+    const keepId = Object.keys(group.decisions).find(id => group.decisions[id] === 'keep');
+    const deleteIds = Object.keys(group.decisions).filter(id => group.decisions[id] === 'delete');
+    if(!keepId || !deleteIds.length) return; // no action for this group
+
+    const keeper = state.people.find(p => p.id === keepId);
+    if(!keeper) return;
+
+    // Merge photos and fill missing metadata from deleted ones
+    deleteIds.forEach(did => {
+      const victim = state.people.find(p => p.id === did);
+      if(!victim) return;
+      // Photos: union, keeping keeper's first (so its order is preserved)
+      const keeperPhotos = keeper.photos || (keeper.mainPhoto?[keeper.mainPhoto]:[]);
+      const victimPhotos = victim.photos || (victim.mainPhoto?[victim.mainPhoto]:[]);
+      const merged = Array.from(new Set([...keeperPhotos, ...victimPhotos]));
+      keeper.photos = merged;
+      if(!keeper.mainPhoto && victim.mainPhoto) keeper.mainPhoto = victim.mainPhoto;
+      // Fill missing metadata
+      ['birthday','nationality','profession','bio','gender','tmdbId','wikiId'].forEach(k => {
+        if(keeper[k]==null && victim[k]!=null) keeper[k] = victim[k];
+      });
+      // Migrate ratings, favorites, elo, duel history (per-user)
+      USERS.forEach(u => {
+        const uid = u.id;
+        // Ratings: keep keeper's if present, else adopt victim's
+        if(state.ratings[uid]){
+          if(state.ratings[uid][did] != null && state.ratings[uid][keepId] == null){
+            state.ratings[uid][keepId] = state.ratings[uid][did];
+          }
+          delete state.ratings[uid][did];
+        }
+        // Favorites: OR them
+        if(state.favorites[uid]){
+          if(state.favorites[uid][did]) state.favorites[uid][keepId] = true;
+          delete state.favorites[uid][did];
+        }
+        // ELO: take highest of the two (keeps the "best" track record)
+        if(state.elo[uid]){
+          if(state.elo[uid][did] != null){
+            const cur = state.elo[uid][keepId];
+            state.elo[uid][keepId] = cur != null ? Math.max(cur, state.elo[uid][did]) : state.elo[uid][did];
+            delete state.elo[uid][did];
+          }
+        }
+        // Duel history: rewrite entries pointing at the victim to point at keeper
+        const hist = state.duelHistory[uid];
+        if(Array.isArray(hist)){
+          hist.forEach(d => {
+            if(d.winnerId === did) d.winnerId = keepId;
+            if(d.loserId === did) d.loserId = keepId;
+          });
+        }
+      });
+      // Remove from state.people
+      state.people = state.people.filter(p => p.id !== did);
+      deletedCount++;
+    });
+    mergedCount++;
+  });
+
+  pendingDupes = null;
+
+  if(!deletedCount){
+    closeAllModals();
+    toast('Aucune action sélectionnée','err');
+    return;
+  }
+
+  const ok = saveState();
+  closeAllModals();
+  renderHeader(); renderList(); renderSettings();
+  if(!ok){
+    toast(`${deletedCount} supprimé${deletedCount>1?'s':''} mais sauvegarde échouée`,'err');
+  } else {
+    toast(`${deletedCount} doublon${deletedCount>1?'s':''} fusionné${deletedCount>1?'s':''} dans ${mergedCount} personne${mergedCount>1?'s':''}`,'ok');
+  }
+}
+
 /* ============ INIT ============ */
 function attachEvents(){
   // toolbar
@@ -3525,6 +3836,8 @@ function attachEvents(){
   $('#detail-delete').addEventListener('click',deletePerson);
   // import confirm
   $('#import-confirm')?.addEventListener('click', applyImport);
+  // dupes apply
+  $('#dupes-apply')?.addEventListener('click', applyDupesDecisions);
   // escape closes modals
   document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeAllModals(); });
 }
