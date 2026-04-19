@@ -2762,7 +2762,9 @@ function renderSettings(){
         <button class="btn" id="clear-uploaded-photos">🧹 Vider photos</button>
       </div>
     </div>`;
-  $('#storage-info');
+  const st=computeStorageStats();
+  const storageColor = st.pct >= 90 ? 'var(--coral)' : st.pct >= 70 ? 'var(--amber)' : 'var(--victor-hi)';
+  const infoEl = $('#storage-info');
   if(infoEl){
     infoEl.innerHTML = `
       <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-weight:700;color:var(--text-2)">
