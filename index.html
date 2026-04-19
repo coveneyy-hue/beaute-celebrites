@@ -76,11 +76,11 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .chip[data-gender="F"].is-active{background:rgba(236,72,153,.15);color:var(--lily-hi);border-color:rgba(236,72,153,.35)}
 
 .list-wrap{margin-top:14px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-sm)}
-.list-head{display:grid;grid-template-columns:52px 1fr 72px 58px;align-items:center;gap:8px;padding:12px 12px;background:linear-gradient(180deg,rgba(255,255,255,.02),transparent);border-bottom:1px solid var(--border);font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--text-3);text-transform:uppercase}
+.list-head{display:grid;grid-template-columns:52px 1fr 58px;align-items:center;gap:8px;padding:12px 12px;background:linear-gradient(180deg,rgba(255,255,255,.02),transparent);border-bottom:1px solid var(--border);font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--text-3);text-transform:uppercase}
 .list-head .sort-btn{display:inline-flex;align-items:center;gap:4px;color:var(--amber)}
 .list-head .sort-btn svg{width:10px;height:10px}
 
-.row{display:grid;grid-template-columns:52px 1fr 72px 58px;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border-soft);transition:background .12s}
+.row{display:grid;grid-template-columns:52px 1fr 58px;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border-soft);transition:background .12s}
 .row:last-child{border-bottom:none}
 .row:active{background:var(--card-hover)}
 .row-rank{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:15px;font-weight:700;color:var(--text);position:relative}
@@ -325,6 +325,8 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 
 .duel-arena{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
 .duel-card{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;transition:transform .15s,border-color .15s;text-align:left;width:100%}
+.duel-h2h{padding:14px 12px 8px;text-align:center;background:linear-gradient(180deg,rgba(245,158,11,.08),transparent)}
+.duel-h2h .h2h-num{font-size:clamp(34px,8vw,52px);font-weight:900;line-height:1;color:var(--amber-hi);font-variant-numeric:tabular-nums}
 .duel-card:active{transform:scale(.98);border-color:var(--amber)}
 .duel-photo{aspect-ratio:3/4;background:var(--bg-3);position:relative;overflow:hidden}
 .duel-photo img{width:100%;height:100%;object-fit:cover;object-position:center 15%}
@@ -348,10 +350,10 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .duel-photo .photo-tool-btn.is-default{background:rgba(251,191,36,.9);color:#1A1200;border-color:rgba(251,191,36,1)}
 .duel-photo .photo-tool-btn svg{width:13px;height:13px}
 .duel-photo .photo-tools-row{display:flex;gap:4px}
-.duel-stats{display:grid;grid-template-columns:minmax(82px,auto) 1fr;align-items:center;gap:10px;padding:10px 12px;background:var(--bg-2);border-top:1px solid var(--border)}
+.duel-stats{display:grid;grid-template-columns:1fr;align-items:center;gap:10px;padding:10px 12px;background:var(--bg-2);border-top:1px solid var(--border)}
 .duel-vote-btn{display:inline-flex;align-items:center;justify-content:center;min-width:82px;height:36px;padding:0 14px;border-radius:12px;background:linear-gradient(180deg,var(--amber-hi),var(--amber));color:#fff;font-size:14px;font-weight:800;letter-spacing:-.01em;box-shadow:0 6px 14px rgba(245,158,11,.25),inset 0 1px 0 rgba(255,255,255,.18);touch-action:manipulation}
 .duel-vote-btn:active{transform:scale(.96)}
-.duel-score{min-width:0;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;text-align:right}
+.duel-score{display:none}
 .duel-stats .wins{font-size:clamp(22px,5vw,30px);font-weight:800;color:var(--amber);line-height:1;white-space:nowrap;word-break:keep-all;overflow-wrap:normal;font-variant-numeric:tabular-nums}
 .duel-stats .wins-l{font-size:10px;font-weight:700;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;margin-top:4px;white-space:nowrap}
 .duel-card .d-name{padding:0 12px 2px;font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -472,8 +474,8 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 @media (max-width:380px){
   .toolbar{gap:7px}
   .tb-btn{width:42px;height:42px}
-  .row{grid-template-columns:44px 1fr 62px 50px;gap:6px;padding:9px 10px}
-  .list-head{grid-template-columns:44px 1fr 62px 50px;gap:6px;padding:10px 10px}
+  .row{grid-template-columns:44px 1fr 50px;gap:6px;padding:9px 10px}
+  .list-head{grid-template-columns:44px 1fr 50px;gap:6px;padding:10px 10px}
   .thumb{width:36px;height:50px}
   .row-badge .badge{padding:2px 6px;font-size:10px}
   .row-badge .badge svg{width:9px;height:9px}
@@ -539,16 +541,13 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
     <button class="chip is-active" data-filter="all">Tous</button>
     <button class="chip" data-filter="M" data-gender="M">Hommes</button>
     <button class="chip" data-filter="F" data-gender="F">Femmes</button>
-    <button class="chip" data-filter="rated">Notés</button>
-    <button class="chip" data-filter="unrated">Non notés</button>
-    <button class="chip" data-filter="fav">Coup de cœur</button>
+        <button class="chip" data-filter="fav">Coup de cœur</button>
   </div>
 
   <div class="list-wrap">
     <div class="list-head">
       <div style="text-align:center">#</div>
       <button class="sort-btn" id="sort-name" style="justify-self:start">PERSONNE</button>
-      <button class="sort-btn" id="sort-note" style="justify-self:center">NOTE <svg viewBox="0 0 12 12" fill="none"><path d="M3 5l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
       <button class="sort-btn" id="sort-elo" style="justify-self:center">ELO</button>
     </div>
     <div id="list-body"></div>
@@ -1079,10 +1078,10 @@ const state = {
     currentUser: 'lily',
     weights: { ...DEFAULT_WEIGHTS },
     tmdbKey: '',
-    sortBy: 'note',
+    sortBy: 'elo',
     filter: 'all',
     query: '',
-    consultSort: 'note',
+    consultSort: 'elo',
     compareA: 'lily',
     compareB: 'victor',
   },
@@ -1159,6 +1158,17 @@ function computeNoteForRating(r,w){
 }
 function computeNote(u,p){ return computeNoteForRating(getRating(u,p)); }
 function getElo(u,p){ return state.elo[u]?.[p]??1500; }
+function getHeadToHeadWins(u,a,b){
+  const hist = state.duelHistory[u]||[];
+  let aWins=0,bWins=0;
+  for(const d of hist){
+    if((d.winnerId===a && d.loserId===b) || (d.winnerId===b && d.loserId===a)){
+      if(d.winnerId===a) aWins++;
+      else if(d.winnerId===b) bWins++;
+    }
+  }
+  return {aWins,bWins};
+}
 function updateElo(u,w,l,K=32){
   ensureBuckets(u);
   const wo=getElo(u,w), lo=getElo(u,l);
@@ -1187,7 +1197,7 @@ function loadState(){
     const d=JSON.parse(r);
     Object.assign(state,d);
     USERS.forEach(u=>ensureBuckets(u.id));
-    state.settings=Object.assign({currentUser:'lily',weights:{...DEFAULT_WEIGHTS},tmdbKey:'',sortBy:'note',filter:'all',query:'',consultSort:'note',compareA:'lily',compareB:'victor'},state.settings||{});
+    state.settings=Object.assign({currentUser:'lily',weights:{...DEFAULT_WEIGHTS},tmdbKey:'',sortBy:'elo',filter:'all',query:'',consultSort:'elo',compareA:'lily',compareB:'victor'},state.settings||{});
     state.settings.weights=Object.assign({...DEFAULT_WEIGHTS},state.settings.weights||{});
   }catch(e){ console.warn(e); }
 }
@@ -1481,11 +1491,9 @@ function filterPeople(){
   return state.people.filter(p=>{
     if(f==='M'&&p.gender!=='M') return false;
     if(f==='F'&&p.gender!=='F') return false;
-    if(f==='rated'&&computeNote(u,p.id)==null) return false;
-    if(f==='unrated'&&computeNote(u,p.id)!=null) return false;
     if(f==='fav'&&!state.favorites[u]?.[p.id]) return false;
     if(q){
-      const h=(p.name+' '+(p.profession||'')+' '+(p.nationality||'')+' '+(getRating(u,p.id)?.tag||'')).toLowerCase();
+      const h=(p.name+' '+(p.profession||'')+' '+(p.nationality||'')).toLowerCase();
       if(!h.includes(q)) return false;
     }
     return true;
@@ -1493,18 +1501,11 @@ function filterPeople(){
 }
 function sortPeople(list){
   const u=state.settings.currentUser;
-  const by=state.settings.sortBy||'note';
+  const by=state.settings.sortBy||'elo';
   const c=list.slice();
   if(by==='name') c.sort((a,b)=>a.name.localeCompare(b.name,'fr'));
-  else if(by==='elo') c.sort((a,b)=>getElo(u,b.id)-getElo(u,a.id));
   else if(by==='added') c.sort((a,b)=>(b.addedAt||0)-(a.addedAt||0));
-  else c.sort((a,b)=>{
-    const na=computeNote(u,a.id),nb=computeNote(u,b.id);
-    if(na==null&&nb==null) return 0;
-    if(na==null) return 1;
-    if(nb==null) return -1;
-    return nb-na;
-  });
+  else c.sort((a,b)=>getElo(u,b.id)-getElo(u,a.id));
   return c;
 }
 function getBadge(r){ return r?.tag ? BEAUTY_TAGS.find(t=>t.k===r.tag) : null; }
@@ -1523,16 +1524,12 @@ function renderList(){
     return;
   }
   body.innerHTML=sorted.map((p,i)=>{
-    const r=getRating(u,p.id);
-    const n=computeNoteForRating(r);
-    const el=state.elo[u]?.[p.id]??null;
-    const bd=getBadge(r);
+    const el=state.elo[u]?.[p.id]??1500;
     const th=p.mainPhoto?`<img class="thumb" loading="lazy" src="${esc(p.mainPhoto)}" onerror="this.outerHTML='&lt;div class=&quot;thumb placeholder&quot;&gt;?&lt;/div&gt;'">`:`<div class="thumb placeholder">?</div>`;
     return `<div class="row" data-open="${p.id}">
       <div style="text-align:center;font-weight:700;font-size:14px">${i+1}</div>
-      <div class="row-main">${th}<div class="row-info"><div class="row-name">${esc(p.name)}</div>${bd?`<div class="row-badge"><span class="badge ${bd.cls}">${icon(bd.ic)}<span>${esc(bd.label)}</span></span></div>`:''}</div></div>
-      <div class="row-note ${n==null?'dim':''}">${n==null?'-':fmt(n)}</div>
-      <div class="row-elo">${el==null?'<span style="color:var(--text-4)">-</span>':el}<small>ELO</small></div>
+      <div class="row-main">${th}<div class="row-info"><div class="row-name">${esc(p.name)}</div></div></div>
+      <div class="row-elo">${el}<small>ELO</small></div>
     </div>`;
   }).join('');
 }
@@ -1545,13 +1542,13 @@ function closeAllModals(){ $$('.modal.is-open').forEach(m=>m.classList.remove('i
 function renderUserSwitch(){
   const cur=state.settings.currentUser;
   $('#user-switch-list').innerHTML=USERS.map(user=>{
-    const nR=Object.keys(state.ratings[user.id]||{}).filter(pid=>computeNote(user.id,pid)!=null).length;
+    const nR=Object.keys(state.elo[user.id]||{}).length;
     const nF=Object.values(state.favorites[user.id]||{}).filter(Boolean).length;
     const nD=state.duels[user.id]||0;
     const act=user.id===cur;
     return `<button class="user-card ${act?'is-current':''}" style="--user-color:${user.color}" data-switch="${user.id}">
       <div class="av" style="background:${user.color}">${user.initial}</div>
-      <div class="info"><div class="un">${user.name}</div><div class="us">${nR} noté${nR>1?'s':''} · ${nF} coup${nF>1?'s':''} de cœur · ${nD} duel${nD>1?'s':''}</div></div>
+      <div class="info"><div class="un">${user.name}</div><div class="us">${nR} profils classés ELO · ${nF} favori${nF>1?'s':''} · ${nD} combat${nD>1?'s':''}</div></div>
       ${act?`<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5 9-11" stroke="${user.color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`:''}
     </button>`;
   }).join('');
@@ -1987,11 +1984,6 @@ function openDetails(pid){
   const p=state.people.find(x=>x.id===pid);
   if(!p) return;
   ui.currentPersonId=pid;
-  const u=state.settings.currentUser;
-  ensureBuckets(u);
-  const ex=getRating(u,pid);
-  ui.draft=ex?JSON.parse(JSON.stringify(ex)):{technique:{},coup:null,pref:null,tag:null,notes:'',updatedAt:0};
-  // Start on the default photo (mainPhoto), not the first in the list
   const photos = p.photos?.length ? p.photos : (p.mainPhoto ? [p.mainPhoto] : []);
   const mainIdx = p.mainPhoto ? photos.indexOf(p.mainPhoto) : -1;
   ui.photoIdx = mainIdx >= 0 ? mainIdx : 0;
@@ -2002,8 +1994,6 @@ function renderDetails(){
   const p=state.people.find(x=>x.id===ui.currentPersonId);
   if(!p) return;
   const u=state.settings.currentUser;
-  const user=getUser(u);
-  const d=ui.draft;
   const photos=p.photos?.length?p.photos:(p.mainPhoto?[p.mainPhoto]:[]);
   const fav=!!state.favorites[u]?.[p.id];
   const sp=[];
@@ -2015,38 +2005,10 @@ function renderDetails(){
   const wikiLink=p.wikiId?`<a href="https://www.wikidata.org/wiki/${p.wikiId}" target="_blank" rel="noreferrer">Wikidata ↗</a>`:'';
   const idx=Math.min(ui.photoIdx||0,Math.max(0,photos.length-1));
   const main=photos[idx]||'';
-  const dTm=techMean(d), dN=computeNoteForRating(d);
-  const w=state.settings.weights;
-  const notes=USERS.map(usr=>{
-    const isMe=usr.id===u;
-    const r=isMe?d:getRating(usr.id,p.id);
-    const n=computeNoteForRating(r);
-    const hd=r&&(techMean(r)!=null||typeof r.coup==='number'||typeof r.pref==='number');
-    const tm=hd?techMean(r):null;
-    return `<div class="note-card ${isMe?'is-current':''}" style="--user-color:${usr.color}">
-      <div class="nc-label">${usr.name}</div>
-      <div class="nc-value ${n==null?'dim':''}">${n==null?'-':fmt(n)}</div>
-      ${hd?`<div class="nc-tiny">T ${tm==null?'-':fmt(tm)} · C ${r.coup==null?'-':fmt(r.coup)} · P ${r.pref==null?'-':fmt(r.pref)}</div>`:''}
-    </div>`;
-  }).join('');
-  ui.critOpen = ui.critOpen || {};
-  const techRows=TECH_CRITERIA.map(c=>{
-    const v=d.technique?.[c.key];
-    const open=!!ui.critOpen[c.key];
-    return `<div class="slider-row">
-      <span class="slider-label">
-        <button type="button" class="crit-info-btn ${open?'is-on':''}" data-crit-info="${c.key}" aria-label="Info ${esc(c.label)}">?</button>
-        <span class="lbl-text">${c.label}</span>
-      </span>
-      <span class="slider-value" data-v-for="${c.key}">${v==null?'-':Number(v).toFixed(1)}</span>
-      <input class="slider" type="range" min="0" max="10" step="0.1" value="${v||0}" data-crit="${c.key}">
-      ${open?`<div class="crit-info">${esc(c.desc)}${c.ex?`<div class="crit-ex">${esc(c.ex)}</div>`:''}</div>`:''}
-    </div>`;
-  }).join('');
-  const tagRow=BEAUTY_TAGS.map(t=>{
-    const on=d.tag===t.k;
-    return `<button type="button" class="badge ${t.cls}" data-tag="${t.k}" style="opacity:${on?1:.5};transform:scale(${on?1:.95})">${icon(t.ic)}<span>${t.label}</span></button>`;
-  }).join('');
+  const elo=getElo(u,p.id);
+  const duels=(state.duelHistory[u]||[]).filter(d=>d.winnerId===p.id || d.loserId===p.id);
+  const wins=duels.filter(d=>d.winnerId===p.id).length;
+  const losses=duels.filter(d=>d.loserId===p.id).length;
   $('#detail-body').innerHTML=`
     <div class="detail-photo">
       ${main?`<img src="${esc(main)}" alt="${esc(p.name)}" onerror="this.style.display='none'">`:`<div style="height:100%;display:grid;place-items:center;color:var(--text-4);font-size:60px">?</div>`}
@@ -2055,10 +2017,7 @@ function renderDetails(){
       </button>
       ${photos.length>1&&main?`
         <button class="set-default ${p.mainPhoto===main?'is-current':''}" id="set-default-photo" aria-label="Photo par défaut">
-          ${p.mainPhoto===main
-            ?`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg><span>Par défaut</span>`
-            :`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/></svg><span>Par défaut</span>`
-          }
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/></svg><span>Par défaut</span>
         </button>
       `:''}
       ${photos.length>1?`
@@ -2086,41 +2045,12 @@ function renderDetails(){
       ${sub?`<div class="detail-subtitle">${esc(sub)}</div>`:''}
       ${(tmdbLink||wikiLink)?`<div class="detail-links">${tmdbLink} ${wikiLink}</div>`:''}
     </div>
-    <div class="notes-grid">${notes}</div>
-    <div class="hint"><span>💡</span><span>Tu modifies les notes de <strong>${user.name}</strong>. Les 3 autres sont en lecture.</span></div>
-    <div class="ventilation">
-      <div class="vent-title">Ventilation</div>
-      <div class="vent-section">
-        <div class="vent-section-label">Techniques <span class="vw">${Math.round(w.technique*100)}%</span></div>
-        ${techRows}
-      </div>
-      <div class="vent-section">
-        <div class="vent-section-label">Coup de cœur <span class="vw">${Math.round(w.coup*100)}%</span></div>
-        <div class="slider-row">
-          <span class="slider-label">Intensité émotionnelle</span>
-          <span class="slider-value" data-v-for="coup">${d.coup==null?'-':Number(d.coup).toFixed(1)}</span>
-          <input class="slider" type="range" min="0" max="10" step="0.1" value="${d.coup||0}" data-global="coup">
-        </div>
-      </div>
-      <div class="vent-section">
-        <div class="vent-section-label">Préférence <span class="vw">${Math.round(w.pref*100)}%</span></div>
-        <div class="slider-row">
-          <span class="slider-label">Goût personnel</span>
-          <span class="slider-value" data-v-for="pref">${d.pref==null?'-':Number(d.pref).toFixed(1)}</span>
-          <input class="slider" type="range" min="0" max="10" step="0.1" value="${d.pref||0}" data-global="pref">
-        </div>
-      </div>
-      <div class="formula-display" id="formula"></div>
-    </div>
-    <div style="margin-top:14px">
-      <div class="vent-section-label" style="margin-bottom:8px">Tag facultatif</div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px">${tagRow}</div>
-    </div>
-    <div style="margin-top:14px" class="field">
-      <label>Notes personnelles</label>
-      <textarea id="d-notes" placeholder="Ce que tu veux te rappeler...">${esc(d.notes||'')}</textarea>
+    <div class="notes-grid">
+      <div class="note-card is-current"><div class="nc-label">ELO</div><div class="nc-value">${elo}</div><div class="nc-tiny">Classement de ${esc(getUser(u).name)}</div></div>
+      <div class="note-card"><div class="nc-label">Victoires</div><div class="nc-value">${wins}</div><div class="nc-tiny">Tous combats confondus</div></div>
+      <div class="note-card"><div class="nc-label">Défaites</div><div class="nc-value">${losses}</div><div class="nc-tiny">Tous combats confondus</div></div>
+      <div class="note-card"><div class="nc-label">Combats</div><div class="nc-value">${duels.length}</div><div class="nc-tiny">Duels + tournois journalisés</div></div>
     </div>`;
-  refreshFormula();
   $('#fav-toggle')?.addEventListener('click',()=>{
     if(!state.favorites[u]) state.favorites[u]={};
     state.favorites[u][p.id]=!state.favorites[u][p.id];
@@ -2141,20 +2071,17 @@ function renderDetails(){
     const f = e.target.files?.[0];
     if(!f) return;
     try {
-      toast('Traitement de l\'image...');
+      toast("Traitement de l'image...");
       const dataUrl = await fileToDataURL(f);
       const imageBytes = dataUrl.length * 0.75;
-      // Pre-flight check: is there room?
       const st = computeStorageStats();
       const freeBytes = (st.quotaMB * 1024 * 1024) - st.bytes;
-      if(imageBytes > freeBytes * 0.9){ // keep 10% margin
+      if(imageBytes > freeBytes * 0.9){
         const needKb = Math.ceil(imageBytes/1024);
         const freeKb = Math.max(0, Math.floor(freeBytes/1024));
-        const msg = `Pas assez d'espace (besoin ${needKb} Ko, libre ${freeKb} Ko).\n\n`
-                  + `Tu peux libérer de l'espace en :\n`
-                  + `• Réglages → 🧹 Vider photos (supprime toutes les photos uploadées)\n`
-                  + `• Réglages → Exporter puis Tout effacer, et ne réimporter que l'essentiel\n\n`
-                  + `Tenter l'ajout quand même ?`;
+        const msg = `Pas assez d'espace (besoin ${needKb} Ko, libre ${freeKb} Ko).
+
+Tenter l'ajout quand même ?`;
         if(!confirm(msg)) { e.target.value=''; return; }
       }
       if(!p.photos) p.photos = p.mainPhoto?[p.mainPhoto]:[];
@@ -2164,89 +2091,23 @@ function renderDetails(){
       p.mainPhoto = dataUrl;
       ui.photoIdx = p.photos.length - 1;
       const ok = saveState();
-      if(!ok){
-        // Rollback
-        p.photos = prevPhotos;
-        p.mainPhoto = prevMain;
-        ui.photoIdx = 0;
-        renderDetails();
-        // saveState already toasts the quota error
-        return;
-      }
-      renderList();
-      renderDetails();
-      const sizeKb = Math.round(imageBytes/1024);
-      toast(`Photo ajoutée (${sizeKb} Ko)`,'ok');
-    } catch(err){
-      toast('Erreur : '+err.message,'err');
-    }
+      if(!ok){ p.photos = prevPhotos; p.mainPhoto = prevMain; ui.photoIdx = 0; renderDetails(); return; }
+      renderList(); renderDetails(); toast(`Photo ajoutée (${Math.round(imageBytes/1024)} Ko)`,'ok');
+    } catch(err){ toast('Erreur : '+err.message,'err'); }
   });
   $('#delete-photo-btn')?.addEventListener('click',()=>{
-    // Only possible when there are multiple photos (button isn't rendered otherwise)
     if(!photos.length || photos.length<=1) return;
     if(!confirm('Supprimer cette photo ?')) return;
     const removed = main;
-    // Remove from photos array
     p.photos = (p.photos||[]).filter(u => u !== removed);
-    // If the removed photo was the default, pick a new default automatically
-    if(p.mainPhoto === removed){
-      p.mainPhoto = p.photos[0] || null;
-    }
-    // Adjust the index so we stay on a valid photo
+    if(p.mainPhoto === removed) p.mainPhoto = p.photos[0] || null;
     if(ui.photoIdx >= p.photos.length) ui.photoIdx = Math.max(0, p.photos.length-1);
-    saveState();
-    renderList();
-    renderDetails();
-    toast('Photo supprimée','ok');
+    saveState(); renderList(); renderDetails(); toast('Photo supprimée','ok');
   });
-  $$('#detail-body .slider[data-crit]').forEach(s=>s.addEventListener('input',e=>{
-    const k=e.target.getAttribute('data-crit');
-    d.technique=d.technique||{};
-    d.technique[k]=parseFloat(e.target.value);
-    $(`[data-v-for="${k}"]`).textContent=Number(e.target.value).toFixed(1);
-    refreshFormula();
-  }));
-  $$('#detail-body .slider[data-global]').forEach(s=>s.addEventListener('input',e=>{
-    const k=e.target.getAttribute('data-global');
-    d[k]=parseFloat(e.target.value);
-    $(`[data-v-for="${k}"]`).textContent=Number(e.target.value).toFixed(1);
-    refreshFormula();
-  }));
-  $$('#detail-body [data-tag]').forEach(b=>b.addEventListener('click',()=>{
-    const t=b.getAttribute('data-tag');
-    d.tag=d.tag===t?null:t;
-    renderDetails();
-  }));
-  $$('#detail-body [data-crit-info]').forEach(b=>b.addEventListener('click',()=>{
-    const k=b.getAttribute('data-crit-info');
-    ui.critOpen[k]=!ui.critOpen[k];
-    renderDetails();
-  }));
 }
-function refreshFormula(){
-  const d=ui.draft, w=state.settings.weights;
-  const tm=techMean(d), n=computeNoteForRating(d);
-  const f=$('#formula');
-  if(!f) return;
-  f.innerHTML=`<span class="n">${n==null?'-':fmt(n)}</span> = T <span class="n">${tm==null?'-':fmt(tm)}</span> × ${Math.round(w.technique*100)} + C <span class="n">${d.coup==null?'-':fmt(d.coup)}</span> × ${Math.round(w.coup*100)} + P <span class="n">${d.pref==null?'-':fmt(d.pref)}</span> × ${Math.round(w.pref*100)}`;
-  const cards=$$('#detail-body .note-card');
-  const i=USERS.findIndex(x=>x.id===state.settings.currentUser);
-  if(i>=0&&cards[i]){
-    cards[i].querySelector('.nc-value').textContent=n==null?'-':fmt(n);
-    cards[i].querySelector('.nc-value').classList.toggle('dim',n==null);
-  }
-}
+function refreshFormula(){}
 function saveDetails(){
-  const p=state.people.find(x=>x.id===ui.currentPersonId);
-  if(!p) return;
-  const u=state.settings.currentUser;
-  ensureBuckets(u);
-  const d=ui.draft;
-  d.notes=$('#d-notes')?.value||'';
-  d.updatedAt=Date.now();
-  state.ratings[u][p.id]=d;
-  saveState(); renderList(); closeAllModals();
-  toast('Notes enregistrées','ok');
+  closeAllModals();
 }
 function removePersonFromBank(pid){
   // Removes a person from the bank and strips all per-user data.
@@ -2311,22 +2172,23 @@ function renderDuel(){
     return;
   }
   const [a,b]=pair;
-  const wA=state.duelHistory[u]?.filter(d=>d.winnerId===a.id).length||0;
-  const wB=state.duelHistory[u]?.filter(d=>d.winnerId===b.id).length||0;
+  const h2h=getHeadToHeadWins(u,a.id,b.id);
+  const wA=h2h.aWins;
+  const wB=h2h.bWins;
   const trashSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
   if(!ui.duel.photoIdx) ui.duel.photoIdx = {};
   const card=(p,wins)=>{
     const photoSrc = cardCurrentPhoto(p, ui.duel.photoIdx) || p.mainPhoto;
     const currentIdx = cardEffectiveIdx(p, ui.duel.photoIdx);
     return `<div class="duel-card" data-card-pid="${p.id}">
-      <div class="duel-photo">
+      <div class="duel-h2h"><div class="h2h-num">${wins}</div></div><div class="duel-photo">
         ${photoSrc?`<img src="${esc(photoSrc)}" alt="${esc(p.name)}" onerror="this.style.display='none'">`:`<div style="height:100%;display:grid;place-items:center;color:var(--text-4);font-size:40px">?</div>`}
         <div class="fav-mini ${state.favorites[u]?.[p.id]?'is-on':''}"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.6-9.5-9.4C1 8.3 2.7 5 6 5c2 0 3.3 1 4 2.2C10.7 6 12 5 14 5c3.3 0 5 3.3 3.5 6.6C19 16.4 12 21 12 21Z"/></svg></div>
         <span class="trash-mini" data-trash="${p.id}" role="button" aria-label="Supprimer de la banque">${trashSvg}</span>
         ${cardPhotoControlsHtml(p, 'duel', currentIdx)}
       </div>
       <div>
-        <div class="duel-stats"><button class="duel-vote-btn" data-pick="${p.id}" type="button">Vote</button><div class="duel-score"><div class="wins">${wins}</div><div class="wins-l">Victoires</div></div></div>
+        <div class="duel-stats"><button class="duel-vote-btn" data-pick="${p.id}" type="button">Vote</button></div>
         <div class="d-name">${esc(p.name)}</div>
         <div class="d-sub">ELO ${getElo(u,p.id)}</div>
       </div>
@@ -2414,7 +2276,7 @@ function recordDuel(w,l){
 
 /* ============ TOURNAMENT ============ */
 function openTournament(){
-  ui.tour={ stage:'setup', config:{ filter:'F', size:8, blind:false, seeding:'note' }, data:null, photoIdx:{} };
+  ui.tour={ stage:'setup', config:{ filter:'F', size:8, blind:false, seeding:'elo' }, data:null, photoIdx:{} };
   renderTournament();
   openModal('modal-tournament');
 }
@@ -2435,11 +2297,11 @@ function renderTourSetup(){
   $('#tour-body').innerHTML=`
     <div class="tour-hero">
       <div class="tico">🏆</div>
-      <div><h3>Tournoi par utilisateur</h3><p>Le vainqueur devient champion. L'ELO et les classements sont mis à jour au passage.</p></div>
+      <div><h3>Tournoi par utilisateur</h3><p>Chaque combat est journalisé et seul l'ELO est mis à jour.</p></div>
     </div>
     <div class="field" style="margin-bottom:12px">
       <label>Catégorie</label>
-      <div class="tour-opts c3">
+      <div class="tour-opts" style="grid-template-columns:1fr 1fr">
         <button class="${t.config.filter==='F'?'on f':''}" data-tf="F">Femmes (${pF})</button>
         <button class="${t.config.filter==='M'?'on m':''}" data-tf="M">Hommes (${pM})</button>
         <button class="${t.config.filter==='all'?'on':''}" data-tf="all">Mixte (${pA})</button>
@@ -2454,7 +2316,6 @@ function renderTourSetup(){
     <div class="field" style="margin-bottom:12px">
       <label>Sélection des participants</label>
       <div class="tour-opts c3">
-        <button class="${t.config.seeding==='note'?'on':''}" data-tseed="note">Top notes</button>
         <button class="${t.config.seeding==='elo'?'on':''}" data-tseed="elo">Top ELO</button>
         <button class="${t.config.seeding==='random'?'on':''}" data-tseed="random">Aléatoire</button>
       </div>
@@ -2493,8 +2354,7 @@ function startTournament(config){
   const u=state.settings.currentUser;
   ensureBuckets(u);
   let pool=state.people.filter(p=>config.filter==='all'||p.gender===config.filter);
-  if(config.seeding==='note') pool.sort((a,b)=>(computeNote(u,b.id)??-1)-(computeNote(u,a.id)??-1));
-  else if(config.seeding==='elo') pool.sort((a,b)=>getElo(u,b.id)-getElo(u,a.id));
+  if(config.seeding==='elo') pool.sort((a,b)=>getElo(u,b.id)-getElo(u,a.id));
   else pool=pool.sort(()=>Math.random()-0.5);
   const parts=pool.slice(0,config.size);
   const matches=[];
@@ -2517,8 +2377,9 @@ function renderTourPlay(){
   const pA=state.people.find(p=>p.id===cm.a);
   const pB=state.people.find(p=>p.id===cm.b);
   const blind=t.config.blind;
-  const nA=blind?null:computeNote(u,pA.id);
-  const nB=blind?null:computeNote(u,pB.id);
+  const h2h=getHeadToHeadWins(u,pA.id,pB.id);
+  const nA=h2h.aWins;
+  const nB=h2h.bWins;
   $('#tour-title').textContent='Tournoi en cours';
   $('#tour-sub').textContent='Round '+(t.currentRound+1)+'/'+t.rounds.length+' · Match '+(t.currentMatch+1)+'/'+t.rounds[t.currentRound].matches.length;
   const tTrashSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
@@ -2527,14 +2388,14 @@ function renderTourPlay(){
     const photoSrc = cardCurrentPhoto(p, ui.tour.photoIdx) || p.mainPhoto;
     const currentIdx = cardEffectiveIdx(p, ui.tour.photoIdx);
     return `<div class="duel-card" data-card-pid="${p.id}">
-      <div class="duel-photo">
+      <div class="duel-h2h"><div class="h2h-num">${n}</div></div><div class="duel-photo">
         ${photoSrc?`<img src="${esc(photoSrc)}" onerror="this.style.display='none'">`:`<div style="height:100%;display:grid;place-items:center;color:var(--text-4);font-size:40px">?</div>`}
         <div class="fav-mini ${state.favorites[u]?.[p.id]?'is-on':''}"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.6-9.5-9.4C1 8.3 2.7 5 6 5c2 0 3.3 1 4 2.2C10.7 6 12 5 14 5c3.3 0 5 3.3 3.5 6.6C19 16.4 12 21 12 21Z"/></svg></div>
         <span class="trash-mini" data-t-trash="${p.id}" role="button" aria-label="Supprimer de la banque">${tTrashSvg}</span>
         ${cardPhotoControlsHtml(p, 'tour', currentIdx)}
       </div>
       <div>
-        <div class="duel-stats"><button class="duel-vote-btn" data-pick="${p.id}" type="button">Vote</button><div class="duel-score"><div class="wins">${n==null?'?':fmt(n)}</div><div class="wins-l">${blind?'Note masquée':'Ta note'}</div></div></div>
+        <div class="duel-stats"><button class="duel-vote-btn" data-pick="${p.id}" type="button">Vote</button></div>
         <div class="d-name">${esc(p.name)}</div>
         <div class="d-sub">${p.birthday||''}${p.profession?(p.birthday?' · ':'')+esc(p.profession):''}</div>
       </div>
@@ -2544,7 +2405,7 @@ function renderTourPlay(){
   $('#tour-body').innerHTML=`
     <div class="tour-hero">
       <div class="tico">🏆</div>
-      <div><h3>Tournoi ${label} ${t.config.size}</h3><p>${blind?"Mode aveugle : utilise le bouton Vote, les notes sont masquées.":'Utilise le bouton Vote pour faire avancer le bracket.'}</p></div>
+      <div><h3>Tournoi ${label} ${t.config.size}</h3><p>Le nombre affiché au-dessus de chaque poster correspond aux victoires en face-à-face entre les deux participants.</p></div>
     </div>
     <div class="duel-actions">
       ${blind?'<button class="btn btn-small" data-act="reveal">Révéler les notes</button>':''}
@@ -2593,7 +2454,8 @@ function renderTourPlay(){
     if(!updated) return;
     const cardEl = $(`#tour-body .duel-card[data-card-pid="${pid}"]`);
     if(!cardEl) return;
-    const n = blind ? null : computeNote(u, updated.id);
+    const curH2h = getHeadToHeadWins(u, updated.id, cm.a === updated.id ? cm.b : cm.a);
+    const n = updated.id === cm.a ? curH2h.aWins : curH2h.bWins;
     const newHtml = card(updated, n);
     const tmp = document.createElement('div');
     tmp.innerHTML = newHtml;
@@ -2720,92 +2582,31 @@ function renderStats(){
   const u=state.settings.currentUser;
   const user=getUser(u);
   $('#stats-sub').textContent='Joueur : '+user.name;
-  const rated=state.people.filter(p=>computeNote(u,p.id)!=null);
-  const notes=rated.map(p=>computeNote(u,p.id));
-  const avg=notes.length?notes.reduce((a,b)=>a+b,0)/notes.length:null;
-  const nbF=state.people.filter(p=>p.gender==='F').length;
-  const nbM=state.people.filter(p=>p.gender==='M').length;
-  const ratedF=rated.filter(p=>p.gender==='F');
-  const ratedM=rated.filter(p=>p.gender==='M');
-  const avgF=ratedF.length?ratedF.map(p=>computeNote(u,p.id)).reduce((a,b)=>a+b,0)/ratedF.length:null;
-  const avgM=ratedM.length?ratedM.map(p=>computeNote(u,p.id)).reduce((a,b)=>a+b,0)/ratedM.length:null;
-  const nbFav=Object.values(state.favorites[u]||{}).filter(Boolean).length;
-  const nbDuels=state.duels[u]||0;
-  const nbTour=(state.tournaments[u]||[]).filter(t=>t.status==='complete').length;
-  const hist=new Array(10).fill(0);
-  notes.forEach(n=>{ const i=Math.min(9,Math.floor(n)); hist[i]++; });
-  const maxH=Math.max(...hist,1);
-  const top10=rated.slice().sort((a,b)=>computeNote(u,b.id)-computeNote(u,a.id)).slice(0,10);
-  const critAvg=TECH_CRITERIA.map(c=>{
-    const vals=rated.map(p=>getRating(u,p.id)?.technique?.[c.key]).filter(v=>typeof v==='number');
-    return { key:c.key, label:c.label, avg:vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null };
-  });
-  const tagCounts={};
-  rated.forEach(p=>{ const t=getRating(u,p.id)?.tag; if(t) tagCounts[t]=(tagCounts[t]||0)+1; });
-  const eloTop=rated.slice().sort((a,b)=>getElo(u,b.id)-getElo(u,a.id)).slice(0,5);
+  const hist=state.duelHistory[u]||[];
+  const tournaments=state.tournaments[u]||[];
+  const completed=tournaments.filter(t=>t.status==='complete');
+  const eloEntries=state.people.map(p=>({p, elo:getElo(u,p.id)})).sort((a,b)=>b.elo-a.elo);
+  const byWins=state.people.map(p=>({
+    p,
+    wins: hist.filter(d=>d.winnerId===p.id).length,
+    combats: hist.filter(d=>d.winnerId===p.id || d.loserId===p.id).length,
+  })).sort((a,b)=>b.wins-a.wins || b.combats-a.combats).slice(0,10);
+  const avgElo = eloEntries.length ? Math.round(eloEntries.reduce((s,x)=>s+x.elo,0)/eloEntries.length) : 1500;
   $('#stats-body').innerHTML=`
     <div class="stat-hero">
-      <div class="box"><div class="v">${rated.length}</div><div class="l">Notées</div></div>
-      <div class="box"><div class="v">${avg==null?'-':fmt(avg)}</div><div class="l">Moyenne</div></div>
-      <div class="box"><div class="v">${nbFav}</div><div class="l">Coups cœur</div></div>
-      <div class="box"><div class="v">${nbDuels}</div><div class="l">Duels</div></div>
+      <div class="box"><div class="v">${state.people.length}</div><div class="l">Profils</div></div>
+      <div class="box"><div class="v">${hist.length}</div><div class="l">Combats</div></div>
+      <div class="box"><div class="v">${completed.length}</div><div class="l">Tournois finis</div></div>
+      <div class="box"><div class="v">${avgElo}</div><div class="l">ELO moyen</div></div>
     </div>
-    <div class="stat-hero">
-      <div class="box"><div class="v" style="color:var(--lily-hi)">${ratedF.length}<span style="font-size:10px;color:var(--text-3);font-weight:600">/${nbF}</span></div><div class="l">Femmes notées</div></div>
-      <div class="box"><div class="v" style="color:var(--lily-hi)">${avgF==null?'-':fmt(avgF)}</div><div class="l">Moy. Femmes</div></div>
-      <div class="box"><div class="v" style="color:var(--yannick-hi)">${ratedM.length}<span style="font-size:10px;color:var(--text-3);font-weight:600">/${nbM}</span></div><div class="l">Hommes notés</div></div>
-      <div class="box"><div class="v" style="color:var(--yannick-hi)">${avgM==null?'-':fmt(avgM)}</div><div class="l">Moy. Hommes</div></div>
-    </div>
-    ${rated.length?`<div class="stat-section">
-      <h3>Distribution des notes</h3>
-      <div class="histogram">${hist.map(v=>`<div class="hist-bar" style="height:${(v/maxH)*70+10}%" data-v="${v}"></div>`).join('')}</div>
-      <div class="hist-axis">${hist.map((_,i)=>`<span>${i}</span>`).join('')}</div>
-    </div>`:''}
-    ${top10.length?`<div class="stat-section">
-      <h3>Top 10</h3>
-      <div class="top-list">${top10.map((p,i)=>`<div class="top-item">
-        <div class="rk ${i===1?'silver':i===2?'bronze':i>2?'flat':''}">${i+1}</div>
-        ${p.mainPhoto?`<img src="${esc(p.mainPhoto)}" onerror="this.style.display='none'">`:`<div style="width:30px;height:42px;background:var(--bg-3);border-radius:6px"></div>`}
-        <div class="nm">${esc(p.name)}</div>
-        <div class="vl">${fmt(computeNote(u,p.id))}</div>
-      </div>`).join('')}</div>
-    </div>`:''}
-    ${eloTop.length?`<div class="stat-section">
-      <h3>Top ELO</h3>
-      <div class="top-list">${eloTop.map((p,i)=>`<div class="top-item">
-        <div class="rk flat">${i+1}</div>
-        ${p.mainPhoto?`<img src="${esc(p.mainPhoto)}" onerror="this.style.display='none'">`:`<div style="width:30px;height:42px;background:var(--bg-3);border-radius:6px"></div>`}
-        <div class="nm">${esc(p.name)}</div>
-        <div class="vl" style="color:var(--text-2)">${getElo(u,p.id)}</div>
-      </div>`).join('')}</div>
-    </div>`:''}
-    ${rated.length?`<div class="stat-section">
-      <h3>Moyennes par critère technique</h3>
-      <div class="top-list">${critAvg.map(c=>`<div class="top-item">
-        <div class="nm">${esc(c.label)}</div>
-        <div class="vl">${c.avg==null?'-':fmt(c.avg)}</div>
-      </div>`).join('')}</div>
-    </div>`:''}
-    ${Object.keys(tagCounts).length?`<div class="stat-section">
-      <h3>Tags attribués</h3>
-      <div style="display:flex;flex-wrap:wrap;gap:6px">
-        ${Object.entries(tagCounts).map(([k,n])=>{
-          const t=BEAUTY_TAGS.find(x=>x.k===k);
-          if(!t) return '';
-          return `<span class="badge ${t.cls}">${icon(t.ic)}<span>${esc(t.label)} · ${n}</span></span>`;
-        }).join('')}
-      </div>
-    </div>`:''}
     <div class="stat-section">
-      <h3>Activité</h3>
-      <div class="stat-hero">
-        <div class="box"><div class="v">${nbDuels}</div><div class="l">Duels joués</div></div>
-        <div class="box"><div class="v">${nbTour}</div><div class="l">Tournois finis</div></div>
-        <div class="box"><div class="v">${(state.tournaments[u]||[]).filter(t=>t.status!=='complete').length}</div><div class="l">En cours</div></div>
-        <div class="box"><div class="v">${state.people.length-rated.length}</div><div class="l">À noter</div></div>
-      </div>
+      <h3>Top ELO</h3>
+      <div class="top-list">${eloEntries.slice(0,10).map((x,i)=>`<div class="top-item"><div class="rk ${i===0?'':i===1?'silver':i===2?'bronze':'flat'}">${i+1}</div>${x.p.mainPhoto?`<img src="${esc(x.p.mainPhoto)}" onerror="this.style.display='none'">`:''}<div class="nm">${esc(x.p.name)}</div><div class="vl">${x.elo}</div></div>`).join('')}</div>
     </div>
-  `;
+    <div class="stat-section">
+      <h3>Plus de victoires</h3>
+      <div class="top-list">${byWins.map((x,i)=>`<div class="top-item"><div class="rk flat">${i+1}</div>${x.p.mainPhoto?`<img src="${esc(x.p.mainPhoto)}" onerror="this.style.display='none'">`:''}<div class="nm">${esc(x.p.name)}</div><div class="vl">${x.wins}</div></div>`).join('')}</div>
+    </div>`;
 }
 
 /* ============ COMPARE MODAL ============ */
@@ -2814,44 +2615,27 @@ function renderCompare(){
   const a=state.settings.compareA;
   const b=state.settings.compareB;
   const uA=getUser(a), uB=getUser(b);
-  const topOf=(uid)=>state.people.filter(p=>computeNote(uid,p.id)!=null).sort((x,y)=>computeNote(uid,y.id)-computeNote(uid,x.id));
+  const topOf=(uid)=>state.people.slice().sort((x,y)=>getElo(uid,y.id)-getElo(uid,x.id));
   const topA=topOf(a), topB=topOf(b);
   const maxRows=Math.max(topA.length, topB.length, 10);
   const rows=[];
-  for(let i=0;i<Math.min(20,maxRows);i++){
-    const pA=topA[i];
-    const pB=topB[i];
-    rows.push({ i, pA, pB });
-  }
+  for(let i=0;i<Math.min(20,maxRows);i++) rows.push({ i, pA:topA[i], pB:topB[i] });
   $('#compare-body').innerHTML=`
     <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:10px;margin-bottom:14px;align-items:center">
-      <button class="user-card" style="--user-color:${uA.color}" data-pick-a><div class="av" style="background:${uA.color}">${uA.initial}</div><div class="info"><div class="un">${uA.name}</div><div class="us">${topA.length} noté${topA.length>1?'s':''}</div></div></button>
+      <button class="user-card" style="--user-color:${uA.color}" data-pick-a><div class="av" style="background:${uA.color}">${uA.initial}</div><div class="info"><div class="un">${uA.name}</div><div class="us">classement ELO</div></div></button>
       <div style="font-size:11px;font-weight:800;letter-spacing:.15em;color:var(--text-3)">VS</div>
-      <button class="user-card" style="--user-color:${uB.color}" data-pick-b><div class="av" style="background:${uB.color}">${uB.initial}</div><div class="info"><div class="un">${uB.name}</div><div class="us">${topB.length} noté${topB.length>1?'s':''}</div></div></button>
+      <button class="user-card" style="--user-color:${uB.color}" data-pick-b><div class="av" style="background:${uB.color}">${uB.initial}</div><div class="info"><div class="un">${uB.name}</div><div class="us">classement ELO</div></div></button>
     </div>
     ${topA.length||topB.length?`<div class="compare-rows">
-      ${rows.map(({i,pA,pB})=>{
-        const nA=pA?computeNote(a,pA.id):null;
-        const nB=pB?computeNote(b,pB.id):null;
-        return `<div class="comp-row">
-          <div class="comp-slot" ${pA?`data-detail="${pA.id}|${a}|${pB?pB.id:''}|${b}"`:''}>
-            ${pA?`${pA.mainPhoto?`<img src="${esc(pA.mainPhoto)}" onerror="this.style.display='none'">`:`<div style="width:32px;height:44px;background:var(--bg-3);border-radius:6px;flex:none"></div>`}<div><div class="nn">${esc(pA.name)}</div><div class="ss" style="color:${uA.color}">${fmt(nA)}</div></div>`:'<div class="ss">-</div>'}
-          </div>
+      ${rows.map(({i,pA,pB})=>`<div class="comp-row">
+          <div class="comp-slot">${pA?`${pA.mainPhoto?`<img src="${esc(pA.mainPhoto)}" onerror="this.style.display='none'">`:''}<div><div class="nn">${esc(pA.name)}</div><div class="ss" style="color:${uA.color}">${getElo(a,pA.id)}</div></div>`:'<div class="ss">-</div>'}</div>
           <div class="comp-mid"><div class="rk">${i+1}</div></div>
-          <div class="comp-slot right" ${pB?`data-detail="${pB.id}|${b}|${pA?pA.id:''}|${a}"`:''}>
-            ${pB?`${pB.mainPhoto?`<img src="${esc(pB.mainPhoto)}" onerror="this.style.display='none'">`:`<div style="width:32px;height:44px;background:var(--bg-3);border-radius:6px;flex:none"></div>`}<div><div class="nn">${esc(pB.name)}</div><div class="ss" style="color:${uB.color}">${fmt(nB)}</div></div>`:'<div class="ss">-</div>'}
-          </div>
-        </div>`;
-      }).join('')}
-    </div>`:'<div class="empty-state"><div class="big">📋</div><h3>Aucune note chez ces utilisateurs</h3><p>Classe quelques personnes avant de comparer.</p></div>'}
-    <div style="margin-top:14px;font-size:12px;color:var(--text-3);text-align:center">Touche une ligne pour voir le duel détaillé avec toutes les notes de ${uA.name} et ${uB.name}.</div>
+          <div class="comp-slot right">${pB?`${pB.mainPhoto?`<img src="${esc(pB.mainPhoto)}" onerror="this.style.display='none'">`:''}<div><div class="nn">${esc(pB.name)}</div><div class="ss" style="color:${uB.color}">${getElo(b,pB.id)}</div></div>`:'<div class="ss">-</div>'}</div>
+        </div>`).join('')}
+    </div>`:'<div class="empty-state"><div class="big">📋</div><h3>Aucune donnée</h3><p>Lance quelques combats pour comparer les classements ELO.</p></div>'}
   `;
   $('[data-pick-a]').addEventListener('click',()=>pickUserFor('A'));
   $('[data-pick-b]').addEventListener('click',()=>pickUserFor('B'));
-  $$('#compare-body [data-detail]').forEach(el=>el.addEventListener('click',()=>{
-    const [pA,uA_,pB,uB_]=el.getAttribute('data-detail').split('|');
-    openCompareDetail(pA,uA_,pB,uB_);
-  }));
 }
 function pickUserFor(slot){
   const current=slot==='A'?state.settings.compareA:state.settings.compareB;
@@ -2859,10 +2643,10 @@ function pickUserFor(slot){
     <h3 style="font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3);margin-bottom:10px">Choisis l'utilisateur ${slot}</h3>
     <div style="display:flex;flex-direction:column;gap:6px">
       ${USERS.map(u=>{
-        const n=Object.keys(state.ratings[u.id]||{}).filter(pid=>computeNote(u.id,pid)!=null).length;
+        const n=Object.keys(state.elo[u.id]||{}).length;
         return `<button class="user-card ${u.id===current?'is-current':''}" style="--user-color:${u.color}" data-set="${u.id}">
           <div class="av" style="background:${u.color}">${u.initial}</div>
-          <div class="info"><div class="un">${u.name}</div><div class="us">${n} noté${n>1?'s':''}</div></div>
+          <div class="info"><div class="un">${u.name}</div><div class="us">${n} profils classés ELO</div></div>
         </button>`;
       }).join('')}
     </div>
@@ -2875,97 +2659,33 @@ function pickUserFor(slot){
   }));
   $('[data-back]').addEventListener('click',renderCompare);
 }
-function openCompareDetail(pAId,uAId,pBId,uBId){
-  const pA=state.people.find(x=>x.id===pAId);
-  const pB=pBId?state.people.find(x=>x.id===pBId):null;
-  const uA=getUser(uAId), uB=getUser(uBId);
-  const rA=getRating(uAId,pAId);
-  const rB=pB?getRating(uBId,pBId):null;
-  const nA=computeNoteForRating(rA), nB=computeNoteForRating(rB);
-  const subParts=p=>{ const s=[]; if(p.profession) s.push(p.profession); if(p.birthday) s.push(p.birthday); return s.join(' · '); };
-  const critRow=(lbl,vA,vB)=>{
-    const winA=vA!=null&&vB!=null&&vA>vB;
-    const winB=vB!=null&&vA!=null&&vB>vA;
-    return `<div class="comp-crit">
-      <div class="v left ${vA==null?'dim':winA?'win':''}">${vA==null?'-':fmt(vA)}</div>
-      <div class="lbl">${esc(lbl)}</div>
-      <div class="v right ${vB==null?'dim':winB?'win':''}">${vB==null?'-':fmt(vB)}</div>
-    </div>`;
-  };
-  $('#compare-body').innerHTML=`
-    <div class="comp-vs-detail">
-      <div class="heads">
-        <div class="head-slot">
-          ${pA.mainPhoto?`<img src="${esc(pA.mainPhoto)}" onerror="this.style.display='none'">`:`<div style="width:80px;height:110px;background:var(--bg-3);border-radius:10px;margin:0 auto 6px"></div>`}
-          <div class="nn">${esc(pA.name)}</div>
-          <div class="ss">${esc(subParts(pA))}</div>
-          <div style="margin-top:6px;font-size:20px;font-weight:800;color:${uA.color}">${fmt(nA)}</div>
-          <div class="ss">par ${uA.name}</div>
-        </div>
-        <div class="vs-lbl">VS</div>
-        <div class="head-slot">
-          ${pB?`${pB.mainPhoto?`<img src="${esc(pB.mainPhoto)}" onerror="this.style.display='none'">`:`<div style="width:80px;height:110px;background:var(--bg-3);border-radius:10px;margin:0 auto 6px"></div>`}
-          <div class="nn">${esc(pB.name)}</div>
-          <div class="ss">${esc(subParts(pB))}</div>
-          <div style="margin-top:6px;font-size:20px;font-weight:800;color:${uB.color}">${fmt(nB)}</div>
-          <div class="ss">par ${uB.name}</div>`:'<div class="ss">Pas de contrepartie</div>'}
-        </div>
-      </div>
-      ${pB?`
-      ${critRow('Note finale',nA,nB)}
-      ${critRow('Moyenne techniques',techMean(rA),techMean(rB))}
-      ${critRow('Coup de cœur',rA?.coup,rB?.coup)}
-      ${critRow('Préférence',rA?.pref,rB?.pref)}
-      ${TECH_CRITERIA.map(c=>critRow(c.label,rA?.technique?.[c.key],rB?.technique?.[c.key])).join('')}
-      ${critRow('ELO',getElo(uAId,pAId),getElo(uBId,pBId))}
-      `:`
-      <h3 style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);margin:12px 0 8px;text-align:center">Détail de ${esc(uA.name)}</h3>
-      ${TECH_CRITERIA.map(c=>{
-        const v=rA?.technique?.[c.key];
-        return `<div class="comp-crit"><div class="v left ${v==null?'dim':''}">${v==null?'-':fmt(v)}</div><div class="lbl">${esc(c.label)}</div><div class="v right dim">-</div></div>`;
-      }).join('')}
-      `}
-    </div>
-    <div style="margin-top:14px"><button class="btn btn-block" data-back>Retour</button></div>
-  `;
-  $('[data-back]').addEventListener('click',renderCompare);
-}
-
 /* ============ CONSULT MODAL ============ */
 function openConsult(){ renderConsult(); openModal('modal-consult'); }
 function renderConsult(){
   const body=$('#consult-body');
-  const sortBy=state.settings.consultSort||'note';
+  const sortBy=state.settings.consultSort||'elo';
+  const u=state.settings.currentUser;
   const list=state.people.slice().sort((a,b)=>{
     if(sortBy==='name') return a.name.localeCompare(b.name,'fr');
-    const na=USERS.reduce((s,u)=>{const n=computeNote(u.id,a.id); return n==null?s:s+n;},0);
-    const nb=USERS.reduce((s,u)=>{const n=computeNote(u.id,b.id); return n==null?s:s+n;},0);
-    return nb-na;
+    if(sortBy==='gender') return (a.gender||'').localeCompare(b.gender||'');
+    return getElo(u,b.id)-getElo(u,a.id);
   });
   if(!list.length){ body.innerHTML='<div class="empty-state"><div class="big">👁</div><h3>Aucune personne</h3><p>Ajoute des profils pour consulter.</p></div>'; return; }
   body.innerHTML=`
     <div class="tour-opts c3" style="margin-bottom:14px">
-      <button class="${sortBy==='note'?'on':''}" data-cs="note">Moy. globale</button>
+      <button class="${sortBy==='elo'?'on':''}" data-cs="elo">ELO</button>
       <button class="${sortBy==='name'?'on':''}" data-cs="name">Alphabétique</button>
       <button class="${sortBy==='gender'?'on':''}" data-cs="gender">Par genre</button>
     </div>
     <div style="display:flex;flex-direction:column;gap:10px">
       ${list.map(p=>{
-        const per=USERS.map(usr=>{
-          const n=computeNote(usr.id,p.id);
-          return `<span class="chipn" style="padding:3px 8px;border-radius:999px;font-size:11px;font-weight:800;border:1px solid ${usr.color};color:${usr.color};display:inline-flex;align-items:center;gap:4px"><small style="font-size:9px;letter-spacing:.08em;text-transform:uppercase;opacity:.7;font-weight:700">${usr.initial}</small>${n==null?'-':fmt(n)}</span>`;
-        }).join('');
-        const avg=(()=>{
-          const arr=USERS.map(u=>computeNote(u.id,p.id)).filter(n=>n!=null);
-          return arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:null;
-        })();
+        const combats=(state.duelHistory[u]||[]).filter(d=>d.winnerId===p.id || d.loserId===p.id).length;
         return `<div class="consult-card" data-open="${p.id}">
           ${p.mainPhoto?`<img src="${esc(p.mainPhoto)}" onerror="this.style.display='none'">`:`<div style="width:56px;height:76px;background:var(--bg-3);border-radius:8px;flex:none"></div>`}
           <div class="ci">
             <div class="n">${esc(p.name)} <span style="color:${p.gender==='F'?'var(--lily-hi)':'var(--yannick-hi)'};font-weight:600;font-size:11px;margin-left:4px">${p.gender==='F'?'F':'H'}</span></div>
             <div class="s">${esc([p.profession,p.birthday,p.nationality].filter(Boolean).join(' · '))}</div>
-            <div class="bigs" style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">${per}</div>
-            ${avg!=null?`<div style="margin-top:6px;font-size:12px;color:var(--text-3)">Moyenne globale : <strong style="color:var(--amber)">${fmt(avg)}</strong></div>`:''}
+            <div style="margin-top:6px;font-size:12px;color:var(--text-3)">ELO : <strong style="color:var(--amber)">${getElo(u,p.id)}</strong> · Combats : <strong style="color:var(--text)">${combats}</strong></div>
           </div>
         </div>`;
       }).join('')}
@@ -2979,46 +2699,18 @@ function renderConsult(){
 /* ============ SETTINGS MODAL ============ */
 function openSettings(){ renderSettings(); openModal('modal-settings'); }
 function renderSettings(){
-  const w=state.settings.weights;
-  const total=w.technique+w.coup+w.pref;
-  const totalOk=Math.abs(total-1)<0.005;
   $('#settings-body').innerHTML=`
-    <div class="setting-section">
-      <h3>Pondération de la note finale</h3>
-      <div class="weight-row">
-        <label>Techniques</label>
-        <input class="slider" type="range" min="0" max="1" step="0.05" value="${w.technique}" data-wk="technique">
-        <div class="val">${Math.round(w.technique*100)}%</div>
-      </div>
-      <div class="weight-row">
-        <label>Coup de cœur</label>
-        <input class="slider" type="range" min="0" max="1" step="0.05" value="${w.coup}" data-wk="coup">
-        <div class="val">${Math.round(w.coup*100)}%</div>
-      </div>
-      <div class="weight-row">
-        <label>Préférence</label>
-        <input class="slider" type="range" min="0" max="1" step="0.05" value="${w.pref}" data-wk="pref">
-        <div class="val">${Math.round(w.pref*100)}%</div>
-      </div>
-      <div class="weight-total ${totalOk?'':'bad'}">Total : ${Math.round(total*100)}% ${totalOk?'✓':'(doit faire 100%)'}</div>
-      <div style="margin-top:8px;display:flex;gap:6px">
-        <button class="btn btn-small" data-wp="40-35-25">40 / 35 / 25</button>
-        <button class="btn btn-small" data-wp="50-25-25">50 / 25 / 25</button>
-        <button class="btn btn-small" data-wp="33-33-33">1/3 égal</button>
-      </div>
-    </div>
-
     <div class="setting-section">
       <h3>Utilisateurs</h3>
       <div style="display:flex;flex-direction:column;gap:6px">
         ${USERS.map(u=>{
-          const n=Object.keys(state.ratings[u.id]||{}).filter(pid=>computeNote(u.id,pid)!=null).length;
+          const n=Object.keys(state.elo[u.id]||{}).length;
           const nF=Object.values(state.favorites[u.id]||{}).filter(Boolean).length;
           const nD=state.duels[u.id]||0;
           const act=u.id===state.settings.currentUser;
           return `<button class="user-card ${act?'is-current':''}" style="--user-color:${u.color}" data-switch="${u.id}">
             <div class="av" style="background:${u.color}">${u.initial}</div>
-            <div class="info"><div class="un">${u.name}</div><div class="us">${n} notés · ${nF} coups cœur · ${nD} duels</div></div>
+            <div class="info"><div class="un">${u.name}</div><div class="us">${n} profils classés ELO · ${nF} favoris · ${nD} combats</div></div>
             ${act?`<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5 9-11" stroke="${u.color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`:''}
           </button>`;
         }).join('')}
@@ -3042,13 +2734,16 @@ function renderSettings(){
     <div class="setting-section">
       <h3>Options d'affichage</h3>
       <div class="setting-row">
-        <div class="sr-info"><div class="sr-name">Tri par défaut de la liste</div><div class="sr-desc">Applicable à la vue principale</div></div>
+        <div class="sr-info"><div class="sr-name">Tri par défaut de la liste</div><div class="sr-desc">Seul le classement ELO peut servir de positionnement</div></div>
         <select class="field" style="padding:7px 10px;border-radius:8px;background:var(--bg-3);border:1px solid var(--border)" id="sort-select">
-          <option value="note" ${state.settings.sortBy==='note'?'selected':''}>Note finale</option>
           <option value="elo" ${state.settings.sortBy==='elo'?'selected':''}>ELO</option>
           <option value="name" ${state.settings.sortBy==='name'?'selected':''}>Nom A-Z</option>
           <option value="added" ${state.settings.sortBy==='added'?'selected':''}>Récemment ajouté</option>
         </select>
+      </div>
+      <div class="setting-row">
+        <div class="sr-info"><div class="sr-name">Modification manuelle de l'ELO</div><div class="sr-desc">Indisponible. L'ELO évolue uniquement via duels et tournois.</div></div>
+        <button class="btn btn-small" disabled>Indisponible</button>
       </div>
     </div>
 
@@ -3059,44 +2754,15 @@ function renderSettings(){
         <button class="btn" id="export-data">📦 Export complet</button>
         <button class="btn" id="export-light">🪶 Export léger</button>
       </div>
-      <div style="font-size:11px;color:var(--text-4);margin-bottom:10px;line-height:1.4">
-        <strong>Complet</strong> inclut les photos uploadées (gros fichier).<br>
-        <strong>Léger</strong> ne garde que les URLs web — idéal pour transférer entre téléphones.
-      </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-        <button class="btn" id="import-data">📥 Importer JSON</button>
-        <button class="btn" id="compress-uploads">🗜️ Compresser photos</button>
+        <button class="btn" id="import-data">📥 Importer</button>
+        <button class="btn btn-danger" id="clear-all">🗑️ Tout effacer</button>
       </div>
-      <div style="font-size:11px;color:var(--text-4);margin-bottom:10px;line-height:1.4">
-        <strong>Compresser photos</strong> recompresse tes photos uploadées pour libérer de l'espace (cible ~40 Ko/photo).
+      <div style="display:grid;grid-template-columns:1fr;gap:8px">
+        <button class="btn" id="clear-uploaded-photos">🧹 Vider photos</button>
       </div>
-      <button class="btn btn-block" id="clear-uploads" style="margin-bottom:8px">🧹 Vider toutes les photos uploadées</button>
-      <div style="font-size:11px;color:var(--text-4);margin-bottom:10px;line-height:1.4">
-        <strong>Vider photos</strong> supprime toutes les photos uploadées depuis ce téléphone (garde les URLs TMDb/Wikidata).
-      </div>
-      <button class="btn btn-block" id="find-dupes" style="margin-bottom:8px">🔍 Détecter les doublons</button>
-      <div style="font-size:11px;color:var(--text-4);margin-bottom:10px;line-height:1.4">
-        <strong>Détecter les doublons</strong> cherche les personnes en double (même TMDb, Wikidata ou nom) et te laisse choisir quelle version garder.
-      </div>
-      <input type="file" id="import-file" accept=".json" style="display:none">
-      <button class="btn btn-danger btn-block" id="reset-data">⚠️ Tout effacer</button>
-    </div>
-
-    <div class="setting-section">
-      <h3>À propos</h3>
-      <div style="font-size:12.5px;color:var(--text-3);line-height:1.6">
-        Classeur Beauté v1. Stockage local uniquement, rien n'est envoyé ailleurs. Les données d'acteurs et actrices viennent de TMDb. Les fiches de non-acteurs viennent de Wikidata et Wikimedia Commons. Cette application utilise l'API TMDB mais n'est ni supportée ni certifiée par TMDB.
-        <br><br>
-        <strong>${state.people.length}</strong> personne${state.people.length>1?'s':''} en banque · 
-        <strong>${USERS.reduce((s,u)=>s+Object.keys(state.ratings[u.id]||{}).length,0)}</strong> note${USERS.reduce((s,u)=>s+Object.keys(state.ratings[u.id]||{}).length,0)>1?'s':''} enregistrée${USERS.reduce((s,u)=>s+Object.keys(state.ratings[u.id]||{}).length,0)>1?'s':''} · 
-        <strong>${USERS.reduce((s,u)=>s+(state.duels[u.id]||0),0)}</strong> duel${USERS.reduce((s,u)=>s+(state.duels[u.id]||0),0)>1?'s':''}
-      </div>
-    </div>
-  `;
-  // Populate storage info
-  const st = computeStorageStats();
-  const storageColor = st.pct >= 80 ? '#F87171' : st.pct >= 60 ? 'var(--amber)' : 'var(--victor-hi)';
-  const infoEl = $('#storage-info');
+    </div>`;
+  $('#storage-info');
   if(infoEl){
     infoEl.innerHTML = `
       <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-weight:700;color:var(--text-2)">
@@ -3286,7 +2952,7 @@ function renderSettings(){
     localStorage.removeItem(STORAGE_KEY);
     Object.assign(state,{
       people:[], ratings:{}, favorites:{}, elo:{}, duels:{}, duelHistory:{}, tournaments:{},
-      settings:{ currentUser:'lily', weights:{...DEFAULT_WEIGHTS}, tmdbKey:'', sortBy:'note', filter:'all', query:'', consultSort:'note', compareA:'lily', compareB:'victor' }
+      settings:{ currentUser:'lily', weights:{...DEFAULT_WEIGHTS}, tmdbKey:'', sortBy:'elo', filter:'all', query:'', consultSort:'elo', compareA:'lily', compareB:'victor' }
     });
     USERS.forEach(u=>ensureBuckets(u.id));
     saveState(); renderHeader(); renderList(); renderSettings();
@@ -3832,7 +3498,6 @@ function attachEvents(){
   }));
   // sort
   $('#sort-name').addEventListener('click',()=>{ state.settings.sortBy='name'; saveState(); renderList(); toast('Tri : nom A-Z'); });
-  $('#sort-note').addEventListener('click',()=>{ state.settings.sortBy='note'; saveState(); renderList(); toast('Tri : note finale'); });
   $('#sort-elo').addEventListener('click',()=>{ state.settings.sortBy='elo'; saveState(); renderList(); toast('Tri : ELO'); });
   // list row
   document.addEventListener('click',e=>{
