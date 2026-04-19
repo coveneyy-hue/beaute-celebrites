@@ -1413,7 +1413,10 @@ function openDetails(pid){
   ensureBuckets(u);
   const ex=getRating(u,pid);
   ui.draft=ex?JSON.parse(JSON.stringify(ex)):{technique:{},coup:null,pref:null,tag:null,notes:'',updatedAt:0};
-  ui.photoIdx=0;
+  // Start on the default photo (mainPhoto), not the first in the list
+  const photos = p.photos?.length ? p.photos : (p.mainPhoto ? [p.mainPhoto] : []);
+  const mainIdx = p.mainPhoto ? photos.indexOf(p.mainPhoto) : -1;
+  ui.photoIdx = mainIdx >= 0 ? mainIdx : 0;
   renderDetails();
   openModal('modal-details');
 }
