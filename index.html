@@ -1,0 +1,1959 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#0B0F1E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Beauté">
+<title>Classeur Beauté</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230B0F1E'/%3E%3Cpath d='M32 12 L54 30 L32 52 L10 30 Z' fill='%23FBBF24'/%3E%3C/svg%3E">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.4;overscroll-behavior:none;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;font-feature-settings:'tnum','ss01'}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+input,select,textarea{font:inherit;color:inherit;background:none;border:none;outline:none}
+img{display:block;max-width:100%}
+ul,ol{list-style:none}
+a{color:inherit;text-decoration:none}
+
+:root{
+  --bg:#0B0F1E;--bg-1:#12162A;--bg-2:#181D37;--bg-3:#1F2545;
+  --card:#151A30;--card-hi:#1C2240;--card-hover:#212748;
+  --border:#262C4D;--border-soft:#1E243E;
+  --text:#ECEEF5;--text-2:#B8BDD1;--text-3:#7E85A3;--text-4:#565B76;
+  --amber:#F59E0B;--amber-hi:#FBBF24;--amber-soft:rgba(245,158,11,.12);
+  --coral:#FB7185;--red:#EF4444;--green:#10B981;
+  --lily:#EC4899;--lily-hi:#F472B6;
+  --victor:#10B981;--victor-hi:#34D399;
+  --julie:#A855F7;--julie-hi:#C084FC;
+  --yannick:#06B6D4;--yannick-hi:#22D3EE;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.35);
+  --shadow-md:0 8px 20px rgba(0,0,0,.35);
+  --shadow-lg:0 24px 48px rgba(0,0,0,.45);
+  --radius-sm:8px;--radius:14px;--radius-lg:20px;--radius-xl:28px;
+  --safe-top:env(safe-area-inset-top,0px);--safe-bot:env(safe-area-inset-bottom,0px);
+}
+
+#app{min-height:100vh;min-height:100dvh;padding:calc(var(--safe-top) + 14px) 14px calc(var(--safe-bot) + 24px);max-width:760px;margin:0 auto}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(1000px 500px at 90% -10%,rgba(245,158,11,.07),transparent 60%),radial-gradient(800px 600px at -10% 40%,rgba(168,85,247,.06),transparent 55%),radial-gradient(700px 500px at 50% 110%,rgba(236,72,153,.05),transparent 60%)}
+
+.top-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand-icon{width:34px;height:34px;flex:none;display:grid;place-items:center;background:linear-gradient(135deg,#1E2448,#12162A);border:1px solid var(--border);border-radius:10px;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+.brand-icon svg{width:20px;height:20px}
+.brand h1{font-size:22px;font-weight:800;letter-spacing:-.02em;background:linear-gradient(90deg,var(--amber-hi),var(--amber) 50%,var(--coral));-webkit-background-clip:text;background-clip:text;color:transparent;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.user-pill{display:flex;align-items:center;gap:8px;flex:none;padding:7px 10px 7px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);transition:border-color .15s,background .15s}
+.user-pill:active{background:var(--card-hi)}
+.user-avatar{width:22px;height:22px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:11px;font-weight:800;color:#0B0F1E}
+.user-pill-name{font-size:13px;font-weight:700;letter-spacing:-.01em}
+.user-pill-chev{color:var(--text-3);width:10px;height:10px}
+
+.toolbar{display:flex;justify-content:center;gap:10px;margin:6px 0 16px;flex-wrap:wrap}
+.tb-btn{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:var(--card);border:1px solid var(--border);color:var(--text-2);transition:transform .1s,background .15s,color .15s,border-color .15s;position:relative}
+.tb-btn svg{width:22px;height:22px}
+.tb-btn:active{transform:scale(.94)}
+.tb-btn.is-primary{background:linear-gradient(180deg,var(--amber-hi),var(--amber));color:#1A1200;border-color:rgba(0,0,0,.2);box-shadow:0 6px 16px rgba(245,158,11,.35),inset 0 1px 0 rgba(255,255,255,.35)}
+.tb-btn.is-danger{color:var(--coral);border-color:rgba(251,113,133,.3)}
+
+.search-row{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:0 14px;height:48px;transition:border-color .15s}
+.search-row:focus-within{border-color:var(--amber)}
+.search-row svg{width:18px;height:18px;color:var(--text-3);flex:none}
+.search-row input{flex:1;height:100%;font-size:15px}
+.search-row input::placeholder{color:var(--text-3)}
+.search-row .count{color:var(--text-3);font-size:13px;font-weight:600;white-space:nowrap;flex:none}
+
+.chips{display:flex;gap:8px;margin-top:12px;overflow-x:auto;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{padding:7px 14px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:13px;font-weight:600;color:var(--text-2);white-space:nowrap;flex:none;transition:all .15s}
+.chip.is-active{background:var(--bg-3);color:var(--text);border-color:var(--border)}
+.chip[data-gender="M"].is-active{background:rgba(6,182,212,.15);color:var(--yannick-hi);border-color:rgba(6,182,212,.35)}
+.chip[data-gender="F"].is-active{background:rgba(236,72,153,.15);color:var(--lily-hi);border-color:rgba(236,72,153,.35)}
+
+.list-wrap{margin-top:14px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-sm)}
+.list-head{display:grid;grid-template-columns:52px 1fr 72px 58px;align-items:center;gap:8px;padding:12px 12px;background:linear-gradient(180deg,rgba(255,255,255,.02),transparent);border-bottom:1px solid var(--border);font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--text-3);text-transform:uppercase}
+.list-head .sort-btn{display:inline-flex;align-items:center;gap:4px;color:var(--amber)}
+.list-head .sort-btn svg{width:10px;height:10px}
+
+.row{display:grid;grid-template-columns:52px 1fr 72px 58px;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border-soft);transition:background .12s}
+.row:last-child{border-bottom:none}
+.row:active{background:var(--card-hover)}
+.row-rank{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:15px;font-weight:700;color:var(--text);position:relative}
+.rank-arrow{width:20px;height:14px;display:grid;place-items:center;color:var(--amber);opacity:.75}
+.rank-arrow:active{opacity:1}
+.rank-arrow svg{width:10px;height:10px}
+.rank-num{min-width:20px;text-align:center}
+.row-main{display:flex;align-items:center;gap:10px;min-width:0}
+.thumb{width:40px;height:56px;border-radius:8px;flex:none;background:var(--bg-3);object-fit:cover;border:1px solid var(--border)}
+.thumb.placeholder{display:grid;place-items:center;color:var(--text-4);font-size:11px}
+.row-info{min-width:0;flex:1}
+.row-name{font-size:15px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-badge{margin-top:4px;display:inline-flex}
+
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;font-size:11.5px;font-weight:700;line-height:1.2;max-width:220px}
+.badge svg{width:12px;height:12px;flex:none}
+.badge span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.badge-coup{background:rgba(236,72,153,.12);color:var(--lily-hi);border:1px solid rgba(236,72,153,.3)}
+.badge-regard{background:rgba(168,85,247,.12);color:var(--julie-hi);border:1px solid rgba(168,85,247,.3)}
+.badge-sourire{background:rgba(245,158,11,.12);color:var(--amber-hi);border:1px solid rgba(245,158,11,.3)}
+.badge-photo{background:rgba(6,182,212,.12);color:var(--yannick-hi);border:1px solid rgba(6,182,212,.3)}
+.badge-charisme{background:rgba(251,113,133,.12);color:var(--coral);border:1px solid rgba(251,113,133,.3)}
+.badge-style{background:rgba(16,185,129,.12);color:var(--victor-hi);border:1px solid rgba(16,185,129,.3)}
+.badge-muse{background:linear-gradient(90deg,rgba(245,158,11,.18),rgba(251,113,133,.18));color:var(--amber-hi);border:1px solid rgba(245,158,11,.4)}
+
+.row-note{text-align:center;font-size:18px;font-weight:800;color:var(--amber);letter-spacing:-.02em}
+.row-note.dim{color:var(--text-4);font-size:15px}
+.row-elo{text-align:center;font-size:13px;font-weight:700;color:var(--text-2)}
+.row-elo small{display:block;color:var(--text-4);font-size:10px;font-weight:600;margin-top:1px}
+
+.empty-state{padding:40px 20px;text-align:center;color:var(--text-3)}
+.empty-state .big{font-size:36px;margin-bottom:10px;opacity:.65}
+.empty-state h3{font-size:15px;font-weight:700;color:var(--text-2);margin-bottom:4px}
+.empty-state p{font-size:13px}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 16px;border-radius:12px;background:var(--card);border:1px solid var(--border);color:var(--text);font-size:14px;font-weight:700;letter-spacing:-.01em;transition:transform .1s,background .15s,border-color .15s;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn svg{width:16px;height:16px}
+.btn-primary{background:linear-gradient(180deg,var(--amber-hi),var(--amber));color:#1A1200;border-color:rgba(0,0,0,.15);box-shadow:0 6px 14px rgba(245,158,11,.3),inset 0 1px 0 rgba(255,255,255,.35)}
+.btn-ghost{background:transparent}
+.btn-danger{color:var(--coral);border-color:rgba(251,113,133,.3)}
+.btn-small{padding:7px 11px;font-size:12.5px;border-radius:9px}
+.btn-block{width:100%}
+.btn:disabled{opacity:.45;pointer-events:none}
+
+.modal{position:fixed;inset:0;z-index:100;display:none;flex-direction:column;background:rgba(5,7,16,.78);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:calc(var(--safe-top) + 16px) 14px calc(var(--safe-bot) + 14px);opacity:0;transition:opacity .18s;overflow:hidden}
+.modal.is-open{display:flex;opacity:1}
+.modal-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-xl);flex:1;min-height:0;display:flex;flex-direction:column;max-width:720px;width:100%;margin:auto;box-shadow:var(--shadow-lg);overflow:hidden;animation:slideUp .25s cubic-bezier(.22,.9,.3,1.1)}
+@keyframes slideUp{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border);flex:none}
+.modal-title{font-size:17px;font-weight:800;letter-spacing:-.01em}
+.modal-sub{font-size:12.5px;color:var(--text-3);margin-top:2px}
+.modal-close{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;color:var(--text-3);background:var(--bg-2);border:1px solid var(--border)}
+.modal-body{flex:1;min-height:0;overflow-y:auto;padding:18px}
+.modal-footer{padding:14px 18px;border-top:1px solid var(--border);display:grid;grid-template-columns:1fr 1.4fr;gap:10px;flex:none;background:linear-gradient(180deg,transparent,rgba(0,0,0,.15))}
+
+.search-people{display:flex;align-items:center;gap:10px;background:var(--bg-2);border:1px solid var(--border);border-radius:14px;padding:0 14px;height:48px}
+.search-people input{flex:1;height:100%;font-size:15px}
+.search-people svg{width:18px;height:18px;color:var(--text-3)}
+.search-hint{font-size:12px;color:var(--text-3);margin-top:8px;line-height:1.45}
+.search-hint a{color:var(--amber);text-decoration:underline}
+
+.search-results{margin-top:16px;display:flex;flex-direction:column;gap:8px}
+.search-result{display:flex;align-items:center;gap:12px;padding:10px;background:var(--bg-2);border:1px solid var(--border);border-radius:14px;transition:background .15s,border-color .15s;text-align:left;width:100%}
+.search-result:active{background:var(--card-hover);border-color:var(--amber)}
+.search-result img{width:48px;height:64px;border-radius:8px;object-fit:cover;background:var(--bg-3);flex:none}
+.search-result .sr-info{min-width:0;flex:1}
+.search-result .sr-name{font-size:14.5px;font-weight:700;line-height:1.2}
+.search-result .sr-meta{font-size:12px;color:var(--text-3);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.search-result .sr-badge{padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;background:var(--bg-3);color:var(--text-2);flex:none}
+
+.tabs{display:flex;gap:6px;background:var(--bg-2);padding:4px;border-radius:12px;border:1px solid var(--border);margin-bottom:14px}
+.tab{flex:1;padding:9px;border-radius:9px;font-size:13px;font-weight:700;color:var(--text-3);text-align:center;transition:all .15s}
+.tab.is-active{background:var(--card-hi);color:var(--text);box-shadow:var(--shadow-sm)}
+
+.detail-photo{position:relative;width:100%;aspect-ratio:2/3;max-height:380px;border-radius:var(--radius-lg);overflow:hidden;background:var(--bg-3);margin-bottom:14px}
+.detail-photo img{width:100%;height:100%;object-fit:cover}
+.detail-photo .fav{position:absolute;top:10px;left:10px;width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);display:grid;place-items:center;color:#fff;transition:all .15s}
+.detail-photo .fav.is-on{background:var(--lily);color:#fff}
+.detail-photo .photo-nav{position:absolute;bottom:10px;right:10px;display:flex;gap:6px;padding:6px 10px;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);border-radius:999px;font-size:12px;font-weight:700;color:#fff;align-items:center}
+.detail-photo .photo-nav button{color:#fff;padding:0 3px;display:grid;place-items:center}
+.detail-photo .photo-dots{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:4px}
+.detail-photo .photo-dots span{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.4)}
+.detail-photo .photo-dots span.on{background:#fff}
+
+.detail-title-wrap{text-align:center;margin-bottom:10px}
+.detail-title{font-size:22px;font-weight:800;letter-spacing:-.02em}
+.detail-subtitle{font-size:13px;color:var(--text-3);margin-top:4px;line-height:1.4}
+.detail-links{display:inline-flex;gap:14px;margin-top:6px;font-size:13px}
+.detail-links a{color:var(--amber);font-weight:600}
+
+.notes-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
+.note-card{padding:14px 12px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg-2);text-align:center;position:relative;border-left:3px solid var(--user-color,var(--amber));transition:background .15s,border-color .15s,transform .1s}
+.note-card:active{transform:scale(.97)}
+.note-card.is-current{background:var(--card-hover)}
+.note-card .nc-label{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--user-color,var(--text-3));margin-bottom:6px}
+.note-card .nc-value{font-size:24px;font-weight:800;letter-spacing:-.02em;color:var(--text)}
+.note-card .nc-value.dim{color:var(--text-4)}
+.note-card .nc-tiny{font-size:10px;font-weight:600;color:var(--text-3);margin-top:3px}
+
+.hint{font-size:12px;color:var(--text-3);padding:10px 12px;background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.15);border-radius:10px;display:flex;align-items:center;gap:8px;margin-bottom:14px}
+
+.ventilation{margin:14px 0;padding:14px;background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius)}
+.vent-title{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.vent-section{margin-top:12px}
+.vent-section-label{font-size:12px;font-weight:700;color:var(--text-2);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.vent-section-label .vw{font-size:10px;font-weight:700;color:var(--text-3);background:var(--bg-3);padding:2px 7px;border-radius:999px}
+.slider-row{display:grid;grid-template-columns:1fr 50px;gap:10px;align-items:center;padding:6px 0}
+.slider-label{font-size:13px;color:var(--text)}
+.slider-value{text-align:right;font-size:14px;font-weight:800;color:var(--amber)}
+.slider{grid-column:1/-1;margin-top:2px;-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:3px;background:var(--bg-3);outline:none}
+.slider::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:linear-gradient(180deg,var(--amber-hi),var(--amber));border:2px solid var(--bg);box-shadow:0 2px 6px rgba(245,158,11,.4);cursor:pointer}
+.slider::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:linear-gradient(180deg,var(--amber-hi),var(--amber));border:2px solid var(--bg);cursor:pointer}
+
+.formula-display{background:var(--bg-3);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-top:10px;font-size:12px;color:var(--text-2);text-align:center;font-family:ui-monospace,Consolas,monospace}
+.formula-display .n{color:var(--amber);font-weight:800}
+
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-grid .full{grid-column:1/-1}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:11px;font-weight:800;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase}
+.field input,.field select,.field textarea{background:var(--bg-2);border:1px solid var(--border);border-radius:10px;padding:11px 12px;font-size:14px;transition:border-color .15s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--amber)}
+.field textarea{resize:vertical;min-height:64px;font-family:inherit}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--bg-2);border:1px solid var(--border);padding:4px;border-radius:10px}
+.seg button{padding:9px;border-radius:7px;font-size:13px;font-weight:700;color:var(--text-3);transition:all .15s}
+.seg button.on[data-g="M"]{background:rgba(6,182,212,.2);color:var(--yannick-hi)}
+.seg button.on[data-g="F"]{background:rgba(236,72,153,.2);color:var(--lily-hi)}
+
+.duel-arena{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.duel-card{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;transition:transform .15s,border-color .15s;text-align:left;width:100%}
+.duel-card:active{transform:scale(.98);border-color:var(--amber)}
+.duel-photo{aspect-ratio:3/4;background:var(--bg-3);position:relative}
+.duel-photo img{width:100%;height:100%;object-fit:cover}
+.duel-photo .fav-mini{position:absolute;top:8px;left:8px;width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);display:grid;place-items:center;color:#fff}
+.duel-photo .fav-mini.is-on{background:var(--lily);color:#fff}
+.duel-stats{padding:10px;background:var(--bg-2);text-align:center;border-top:1px solid var(--border)}
+.duel-stats .wins{font-size:30px;font-weight:800;color:var(--amber);line-height:1}
+.duel-stats .wins-l{font-size:10px;font-weight:700;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;margin-top:4px}
+.duel-card .d-name{padding:0 12px 2px;font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.duel-card .d-sub{padding:0 12px 12px;font-size:12px;color:var(--text-3)}
+
+.duel-hero-card{background:linear-gradient(135deg,rgba(245,158,11,.14),rgba(251,113,133,.1));border:1px solid rgba(245,158,11,.28);border-radius:var(--radius);padding:14px;margin-bottom:14px;display:flex;gap:12px;align-items:center}
+.duel-hero-card .hico{width:44px;height:44px;border-radius:10px;display:grid;place-items:center;background:rgba(245,158,11,.2);color:var(--amber-hi);flex:none;font-size:20px}
+.duel-hero-card h3{font-size:15px;font-weight:800;letter-spacing:-.01em}
+.duel-hero-card p{font-size:12.5px;color:var(--text-2);margin-top:2px}
+
+.duel-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.duel-actions .btn{flex:1;min-width:100px}
+
+.tour-hero{display:flex;gap:12px;align-items:flex-start;padding:14px;background:linear-gradient(135deg,rgba(251,113,133,.14),rgba(168,85,247,.1));border:1px solid rgba(251,113,133,.3);border-radius:var(--radius);margin-bottom:14px}
+.tour-hero .tico{width:44px;height:44px;border-radius:10px;display:grid;place-items:center;background:rgba(251,113,133,.2);color:var(--coral);flex:none;font-size:20px}
+.tour-hero h3{font-size:15px;font-weight:800}
+.tour-hero p{font-size:12.5px;color:var(--text-2);margin-top:2px}
+
+.bracket{display:grid;gap:6px;overflow-x:auto;padding:10px 0;grid-auto-flow:column;grid-auto-columns:180px;scrollbar-width:thin}
+.bracket-round{display:flex;flex-direction:column;gap:6px;justify-content:space-around}
+.bracket-round h4{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);margin-bottom:4px;text-align:center}
+.bracket-match{background:var(--bg-2);border:1px solid var(--border);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:4px;font-size:12.5px}
+.bracket-match.is-current{border-color:var(--amber);box-shadow:0 0 0 3px var(--amber-soft)}
+.bracket-slot{display:flex;align-items:center;gap:6px;padding:5px 6px;border-radius:6px;background:var(--bg-3)}
+.bracket-slot img{width:22px;height:28px;border-radius:4px;object-fit:cover;background:var(--bg-3)}
+.bracket-slot .bs-name{flex:1;min-width:0;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bracket-slot.is-winner{background:rgba(245,158,11,.16);color:var(--amber-hi)}
+.bracket-slot.is-tbd{color:var(--text-4);font-style:italic}
+
+.stat-hero{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.stat-hero .box{background:var(--bg-2);border:1px solid var(--border);border-radius:10px;padding:10px 8px;text-align:center}
+.stat-hero .box .v{font-size:18px;font-weight:800;color:var(--amber)}
+.stat-hero .box .l{font-size:9.5px;font-weight:700;color:var(--text-3);letter-spacing:.06em;text-transform:uppercase;margin-top:2px}
+
+.stat-section{margin-bottom:22px}
+.stat-section h3{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3);margin-bottom:10px}
+
+.histogram{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;height:80px;align-items:end}
+.hist-bar{background:linear-gradient(180deg,var(--amber),var(--amber-hi));border-radius:3px 3px 0 0;min-height:2px;position:relative}
+.hist-bar::after{content:attr(data-v);position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:700;color:var(--text-3)}
+.hist-axis{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;margin-top:4px;font-size:10px;color:var(--text-3);text-align:center}
+
+.top-list{display:flex;flex-direction:column;gap:6px}
+.top-item{display:flex;align-items:center;gap:10px;padding:8px;background:var(--bg-2);border:1px solid var(--border);border-radius:10px}
+.top-item .rk{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:800;color:#0B0F1E;background:var(--amber);flex:none}
+.top-item .rk.silver{background:#C0C4D1}
+.top-item .rk.bronze{background:#D5864B}
+.top-item .rk.flat{background:var(--bg-3);color:var(--text-2)}
+.top-item img{width:30px;height:42px;border-radius:6px;object-fit:cover;background:var(--bg-3)}
+.top-item .nm{flex:1;font-size:13px;font-weight:600;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top-item .vl{font-size:14px;font-weight:800;color:var(--amber)}
+
+.compare-rows{display:flex;flex-direction:column;gap:8px}
+.comp-row{display:grid;grid-template-columns:1fr 56px 1fr;gap:6px;padding:6px;background:var(--bg-2);border:1px solid var(--border);border-radius:10px;align-items:center}
+.comp-slot{display:flex;align-items:center;gap:8px;min-width:0}
+.comp-slot.right{flex-direction:row-reverse;text-align:right}
+.comp-slot img{width:32px;height:44px;border-radius:6px;object-fit:cover;background:var(--bg-3);flex:none}
+.comp-slot .nn{font-size:12.5px;font-weight:700;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.comp-slot .ss{font-size:11px;color:var(--text-3);margin-top:2px}
+.comp-mid{display:flex;flex-direction:column;align-items:center;gap:1px}
+.comp-mid .rk{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:800;background:var(--bg-3);color:var(--text-2)}
+.comp-score{font-size:13px;font-weight:800}
+.comp-score.win{color:var(--amber)}
+
+.comp-vs-detail{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:14px}
+.comp-vs-detail .heads{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin-bottom:12px}
+.comp-vs-detail .head-slot{text-align:center}
+.comp-vs-detail .head-slot img{width:80px;height:110px;border-radius:10px;object-fit:cover;margin:0 auto 6px;background:var(--bg-3)}
+.comp-vs-detail .head-slot .nn{font-size:13px;font-weight:700}
+.comp-vs-detail .head-slot .ss{font-size:11px;color:var(--text-3);margin-top:2px}
+.comp-vs-detail .vs-lbl{font-size:14px;font-weight:800;color:var(--amber)}
+.comp-crit{display:grid;grid-template-columns:1fr 90px 1fr;gap:6px;padding:5px 0;border-bottom:1px solid var(--border-soft);font-size:12.5px;align-items:center}
+.comp-crit:last-child{border-bottom:none}
+.comp-crit .lbl{text-align:center;font-size:11px;color:var(--text-3);font-weight:700}
+.comp-crit .v{text-align:center;font-weight:700}
+.comp-crit .v.left{text-align:right}
+.comp-crit .v.right{text-align:left}
+.comp-crit .v.win{color:var(--amber)}
+.comp-crit .v.dim{color:var(--text-4)}
+
+.setting-section{margin-bottom:22px}
+.setting-section h3{font-size:12.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3);margin-bottom:10px}
+.setting-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;background:var(--bg-2);border:1px solid var(--border);border-radius:10px;margin-bottom:6px}
+.setting-row .sr-info{flex:1;min-width:0}
+.setting-row .sr-name{font-size:14px;font-weight:700}
+.setting-row .sr-desc{font-size:12px;color:var(--text-3);margin-top:2px}
+.user-card{display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg-2);border:1px solid var(--border);border-radius:10px;text-align:left;width:100%}
+.user-card.is-current{border-color:var(--user-color,var(--amber))}
+.user-card .av{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:15px;font-weight:800;color:#0B0F1E;flex:none}
+.user-card .info{flex:1;min-width:0}
+.user-card .info .un{font-size:14px;font-weight:700}
+.user-card .info .us{font-size:11.5px;color:var(--text-3);margin-top:2px}
+
+.weight-row{display:grid;grid-template-columns:110px 1fr 52px;gap:10px;align-items:center;margin-bottom:8px}
+.weight-row label{font-size:13px;font-weight:700;color:var(--text-2)}
+.weight-row .val{text-align:right;font-size:13px;font-weight:800;color:var(--amber)}
+.weight-total{margin-top:8px;padding:8px;background:var(--bg-2);border:1px solid var(--border);border-radius:8px;text-align:center;font-size:12px;font-weight:700;color:var(--text-2)}
+.weight-total.bad{color:var(--coral);border-color:rgba(251,113,133,.3)}
+
+.tour-opts{display:grid;gap:6px;background:var(--bg-2);border:1px solid var(--border);padding:4px;border-radius:10px}
+.tour-opts.c3{grid-template-columns:1fr 1fr 1fr}
+.tour-opts.c4{grid-template-columns:repeat(4,1fr)}
+.tour-opts button{padding:10px;border-radius:7px;font-size:13px;font-weight:700;color:var(--text-3);background:transparent}
+.tour-opts button.on{background:var(--card-hi);color:var(--text)}
+.tour-opts button.on.m{background:rgba(6,182,212,.2);color:var(--yannick-hi)}
+.tour-opts button.on.f{background:rgba(236,72,153,.2);color:var(--lily-hi)}
+.tour-opts button:disabled{opacity:.35;pointer-events:none}
+
+#toast{position:fixed;top:calc(var(--safe-top) + 16px);left:50%;transform:translate(-50%,-80px);z-index:999;padding:11px 16px;background:var(--card);border:1px solid var(--border);border-radius:999px;font-size:13px;font-weight:600;color:var(--text);box-shadow:var(--shadow-md);opacity:0;transition:all .25s;pointer-events:none;max-width:90vw}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+#toast.err{border-color:rgba(251,113,133,.5);color:var(--coral)}
+#toast.ok{border-color:rgba(16,185,129,.5);color:var(--victor-hi)}
+
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bg-3);border-radius:4px}
+
+@media (max-width:380px){
+  .toolbar{gap:7px}
+  .tb-btn{width:42px;height:42px}
+  .row{grid-template-columns:44px 1fr 62px 50px;gap:6px;padding:9px 10px}
+  .list-head{grid-template-columns:44px 1fr 62px 50px;gap:6px;padding:10px 10px}
+  .thumb{width:36px;height:50px}
+  .stat-hero{grid-template-columns:repeat(2,1fr)}
+}
+@media (min-width:700px){
+  #app{padding-top:calc(var(--safe-top) + 20px)}
+  .notes-grid{grid-template-columns:repeat(4,1fr)}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="top-bar">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none">
+          <defs><linearGradient id="bi" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FBBF24"/><stop offset="100%" stop-color="#F59E0B"/></linearGradient></defs>
+          <path d="M12 3 L20 10 L12 21 L4 10 Z" fill="url(#bi)"/>
+          <path d="M12 3 L20 10 L12 10 Z" fill="rgba(255,255,255,.25)"/>
+        </svg>
+      </div>
+      <h1>Classeur Beauté</h1>
+    </div>
+    <button class="user-pill" id="btn-user-switch" aria-label="Changer d'utilisateur">
+      <span class="user-avatar" id="user-avatar">L</span>
+      <span class="user-pill-name" id="user-name">Lily</span>
+      <svg class="user-pill-chev" viewBox="0 0 12 12" fill="none"><path d="M3 4.5 L6 7.5 L9 4.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+
+  <div class="toolbar">
+    <button class="tb-btn is-primary" data-act="add" aria-label="Ajouter">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+    </button>
+    <button class="tb-btn" data-act="consult" aria-label="Consulter">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M2.5 12s3-7 9.5-7 9.5 7 9.5 7-3 7-9.5 7S2.5 12 2.5 12Z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+    </button>
+    <button class="tb-btn" data-act="stats" aria-label="Statistiques">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M4 19V8M10 19V5M16 19v-6M22 19H2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+    <button class="tb-btn" data-act="compare" aria-label="Comparer">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M7 3v18M17 3v18M3 7h8M13 17h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+    <button class="tb-btn" data-act="duel" aria-label="Duels">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M14 5 L19 10 M14 10 L19 5 M5 14 L10 19 M5 19 L10 14 M9 15 L15 9 M3 21 L6 18 M18 6 L21 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+    <button class="tb-btn" data-act="tournament" aria-label="Tournoi">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M6 9h12M6 4h12v4a6 6 0 0 1-12 0V4ZM4 4h2v2a2 2 0 0 0 2 2M20 4h-2v2a2 2 0 0 1-2 2M9 19h6M12 13v6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <button class="tb-btn" data-act="settings" aria-label="Réglages">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z" stroke="currentColor" stroke-width="1.5"/></svg>
+    </button>
+  </div>
+
+  <div class="search-row">
+    <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <input id="search" type="text" placeholder="Rechercher un nom, un tag...">
+    <span class="count" id="count">0 / 0</span>
+  </div>
+
+  <div class="chips" id="chips">
+    <button class="chip is-active" data-filter="all">Tous</button>
+    <button class="chip" data-filter="M" data-gender="M">Hommes</button>
+    <button class="chip" data-filter="F" data-gender="F">Femmes</button>
+    <button class="chip" data-filter="rated">Notés</button>
+    <button class="chip" data-filter="unrated">Non notés</button>
+    <button class="chip" data-filter="fav">Coup de cœur</button>
+  </div>
+
+  <div class="list-wrap">
+    <div class="list-head">
+      <div style="text-align:center">#</div>
+      <button class="sort-btn" id="sort-name" style="justify-self:start">PERSONNE</button>
+      <button class="sort-btn" id="sort-note" style="justify-self:center">NOTE <svg viewBox="0 0 12 12" fill="none"><path d="M3 5l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+      <button class="sort-btn" id="sort-elo" style="justify-self:center">ELO</button>
+    </div>
+    <div id="list-body"></div>
+  </div>
+</div>
+
+<div class="modal" id="modal-user-switch">
+  <div class="modal-card" style="max-width:420px">
+    <div class="modal-header">
+      <div><div class="modal-title">Utilisateur actif</div><div class="modal-sub">Qui note et consulte en ce moment</div></div>
+      <button class="modal-close" data-close><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="modal-body"><div id="user-switch-list" style="display:flex;flex-direction:column;gap:6px"></div></div>
+  </div>
+</div>
+
+<div class="modal" id="modal-add">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div><div class="modal-title">Ajouter une personne</div><div class="modal-sub">TMDb, Wikidata ou ajout manuel</div></div>
+      <button class="modal-close" data-close><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="tabs">
+        <button class="tab is-active" data-tab="tmdb">TMDb</button>
+        <button class="tab" data-tab="wiki">Wikidata</button>
+        <button class="tab" data-tab="manual">Manuel</button>
+      </div>
+      <div data-panel="tmdb">
+        <div class="search-people">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <input id="tmdb-q" type="text" placeholder="Ex: Margot Robbie, Timothée Chalamet...">
+        </div>
+        <div class="search-hint" id="tmdb-hint"></div>
+        <div class="search-results" id="tmdb-results"></div>
+      </div>
+      <div data-panel="wiki" hidden>
+        <div class="search-people">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <input id="wiki-q" type="text" placeholder="Ex: Zendaya, Rihanna, Naomi Campbell...">
+        </div>
+        <div class="search-hint">Fallback utile pour les non acteurs (chanteuses, sportives, mannequins). Photos via Wikimedia Commons, sans clé d'API.</div>
+        <div class="search-results" id="wiki-results"></div>
+      </div>
+      <div data-panel="manual" hidden>
+        <div class="form-grid">
+          <div class="field full"><label>Nom complet</label><input id="m-name" type="text" placeholder="Prénom et nom"></div>
+          <div class="field full"><label>Genre</label>
+            <div class="seg" id="m-gender">
+              <button type="button" data-g="F">Femme</button>
+              <button type="button" data-g="M">Homme</button>
+            </div>
+          </div>
+          <div class="field full"><label>URL de la photo</label><input id="m-photo" type="url" placeholder="https://..."></div>
+          <div class="field"><label>Année de naissance</label><input id="m-year" type="number" placeholder="1990"></div>
+          <div class="field"><label>Nationalité</label><input id="m-nat" type="text" placeholder="Française"></div>
+          <div class="field full"><label>Profession</label><input id="m-prof" type="text" placeholder="Actrice, mannequin..."></div>
+          <div class="field full"><label>Bio courte</label><textarea id="m-bio" placeholder="Univers, parcours..."></textarea></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" data-close>Annuler</button>
+      <button class="btn btn-primary" id="add-manual-save" hidden>Ajouter à la banque</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modal-details">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div><div class="modal-title">Fiche personne</div><div class="modal-sub" id="detail-sub">Notes des 4 utilisateurs</div></div>
+      <button class="modal-close" data-close><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="modal-body" id="detail-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-danger" id="detail-delete">Supprimer</button>
+      <button class="btn btn-primary" id="detail-save">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modal-duel">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div><div class="modal-title">Duel libre</div><div class="modal-sub" id="duel-sub">Choisis le plus beau visage</div></div>
+      <button class="modal-close" data-close><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="modal-body" id="duel-body"></div>
+  </div>
+</div>
+
+<div class="modal" id="modal-tournament">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div><div class="modal-title" id="tour-title">Tournoi</div><div class="modal-sub" id="tour-sub">Organise un bracket</div></div>
+      <button class="modal-close" data-close><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="modal-body" id="tour-body"></div>
+  </div>
+</div>
+
+<div class="modal" id="modal-stats">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div><div class="modal-title">Statistiques</div><div class="modal-sub" id="stats-sub">Tes chiffres à toi</div></div>
+      <button class="modal-close" data-close><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="modal-body" id="stats-body"></div>
+  </div>
+</div>
+
+<div class="modal" id="modal-compare">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div><div class="modal-title">Comparer deux tops</div><div class="modal-sub">Face à face en lecture</div></div>
+      <button class="modal-close" data-close><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="modal-body" id="compare-body"></div>
+  </div>
+</div>
+
+<div class="modal" id="modal-consult">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div><div class="modal-title">Consultation</div><div class="modal-sub">Toutes les notes des 4 utilisateurs</div></div>
+      <button class="modal-close" data-close><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="modal-body" id="consult-body"></div>
+  </div>
+</div>
+
+<div class="modal" id="modal-settings">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div><div class="modal-title">Réglages</div><div class="modal-sub">Pondération, utilisateurs, données</div></div>
+      <button class="modal-close" data-close><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="modal-body" id="settings-body"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+/* ============ CONSTANTS ============ */
+const USERS = [
+  { id:'lily',    name:'Lily',    color:'#EC4899', hi:'#F472B6', initial:'L' },
+  { id:'victor',  name:'Victor',  color:'#10B981', hi:'#34D399', initial:'V' },
+  { id:'julie',   name:'Julie',   color:'#A855F7', hi:'#C084FC', initial:'J' },
+  { id:'yannick', name:'Yannick', color:'#06B6D4', hi:'#22D3EE', initial:'Y' },
+];
+const TECH_CRITERIA = [
+  { key:'symetrie',  label:'Symétrie et harmonie' },
+  { key:'structure', label:'Structure du visage' },
+  { key:'regard',    label:'Regard' },
+  { key:'sourire',   label:'Sourire' },
+  { key:'photogenie',label:'Photogénie' },
+  { key:'charisme',  label:'Présence et charisme' },
+  { key:'style',     label:'Style et allure' },
+  { key:'pic',       label:'Pic de forme' },
+];
+const BEAUTY_TAGS = [
+  { k:'coup',     label:'Coup de cœur',        cls:'badge-coup',     ic:'heart' },
+  { k:'regard',   label:'Regard magnétique',   cls:'badge-regard',   ic:'eye' },
+  { k:'sourire',  label:'Sourire lumineux',    cls:'badge-sourire',  ic:'smile' },
+  { k:'photo',    label:'Photogénie rare',     cls:'badge-photo',    ic:'camera' },
+  { k:'charisme', label:'Charisme magnétique', cls:'badge-charisme', ic:'spark' },
+  { k:'style',    label:'Style iconique',      cls:'badge-style',    ic:'star' },
+  { k:'muse',     label:'Muse absolue',        cls:'badge-muse',     ic:'crown' },
+];
+const DEFAULT_WEIGHTS = { technique:0.40, coup:0.35, pref:0.25 };
+const STORAGE_KEY = 'classeur-beaute-v1';
+const TMDB_IMG = 'https://image.tmdb.org/t/p/w500';
+const ICONS = {
+  heart:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.6-9.5-9.4C1 8.3 2.7 5 6 5c2 0 3.3 1 4 2.2C10.7 6 12 5 14 5c3.3 0 5 3.3 3.5 6.6C19 16.4 12 21 12 21Z"/></svg>',
+  eye:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2.5 12s3-7 9.5-7 9.5 7 9.5 7-3 7-9.5 7S2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3"/></svg>',
+  smile:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01" stroke-linecap="round"/></svg>',
+  camera:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8h4l2-3h6l2 3h4v11H3V8Z"/><circle cx="12" cy="13" r="3.5"/></svg>',
+  spark:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2 6 6 2-6 2-2 6-2-6-6-2 6-2 2-6z"/></svg>',
+  star:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 7 7 .8-5.3 4.9 1.6 7.1L12 18.3 5.7 21.8l1.6-7.1L2 9.8 9 9z"/></svg>',
+  crown:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 7l4 4 6-7 6 7 4-4v11H2V7z"/></svg>',
+};
+
+/* ============ STATE ============ */
+const state = {
+  people: [],
+  ratings: {},
+  favorites: {},
+  elo: {},
+  duels: {},
+  duelHistory: {},
+  tournaments: {},
+  settings: {
+    currentUser: 'lily',
+    weights: { ...DEFAULT_WEIGHTS },
+    tmdbKey: '',
+    sortBy: 'note',
+    filter: 'all',
+    query: '',
+    consultSort: 'note',
+    compareA: 'lily',
+    compareB: 'victor',
+  },
+};
+const ui = { currentPersonId:null, draft:null, duel:null, tour:null, photoIdx:0 };
+
+/* ============ UTILITIES ============ */
+const $ = (s,r=document)=>r.querySelector(s);
+const $$ = (s,r=document)=>Array.from(r.querySelectorAll(s));
+function uid(){ return 'p_'+Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4); }
+function getUser(id){ return USERS.find(u=>u.id===id)||USERS[0]; }
+function esc(s){ if(s==null) return ''; return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function fmt(n){ return (n==null||Number.isNaN(n))?'-':Number(n).toFixed(2); }
+function icon(n){ return ICONS[n]||''; }
+function toast(msg,kind=''){ const t=$('#toast'); t.textContent=msg; t.className='show '+kind; clearTimeout(toast._tm); toast._tm=setTimeout(()=>{t.className='';},2400); }
+function ensureBuckets(u){
+  if(!state.ratings[u]) state.ratings[u]={};
+  if(!state.favorites[u]) state.favorites[u]={};
+  if(!state.elo[u]) state.elo[u]={};
+  if(!state.duels[u]) state.duels[u]=0;
+  if(!state.duelHistory[u]) state.duelHistory[u]=[];
+  if(!state.tournaments[u]) state.tournaments[u]=[];
+}
+function getRating(u,p){ return state.ratings[u]?.[p]||null; }
+function techMean(r){
+  if(!r?.technique) return null;
+  const v=TECH_CRITERIA.map(c=>r.technique[c.key]).filter(x=>typeof x==='number');
+  return v.length?v.reduce((a,b)=>a+b,0)/v.length:null;
+}
+function computeNoteForRating(r,w){
+  if(!r) return null;
+  const wt=w||state.settings.weights;
+  const t=techMean(r);
+  const c=typeof r.coup==='number'?r.coup:null;
+  const p=typeof r.pref==='number'?r.pref:null;
+  if(t==null&&c==null&&p==null) return null;
+  let s=0,ws=0;
+  if(t!=null){s+=t*wt.technique;ws+=wt.technique;}
+  if(c!=null){s+=c*wt.coup;ws+=wt.coup;}
+  if(p!=null){s+=p*wt.pref;ws+=wt.pref;}
+  return ws?s/ws:null;
+}
+function computeNote(u,p){ return computeNoteForRating(getRating(u,p)); }
+function getElo(u,p){ return state.elo[u]?.[p]??1500; }
+function updateElo(u,w,l,K=32){
+  ensureBuckets(u);
+  const wo=getElo(u,w), lo=getElo(u,l);
+  const ew=1/(1+Math.pow(10,(lo-wo)/400));
+  state.elo[u][w]=Math.round(wo+K*(1-ew));
+  state.elo[u][l]=Math.round(lo+K*(0-(1-ew)));
+}
+
+/* ============ STORAGE ============ */
+function saveState(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    people:state.people, ratings:state.ratings, favorites:state.favorites,
+    elo:state.elo, duels:state.duels, duelHistory:state.duelHistory,
+    tournaments:state.tournaments, settings:state.settings,
+  })); }catch(e){}
+}
+function loadState(){
+  try{
+    const r=localStorage.getItem(STORAGE_KEY);
+    if(!r) return;
+    const d=JSON.parse(r);
+    Object.assign(state,d);
+    USERS.forEach(u=>ensureBuckets(u.id));
+    state.settings=Object.assign({currentUser:'lily',weights:{...DEFAULT_WEIGHTS},tmdbKey:'',sortBy:'note',filter:'all',query:'',consultSort:'note',compareA:'lily',compareB:'victor'},state.settings||{});
+    state.settings.weights=Object.assign({...DEFAULT_WEIGHTS},state.settings.weights||{});
+  }catch(e){ console.warn(e); }
+}
+
+/* ============ TMDB ============ */
+async function tmdbFetch(path,params={}){
+  const key=state.settings.tmdbKey?.trim();
+  if(!key) throw new Error('Pas de clé TMDb');
+  const url=new URL('https://api.themoviedb.org/3'+path);
+  url.searchParams.set('language','fr-FR');
+  Object.entries(params).forEach(([k,v])=>url.searchParams.set(k,v));
+  const opts={};
+  if(key.length>40) opts.headers={Authorization:'Bearer '+key};
+  else url.searchParams.set('api_key',key);
+  const r=await fetch(url.toString(),opts);
+  if(!r.ok) throw new Error('TMDb '+r.status);
+  return r.json();
+}
+async function tmdbSearchPerson(q){
+  const d=await tmdbFetch('/search/person',{query:q,include_adult:'false'});
+  return (d.results||[]).slice(0,12);
+}
+async function tmdbPerson(id){ return tmdbFetch('/person/'+id,{append_to_response:'images'}); }
+
+/* ============ WIKIDATA ============ */
+async function wikiSearch(q){
+  const url=new URL('https://www.wikidata.org/w/api.php');
+  const p={action:'wbsearchentities',search:q,language:'fr',uselang:'fr',format:'json',origin:'*',type:'item',limit:'12'};
+  Object.entries(p).forEach(([k,v])=>url.searchParams.set(k,v));
+  const r=await fetch(url.toString());
+  if(!r.ok) throw new Error('Wikidata '+r.status);
+  return (await r.json()).search||[];
+}
+async function wikiEntity(qid){
+  const r=await fetch('https://www.wikidata.org/wiki/Special:EntityData/'+qid+'.json');
+  if(!r.ok) throw new Error('Wikidata '+r.status);
+  return (await r.json()).entities?.[qid];
+}
+function wikiImg(fn,size=500){
+  if(!fn) return null;
+  return 'https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/'+encodeURIComponent(fn.replace(/ /g,'_'))+'&width='+size;
+}
+async function wikiHydrate(qid){
+  const e=await wikiEntity(qid);
+  if(!e) return null;
+  const c=e.claims||{};
+  const name=(e.labels?.fr?.value)||(e.labels?.en?.value)||'';
+  const desc=(e.descriptions?.fr?.value)||(e.descriptions?.en?.value)||'';
+  const gQ=c.P21?.[0]?.mainsnak?.datavalue?.value?.id;
+  const gender=gQ==='Q6581072'?'F':gQ==='Q6581097'?'M':null;
+  const imgF=c.P18?.[0]?.mainsnak?.datavalue?.value;
+  const dob=c.P569?.[0]?.mainsnak?.datavalue?.value?.time;
+  const year=dob?parseInt(dob.replace(/^[+-]/,'').slice(0,4)):null;
+  return { wikiId:qid, name, gender, bio:desc, birthday:year, mainPhoto:wikiImg(imgF,500), photos:imgF?[wikiImg(imgF,800)]:[] };
+}
+
+/* ============ RENDER: HEADER ============ */
+function renderHeader(){
+  const u=getUser(state.settings.currentUser);
+  $('#user-avatar').textContent=u.initial;
+  $('#user-avatar').style.background=u.color;
+  $('#user-name').textContent=u.name;
+}
+
+/* ============ RENDER: LIST ============ */
+function filterPeople(){
+  const q=(state.settings.query||'').trim().toLowerCase();
+  const f=state.settings.filter||'all';
+  const u=state.settings.currentUser;
+  return state.people.filter(p=>{
+    if(f==='M'&&p.gender!=='M') return false;
+    if(f==='F'&&p.gender!=='F') return false;
+    if(f==='rated'&&computeNote(u,p.id)==null) return false;
+    if(f==='unrated'&&computeNote(u,p.id)!=null) return false;
+    if(f==='fav'&&!state.favorites[u]?.[p.id]) return false;
+    if(q){
+      const h=(p.name+' '+(p.profession||'')+' '+(p.nationality||'')+' '+(getRating(u,p.id)?.tag||'')).toLowerCase();
+      if(!h.includes(q)) return false;
+    }
+    return true;
+  });
+}
+function sortPeople(list){
+  const u=state.settings.currentUser;
+  const by=state.settings.sortBy||'note';
+  const c=list.slice();
+  if(by==='name') c.sort((a,b)=>a.name.localeCompare(b.name,'fr'));
+  else if(by==='elo') c.sort((a,b)=>getElo(u,b.id)-getElo(u,a.id));
+  else if(by==='added') c.sort((a,b)=>(b.addedAt||0)-(a.addedAt||0));
+  else c.sort((a,b)=>{
+    const na=computeNote(u,a.id),nb=computeNote(u,b.id);
+    if(na==null&&nb==null) return 0;
+    if(na==null) return 1;
+    if(nb==null) return -1;
+    return nb-na;
+  });
+  return c;
+}
+function getBadge(r){ return r?.tag ? BEAUTY_TAGS.find(t=>t.k===r.tag) : null; }
+function renderList(){
+  const body=$('#list-body');
+  const u=state.settings.currentUser;
+  const filt=filterPeople();
+  const sorted=sortPeople(filt);
+  $('#count').textContent=filt.length+' / '+state.people.length;
+  if(!state.people.length){
+    body.innerHTML=`<div class="empty-state"><div class="big">💎</div><h3>Aucune personne dans la banque</h3><p>Appuie sur le bouton + pour ajouter une première célébrité</p></div>`;
+    return;
+  }
+  if(!sorted.length){
+    body.innerHTML=`<div class="empty-state"><div class="big">🔎</div><h3>Aucun résultat</h3><p>Essaie un autre filtre ou une autre recherche</p></div>`;
+    return;
+  }
+  body.innerHTML=sorted.map((p,i)=>{
+    const r=getRating(u,p.id);
+    const n=computeNoteForRating(r);
+    const el=state.elo[u]?.[p.id]??null;
+    const bd=getBadge(r);
+    const th=p.mainPhoto?`<img class="thumb" loading="lazy" src="${esc(p.mainPhoto)}" onerror="this.outerHTML='&lt;div class=&quot;thumb placeholder&quot;&gt;?&lt;/div&gt;'">`:`<div class="thumb placeholder">?</div>`;
+    return `<div class="row" data-open="${p.id}">
+      <div style="text-align:center;font-weight:700;font-size:14px">${i+1}</div>
+      <div class="row-main">${th}<div class="row-info"><div class="row-name">${esc(p.name)}</div>${bd?`<div class="row-badge"><span class="badge ${bd.cls}">${icon(bd.ic)}<span>${esc(bd.label)}</span></span></div>`:''}</div></div>
+      <div class="row-note ${n==null?'dim':''}">${n==null?'-':fmt(n)}</div>
+      <div class="row-elo">${el==null?'<span style="color:var(--text-4)">-</span>':el}<small>ELO</small></div>
+    </div>`;
+  }).join('');
+}
+
+/* ============ MODALS ============ */
+function openModal(id){ document.getElementById(id)?.classList.add('is-open'); }
+function closeAllModals(){ $$('.modal.is-open').forEach(m=>m.classList.remove('is-open')); }
+
+/* User switch */
+function renderUserSwitch(){
+  const cur=state.settings.currentUser;
+  $('#user-switch-list').innerHTML=USERS.map(user=>{
+    const nR=Object.keys(state.ratings[user.id]||{}).filter(pid=>computeNote(user.id,pid)!=null).length;
+    const nF=Object.values(state.favorites[user.id]||{}).filter(Boolean).length;
+    const nD=state.duels[user.id]||0;
+    const act=user.id===cur;
+    return `<button class="user-card ${act?'is-current':''}" style="--user-color:${user.color}" data-switch="${user.id}">
+      <div class="av" style="background:${user.color}">${user.initial}</div>
+      <div class="info"><div class="un">${user.name}</div><div class="us">${nR} noté${nR>1?'s':''} · ${nF} coup${nF>1?'s':''} de cœur · ${nD} duel${nD>1?'s':''}</div></div>
+      ${act?`<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5 9-11" stroke="${user.color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`:''}
+    </button>`;
+  }).join('');
+  $$('#user-switch-list [data-switch]').forEach(b=>b.addEventListener('click',()=>{
+    state.settings.currentUser=b.getAttribute('data-switch');
+    saveState(); renderHeader(); renderList(); closeAllModals();
+    toast('Utilisateur : '+getUser(state.settings.currentUser).name,'ok');
+  }));
+}
+
+
+/* ============ ADD MODAL ============ */
+function initAddOnce(){
+  if(initAddOnce.done) return; initAddOnce.done=true;
+  $$('#modal-add .tab').forEach(t=>t.addEventListener('click',()=>{
+    $$('#modal-add .tab').forEach(x=>x.classList.remove('is-active'));
+    t.classList.add('is-active');
+    const k=t.getAttribute('data-tab');
+    $$('#modal-add [data-panel]').forEach(p=>p.hidden=p.getAttribute('data-panel')!==k);
+    $('#add-manual-save').hidden=k!=='manual';
+  }));
+  let tT,wT;
+  $('#tmdb-q').addEventListener('input',e=>{
+    clearTimeout(tT);
+    const q=e.target.value.trim();
+    if(!q){ $('#tmdb-results').innerHTML=''; return; }
+    tT=setTimeout(async()=>{
+      if(!state.settings.tmdbKey){ renderTmdbHint(); return; }
+      $('#tmdb-results').innerHTML='<div class="empty-state" style="padding:20px"><p>Recherche...</p></div>';
+      try{ renderTmdbResults(await tmdbSearchPerson(q)); }
+      catch(err){ $('#tmdb-results').innerHTML='<div class="empty-state" style="padding:20px"><p>Erreur : '+esc(err.message)+'</p></div>'; }
+    },450);
+  });
+  $('#wiki-q').addEventListener('input',e=>{
+    clearTimeout(wT);
+    const q=e.target.value.trim();
+    if(!q){ $('#wiki-results').innerHTML=''; return; }
+    wT=setTimeout(async()=>{
+      $('#wiki-results').innerHTML='<div class="empty-state" style="padding:20px"><p>Recherche...</p></div>';
+      try{ renderWikiResults(await wikiSearch(q)); }
+      catch(err){ $('#wiki-results').innerHTML='<div class="empty-state" style="padding:20px"><p>Erreur : '+esc(err.message)+'</p></div>'; }
+    },450);
+  });
+  $$('#m-gender button').forEach(b=>b.addEventListener('click',()=>{
+    $$('#m-gender button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+  }));
+  $('#add-manual-save').addEventListener('click',()=>{
+    const name=$('#m-name').value.trim();
+    const g=$('#m-gender button.on');
+    if(!name){ toast('Nom requis','err'); return; }
+    if(!g){ toast('Sélectionne un genre','err'); return; }
+    const ph=$('#m-photo').value.trim();
+    const yr=parseInt($('#m-year').value)||null;
+    const nt=$('#m-nat').value.trim();
+    const pr=$('#m-prof').value.trim();
+    const bo=$('#m-bio').value.trim();
+    state.people.push({ id:uid(), name, gender:g.getAttribute('data-g'), mainPhoto:ph||null, photos:ph?[ph]:[], birthday:yr, nationality:nt||null, profession:pr||null, bio:bo||null, addedAt:Date.now() });
+    saveState(); renderList(); closeAllModals();
+    toast('Ajouté : '+name,'ok');
+    ['m-name','m-photo','m-year','m-nat','m-prof','m-bio'].forEach(id=>$('#'+id).value='');
+    $$('#m-gender button').forEach(x=>x.classList.remove('on'));
+  });
+}
+function renderTmdbHint(){
+  const h=$('#tmdb-hint');
+  if(state.settings.tmdbKey){ h.textContent='Clé TMDb active. Tape un nom pour chercher.'; return; }
+  h.innerHTML=`Aucune clé TMDb enregistrée. Ouvre les <a href="#" id="go-settings">Réglages</a> pour la coller (clé v3 ou token v4). L'onglet Wikidata fonctionne sans clé.`;
+  $('#go-settings')?.addEventListener('click',e=>{ e.preventDefault(); closeAllModals(); setTimeout(openSettings,180); });
+}
+function renderTmdbResults(results){
+  const box=$('#tmdb-results');
+  if(!results.length){ box.innerHTML='<div class="empty-state" style="padding:20px"><p>Aucun résultat</p></div>'; return; }
+  box.innerHTML=results.map(r=>{
+    const ex=state.people.find(p=>p.tmdbId===r.id);
+    const ph=r.profile_path?(TMDB_IMG+r.profile_path):'';
+    const kn=(r.known_for||[]).slice(0,2).map(k=>k.title||k.name).filter(Boolean).join(', ');
+    const dp=r.known_for_department||'';
+    const g=r.gender===1?'F':r.gender===2?'M':'?';
+    return `<button class="search-result" data-tmdb-id="${r.id}" data-gender="${g}">
+      ${ph?`<img src="${esc(ph)}" loading="lazy" onerror="this.style.display='none'">`:`<div style="width:48px;height:64px;background:var(--bg-3);border-radius:8px;display:grid;place-items:center;color:var(--text-4);font-size:11px">?</div>`}
+      <div class="sr-info"><div class="sr-name">${esc(r.name)}</div><div class="sr-meta">${esc(dp)}${kn?' · '+esc(kn):''}</div></div>
+      <div class="sr-badge">${ex?'Déjà là':(g==='F'?'Femme':g==='M'?'Homme':'?')}</div>
+    </button>`;
+  }).join('');
+  $$('#tmdb-results .search-result').forEach(btn=>btn.addEventListener('click',async()=>{
+    const tid=parseInt(btn.getAttribute('data-tmdb-id'));
+    const ex=state.people.find(p=>p.tmdbId===tid);
+    if(ex){ toast('Déjà dans ta banque','err'); openDetails(ex.id); return; }
+    try{
+      btn.style.opacity='.5';
+      const f=await tmdbPerson(tid);
+      const g=f.gender===1?'F':f.gender===2?'M':(btn.getAttribute('data-gender')||'F');
+      const ph=(f.images?.profiles||[]).map(x=>TMDB_IMG+x.file_path);
+      const main=f.profile_path?(TMDB_IMG+f.profile_path):(ph[0]||null);
+      const yr=f.birthday?parseInt(f.birthday.slice(0,4)):null;
+      state.people.push({ id:uid(), tmdbId:tid, name:f.name, gender:g==='?'?'F':g, mainPhoto:main, photos:ph.length?ph:(main?[main]:[]), birthday:yr, nationality:f.place_of_birth||null, profession:f.known_for_department||null, bio:f.biography||null, addedAt:Date.now() });
+      saveState(); renderList(); closeAllModals();
+      toast('Ajouté : '+f.name,'ok');
+    }catch(err){ toast('Erreur TMDb : '+err.message,'err'); btn.style.opacity=''; }
+  }));
+}
+function renderWikiResults(results){
+  const box=$('#wiki-results');
+  if(!results.length){ box.innerHTML='<div class="empty-state" style="padding:20px"><p>Aucun résultat</p></div>'; return; }
+  box.innerHTML=results.map(r=>{
+    const ex=state.people.find(p=>p.wikiId===r.id);
+    return `<button class="search-result" data-wiki-id="${r.id}">
+      <div style="width:48px;height:64px;background:var(--bg-3);border-radius:8px;display:grid;place-items:center;color:var(--text-4);font-size:18px;font-weight:800">W</div>
+      <div class="sr-info"><div class="sr-name">${esc(r.label||r.id)}</div><div class="sr-meta">${esc(r.description||'')}</div></div>
+      <div class="sr-badge">${ex?'Déjà là':r.id}</div>
+    </button>`;
+  }).join('');
+  $$('#wiki-results .search-result').forEach(btn=>btn.addEventListener('click',async()=>{
+    const qid=btn.getAttribute('data-wiki-id');
+    const ex=state.people.find(p=>p.wikiId===qid);
+    if(ex){ toast('Déjà dans ta banque','err'); openDetails(ex.id); return; }
+    try{
+      btn.style.opacity='.5';
+      const h=await wikiHydrate(qid);
+      if(!h?.name){ toast('Entité incomplète','err'); btn.style.opacity=''; return; }
+      if(!h.gender){ toast('Genre manquant, utilise l\'ajout manuel','err'); btn.style.opacity=''; return; }
+      state.people.push({ id:uid(), wikiId:qid, name:h.name, gender:h.gender, mainPhoto:h.mainPhoto, photos:h.photos||[], birthday:h.birthday||null, bio:h.bio||null, addedAt:Date.now() });
+      saveState(); renderList(); closeAllModals();
+      toast('Ajouté : '+h.name,'ok');
+    }catch(err){ toast('Erreur Wikidata : '+err.message,'err'); btn.style.opacity=''; }
+  }));
+}
+function openAdd(){ initAddOnce(); renderTmdbHint(); openModal('modal-add'); }
+
+/* ============ DETAILS MODAL ============ */
+function openDetails(pid){
+  const p=state.people.find(x=>x.id===pid);
+  if(!p) return;
+  ui.currentPersonId=pid;
+  const u=state.settings.currentUser;
+  ensureBuckets(u);
+  const ex=getRating(u,pid);
+  ui.draft=ex?JSON.parse(JSON.stringify(ex)):{technique:{},coup:null,pref:null,tag:null,notes:'',updatedAt:0};
+  ui.photoIdx=0;
+  renderDetails();
+  openModal('modal-details');
+}
+function renderDetails(){
+  const p=state.people.find(x=>x.id===ui.currentPersonId);
+  if(!p) return;
+  const u=state.settings.currentUser;
+  const user=getUser(u);
+  const d=ui.draft;
+  const photos=p.photos?.length?p.photos:(p.mainPhoto?[p.mainPhoto]:[]);
+  const fav=!!state.favorites[u]?.[p.id];
+  const sp=[];
+  if(p.profession) sp.push(p.profession);
+  if(p.birthday) sp.push(p.birthday);
+  if(p.nationality) sp.push(p.nationality);
+  const sub=sp.join(' · ');
+  const tmdbLink=p.tmdbId?`<a href="https://www.themoviedb.org/person/${p.tmdbId}" target="_blank" rel="noreferrer">Voir sur TMDb ↗</a>`:'';
+  const wikiLink=p.wikiId?`<a href="https://www.wikidata.org/wiki/${p.wikiId}" target="_blank" rel="noreferrer">Wikidata ↗</a>`:'';
+  const idx=Math.min(ui.photoIdx||0,Math.max(0,photos.length-1));
+  const main=photos[idx]||'';
+  const dTm=techMean(d), dN=computeNoteForRating(d);
+  const w=state.settings.weights;
+  const notes=USERS.map(usr=>{
+    const isMe=usr.id===u;
+    const r=isMe?d:getRating(usr.id,p.id);
+    const n=computeNoteForRating(r);
+    const hd=r&&(techMean(r)!=null||typeof r.coup==='number'||typeof r.pref==='number');
+    const tm=hd?techMean(r):null;
+    return `<div class="note-card ${isMe?'is-current':''}" style="--user-color:${usr.color}">
+      <div class="nc-label">${usr.name}</div>
+      <div class="nc-value ${n==null?'dim':''}">${n==null?'-':fmt(n)}</div>
+      ${hd?`<div class="nc-tiny">T ${tm==null?'-':fmt(tm)} · C ${r.coup==null?'-':fmt(r.coup)} · P ${r.pref==null?'-':fmt(r.pref)}</div>`:''}
+    </div>`;
+  }).join('');
+  const techRows=TECH_CRITERIA.map(c=>{
+    const v=d.technique?.[c.key];
+    return `<div class="slider-row">
+      <span class="slider-label">${c.label}</span>
+      <span class="slider-value" data-v-for="${c.key}">${v==null?'-':Number(v).toFixed(1)}</span>
+      <input class="slider" type="range" min="0" max="10" step="0.1" value="${v||0}" data-crit="${c.key}">
+    </div>`;
+  }).join('');
+  const tagRow=BEAUTY_TAGS.map(t=>{
+    const on=d.tag===t.k;
+    return `<button type="button" class="badge ${t.cls}" data-tag="${t.k}" style="opacity:${on?1:.5};transform:scale(${on?1:.95})">${icon(t.ic)}<span>${t.label}</span></button>`;
+  }).join('');
+  $('#detail-body').innerHTML=`
+    <div class="detail-photo">
+      ${main?`<img src="${esc(main)}" alt="${esc(p.name)}" onerror="this.style.display='none'">`:`<div style="height:100%;display:grid;place-items:center;color:var(--text-4);font-size:60px">?</div>`}
+      <button class="fav ${fav?'is-on':''}" id="fav-toggle" aria-label="Favori">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.6-9.5-9.4C1 8.3 2.7 5 6 5c2 0 3.3 1 4 2.2C10.7 6 12 5 14 5c3.3 0 5 3.3 3.5 6.6C19 16.4 12 21 12 21Z"/></svg>
+      </button>
+      ${photos.length>1?`
+        <div class="photo-nav">
+          <button id="photo-prev" aria-label="Précédente"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M8 2 L4 6 L8 10" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></button>
+          ${idx+1}/${photos.length}
+          <button id="photo-next" aria-label="Suivante"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M4 2 L8 6 L4 10" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></button>
+        </div>
+        <div class="photo-dots">${photos.map((_,i)=>`<span class="${i===idx?'on':''}"></span>`).join('')}</div>
+      `:''}
+    </div>
+    <div class="detail-title-wrap">
+      <div class="detail-title">${esc(p.name)}</div>
+      ${sub?`<div class="detail-subtitle">${esc(sub)}</div>`:''}
+      ${(tmdbLink||wikiLink)?`<div class="detail-links">${tmdbLink} ${wikiLink}</div>`:''}
+    </div>
+    <div class="notes-grid">${notes}</div>
+    <div class="hint"><span>💡</span><span>Tu modifies les notes de <strong>${user.name}</strong>. Les 3 autres sont en lecture.</span></div>
+    <div class="ventilation">
+      <div class="vent-title">Ventilation</div>
+      <div class="vent-section">
+        <div class="vent-section-label">Techniques <span class="vw">${Math.round(w.technique*100)}%</span></div>
+        ${techRows}
+      </div>
+      <div class="vent-section">
+        <div class="vent-section-label">Coup de cœur <span class="vw">${Math.round(w.coup*100)}%</span></div>
+        <div class="slider-row">
+          <span class="slider-label">Intensité émotionnelle</span>
+          <span class="slider-value" data-v-for="coup">${d.coup==null?'-':Number(d.coup).toFixed(1)}</span>
+          <input class="slider" type="range" min="0" max="10" step="0.1" value="${d.coup||0}" data-global="coup">
+        </div>
+      </div>
+      <div class="vent-section">
+        <div class="vent-section-label">Préférence <span class="vw">${Math.round(w.pref*100)}%</span></div>
+        <div class="slider-row">
+          <span class="slider-label">Goût personnel</span>
+          <span class="slider-value" data-v-for="pref">${d.pref==null?'-':Number(d.pref).toFixed(1)}</span>
+          <input class="slider" type="range" min="0" max="10" step="0.1" value="${d.pref||0}" data-global="pref">
+        </div>
+      </div>
+      <div class="formula-display" id="formula"></div>
+    </div>
+    <div style="margin-top:14px">
+      <div class="vent-section-label" style="margin-bottom:8px">Tag facultatif</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">${tagRow}</div>
+    </div>
+    <div style="margin-top:14px" class="field">
+      <label>Notes personnelles</label>
+      <textarea id="d-notes" placeholder="Ce que tu veux te rappeler...">${esc(d.notes||'')}</textarea>
+    </div>`;
+  refreshFormula();
+  $('#fav-toggle')?.addEventListener('click',()=>{
+    if(!state.favorites[u]) state.favorites[u]={};
+    state.favorites[u][p.id]=!state.favorites[u][p.id];
+    saveState(); renderDetails();
+  });
+  $('#photo-prev')?.addEventListener('click',()=>{ ui.photoIdx=(ui.photoIdx-1+photos.length)%photos.length; renderDetails(); });
+  $('#photo-next')?.addEventListener('click',()=>{ ui.photoIdx=(ui.photoIdx+1)%photos.length; renderDetails(); });
+  $$('#detail-body .slider[data-crit]').forEach(s=>s.addEventListener('input',e=>{
+    const k=e.target.getAttribute('data-crit');
+    d.technique=d.technique||{};
+    d.technique[k]=parseFloat(e.target.value);
+    $(`[data-v-for="${k}"]`).textContent=Number(e.target.value).toFixed(1);
+    refreshFormula();
+  }));
+  $$('#detail-body .slider[data-global]').forEach(s=>s.addEventListener('input',e=>{
+    const k=e.target.getAttribute('data-global');
+    d[k]=parseFloat(e.target.value);
+    $(`[data-v-for="${k}"]`).textContent=Number(e.target.value).toFixed(1);
+    refreshFormula();
+  }));
+  $$('#detail-body [data-tag]').forEach(b=>b.addEventListener('click',()=>{
+    const t=b.getAttribute('data-tag');
+    d.tag=d.tag===t?null:t;
+    renderDetails();
+  }));
+}
+function refreshFormula(){
+  const d=ui.draft, w=state.settings.weights;
+  const tm=techMean(d), n=computeNoteForRating(d);
+  const f=$('#formula');
+  if(!f) return;
+  f.innerHTML=`<span class="n">${n==null?'-':fmt(n)}</span> = T <span class="n">${tm==null?'-':fmt(tm)}</span> × ${Math.round(w.technique*100)} + C <span class="n">${d.coup==null?'-':fmt(d.coup)}</span> × ${Math.round(w.coup*100)} + P <span class="n">${d.pref==null?'-':fmt(d.pref)}</span> × ${Math.round(w.pref*100)}`;
+  const cards=$$('#detail-body .note-card');
+  const i=USERS.findIndex(x=>x.id===state.settings.currentUser);
+  if(i>=0&&cards[i]){
+    cards[i].querySelector('.nc-value').textContent=n==null?'-':fmt(n);
+    cards[i].querySelector('.nc-value').classList.toggle('dim',n==null);
+  }
+}
+function saveDetails(){
+  const p=state.people.find(x=>x.id===ui.currentPersonId);
+  if(!p) return;
+  const u=state.settings.currentUser;
+  ensureBuckets(u);
+  const d=ui.draft;
+  d.notes=$('#d-notes')?.value||'';
+  d.updatedAt=Date.now();
+  state.ratings[u][p.id]=d;
+  saveState(); renderList(); closeAllModals();
+  toast('Notes enregistrées','ok');
+}
+function deletePerson(){
+  const p=state.people.find(x=>x.id===ui.currentPersonId);
+  if(!p) return;
+  if(!confirm('Supprimer '+p.name+' de la banque commune ?\nLes notes de tous les utilisateurs seront effacées.')) return;
+  state.people=state.people.filter(x=>x.id!==p.id);
+  USERS.forEach(u=>{
+    if(state.ratings[u.id]) delete state.ratings[u.id][p.id];
+    if(state.favorites[u.id]) delete state.favorites[u.id][p.id];
+    if(state.elo[u.id]) delete state.elo[u.id][p.id];
+  });
+  saveState(); renderList(); closeAllModals();
+  toast('Supprimé : '+p.name);
+}
+
+
+/* ============ DUEL MODAL ============ */
+function openDuel(){
+  ui.duel={ filter:'all', pair:null };
+  renderDuel();
+  openModal('modal-duel');
+}
+function pickPair(){
+  const f=ui.duel.filter;
+  const pool=state.people.filter(p=>f==='all'||p.gender===f);
+  if(pool.length<2) return null;
+  const u=state.settings.currentUser;
+  const a=pool[Math.floor(Math.random()*pool.length)];
+  const ae=getElo(u,a.id);
+  const rest=pool.filter(p=>p.id!==a.id).map(p=>({p,d:Math.abs(getElo(u,p.id)-ae)}));
+  rest.sort((x,y)=>x.d-y.d);
+  const near=rest.slice(0,Math.min(8,rest.length));
+  return [a,near[Math.floor(Math.random()*near.length)].p];
+}
+function renderDuel(){
+  const u=state.settings.currentUser;
+  const user=getUser(u);
+  if(!ui.duel.pair) ui.duel.pair=pickPair();
+  const pair=ui.duel.pair;
+  const body=$('#duel-body');
+  $('#duel-sub').textContent='Joueur : '+user.name;
+  if(state.people.length<2){
+    body.innerHTML=`<div class="empty-state"><div class="big">⚔</div><h3>Pas assez de personnes</h3><p>Ajoute au moins 2 profils pour lancer un duel.</p></div>`;
+    return;
+  }
+  const filterBar=`<div class="tour-opts c3" style="margin-bottom:14px">
+    <button class="${ui.duel.filter==='all'?'on':''}" data-f="all">Tous</button>
+    <button class="${ui.duel.filter==='F'?'on f':''}" data-f="F">Femmes</button>
+    <button class="${ui.duel.filter==='M'?'on m':''}" data-f="M">Hommes</button>
+  </div>`;
+  if(!pair){
+    body.innerHTML=filterBar+`<div class="empty-state"><div class="big">⚔</div><h3>Pas assez dans ce filtre</h3><p>Change de filtre ou ajoute plus de profils.</p></div>`;
+    $$('#duel-body [data-f]').forEach(b=>b.addEventListener('click',()=>{ ui.duel.filter=b.getAttribute('data-f'); ui.duel.pair=null; renderDuel(); }));
+    return;
+  }
+  const [a,b]=pair;
+  const wA=state.duelHistory[u]?.filter(d=>d.winnerId===a.id).length||0;
+  const wB=state.duelHistory[u]?.filter(d=>d.winnerId===b.id).length||0;
+  const card=(p,wins)=>`<button class="duel-card" data-pick="${p.id}">
+    <div class="duel-photo">
+      ${p.mainPhoto?`<img src="${esc(p.mainPhoto)}" alt="${esc(p.name)}" onerror="this.style.display='none'">`:`<div style="height:100%;display:grid;place-items:center;color:var(--text-4);font-size:40px">?</div>`}
+      <div class="fav-mini ${state.favorites[u]?.[p.id]?'is-on':''}"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.6-9.5-9.4C1 8.3 2.7 5 6 5c2 0 3.3 1 4 2.2C10.7 6 12 5 14 5c3.3 0 5 3.3 3.5 6.6C19 16.4 12 21 12 21Z"/></svg></div>
+    </div>
+    <div class="duel-stats"><div class="wins">${wins}</div><div class="wins-l">Victoires</div></div>
+    <div class="d-name">${esc(p.name)}</div>
+    <div class="d-sub">ELO ${getElo(u,p.id)}</div>
+  </button>`;
+  body.innerHTML=filterBar+`
+    <div class="duel-hero-card">
+      <div class="hico">⚔</div>
+      <div><h3>Duel libre</h3><p>Touche la personne la plus attirante. L'ELO est mis à jour automatiquement.</p></div>
+    </div>
+    <div class="duel-actions">
+      <button class="btn btn-small" data-act="skip">Passer</button>
+      <button class="btn btn-small btn-danger" data-act="close">Terminer</button>
+    </div>
+    <div class="duel-arena">${card(a,wA)}${card(b,wB)}</div>
+    <div style="margin-top:14px;text-align:center;font-size:12px;color:var(--text-3)">${state.duels[u]||0} duel${(state.duels[u]||0)>1?'s':''} au total</div>`;
+  $$('#duel-body [data-f]').forEach(x=>x.addEventListener('click',()=>{ ui.duel.filter=x.getAttribute('data-f'); ui.duel.pair=null; renderDuel(); }));
+  $$('#duel-body [data-pick]').forEach(btn=>btn.addEventListener('click',()=>{
+    const winId=btn.getAttribute('data-pick');
+    const loseId=winId===a.id?b.id:a.id;
+    recordDuel(winId,loseId);
+  }));
+  $('#duel-body [data-act="skip"]')?.addEventListener('click',()=>{ ui.duel.pair=null; renderDuel(); });
+  $('#duel-body [data-act="close"]')?.addEventListener('click',closeAllModals);
+}
+function recordDuel(w,l){
+  const u=state.settings.currentUser;
+  ensureBuckets(u);
+  state.duels[u]=(state.duels[u]||0)+1;
+  state.duelHistory[u].push({ winnerId:w, loserId:l, t:Date.now() });
+  updateElo(u,w,l);
+  saveState();
+  renderList();
+  ui.duel.pair=null;
+  renderDuel();
+}
+
+/* ============ TOURNAMENT ============ */
+function openTournament(){
+  ui.tour={ stage:'setup', config:{ filter:'F', size:8, blind:false, seeding:'note' }, data:null };
+  renderTournament();
+  openModal('modal-tournament');
+}
+function renderTournament(){
+  if(ui.tour.stage==='setup') renderTourSetup();
+  else if(ui.tour.stage==='playing') renderTourPlay();
+  else renderTourPodium();
+}
+function renderTourSetup(){
+  const t=ui.tour;
+  const u=state.settings.currentUser;
+  const pF=state.people.filter(p=>p.gender==='F').length;
+  const pM=state.people.filter(p=>p.gender==='M').length;
+  const pA=state.people.length;
+  const cur=t.config.filter==='all'?pA:t.config.filter==='F'?pF:pM;
+  $('#tour-title').textContent='Nouveau tournoi';
+  $('#tour-sub').textContent='Joueur : '+getUser(u).name;
+  $('#tour-body').innerHTML=`
+    <div class="tour-hero">
+      <div class="tico">🏆</div>
+      <div><h3>Tournoi par utilisateur</h3><p>Le vainqueur devient champion. L'ELO et les classements sont mis à jour au passage.</p></div>
+    </div>
+    <div class="field" style="margin-bottom:12px">
+      <label>Catégorie</label>
+      <div class="tour-opts c3">
+        <button class="${t.config.filter==='F'?'on f':''}" data-tf="F">Femmes (${pF})</button>
+        <button class="${t.config.filter==='M'?'on m':''}" data-tf="M">Hommes (${pM})</button>
+        <button class="${t.config.filter==='all'?'on':''}" data-tf="all">Mixte (${pA})</button>
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:12px">
+      <label>Taille du bracket</label>
+      <div class="tour-opts c4">
+        ${[4,8,16,32].map(n=>`<button class="${t.config.size===n?'on':''}" data-ts="${n}" ${n>cur?'disabled':''}>${n}</button>`).join('')}
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:12px">
+      <label>Sélection des participants</label>
+      <div class="tour-opts c3">
+        <button class="${t.config.seeding==='note'?'on':''}" data-tseed="note">Top notes</button>
+        <button class="${t.config.seeding==='elo'?'on':''}" data-tseed="elo">Top ELO</button>
+        <button class="${t.config.seeding==='random'?'on':''}" data-tseed="random">Aléatoire</button>
+      </div>
+    </div>
+    <div class="setting-row">
+      <div class="sr-info"><div class="sr-name">Mode aveugle</div><div class="sr-desc">Cache les notes pendant le tournoi, choix à l'instinct</div></div>
+      <button class="btn btn-small ${t.config.blind?'btn-primary':''}" data-blind>${t.config.blind?'Activé':'Désactivé'}</button>
+    </div>
+    <div style="margin-top:6px">
+      <button class="btn btn-primary btn-block" id="tour-start" ${cur<t.config.size?'disabled':''}>
+        ${cur<t.config.size?'Pas assez de personnes ('+cur+'/'+t.config.size+')':'Lancer le tournoi'}
+      </button>
+    </div>
+    ${state.tournaments[u]?.length?`<div style="margin-top:18px"><h3 style="font-size:12.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3);margin-bottom:10px">Historique</h3><div id="tour-history"></div></div>`:''}
+  `;
+  $$('#tour-body [data-tf]').forEach(b=>b.addEventListener('click',()=>{ t.config.filter=b.getAttribute('data-tf'); renderTourSetup(); }));
+  $$('#tour-body [data-ts]').forEach(b=>b.addEventListener('click',()=>{ if(!b.disabled){ t.config.size=parseInt(b.getAttribute('data-ts')); renderTourSetup(); }}));
+  $$('#tour-body [data-tseed]').forEach(b=>b.addEventListener('click',()=>{ t.config.seeding=b.getAttribute('data-tseed'); renderTourSetup(); }));
+  $('[data-blind]').addEventListener('click',()=>{ t.config.blind=!t.config.blind; renderTourSetup(); });
+  $('#tour-start').addEventListener('click',()=>startTournament(t.config));
+  const hist=$('#tour-history');
+  if(hist && state.tournaments[u]?.length){
+    hist.innerHTML=state.tournaments[u].slice().reverse().slice(0,10).map(x=>{
+      const win=state.people.find(p=>p.id===x.winnerId);
+      const d=new Date(x.createdAt);
+      const label=x.config.filter==='F'?'Femmes':x.config.filter==='M'?'Hommes':'Mixte';
+      return `<div class="top-item" style="cursor:default">
+        ${win?.mainPhoto?`<img src="${esc(win.mainPhoto)}" onerror="this.style.display='none'">`:`<div style="width:30px;height:42px;background:var(--bg-3);border-radius:6px"></div>`}
+        <div class="nm">${label} ${x.config.size} · ${x.status==='complete'?'Champion : '+esc(win?.name||'?'):'En cours'}</div>
+        <div class="vl" style="font-size:11px;color:var(--text-3);font-weight:700">${d.toLocaleDateString('fr-FR')}</div>
+      </div>`;
+    }).join('');
+  }
+}
+function startTournament(config){
+  const u=state.settings.currentUser;
+  ensureBuckets(u);
+  let pool=state.people.filter(p=>config.filter==='all'||p.gender===config.filter);
+  if(config.seeding==='note') pool.sort((a,b)=>(computeNote(u,b.id)??-1)-(computeNote(u,a.id)??-1));
+  else if(config.seeding==='elo') pool.sort((a,b)=>getElo(u,b.id)-getElo(u,a.id));
+  else pool=pool.sort(()=>Math.random()-0.5);
+  const parts=pool.slice(0,config.size);
+  const matches=[];
+  for(let i=0;i<config.size/2;i++) matches.push({a:parts[i].id,b:parts[config.size-1-i].id,winner:null});
+  const rounds=[{matches}];
+  let n=config.size/2;
+  while(n>=2){ n=n/2; const m=[]; for(let i=0;i<n;i++) m.push({a:null,b:null,winner:null}); rounds.push({matches:m}); }
+  const tour={ id:'t_'+Date.now(), createdAt:Date.now(), config, rounds, currentRound:0, currentMatch:0, status:'playing', winnerId:null };
+  state.tournaments[u].push(tour);
+  ui.tour.stage='playing';
+  ui.tour.data=tour;
+  saveState();
+  renderTournament();
+}
+function renderTourPlay(){
+  const t=ui.tour.data;
+  const u=state.settings.currentUser;
+  if(t.status==='complete'){ ui.tour.stage='podium'; renderTournament(); return; }
+  const cm=t.rounds[t.currentRound].matches[t.currentMatch];
+  const pA=state.people.find(p=>p.id===cm.a);
+  const pB=state.people.find(p=>p.id===cm.b);
+  const blind=t.config.blind;
+  const nA=blind?null:computeNote(u,pA.id);
+  const nB=blind?null:computeNote(u,pB.id);
+  $('#tour-title').textContent='Tournoi en cours';
+  $('#tour-sub').textContent='Round '+(t.currentRound+1)+'/'+t.rounds.length+' · Match '+(t.currentMatch+1)+'/'+t.rounds[t.currentRound].matches.length;
+  const card=(p,n)=>`<button class="duel-card" data-pick="${p.id}">
+    <div class="duel-photo">
+      ${p.mainPhoto?`<img src="${esc(p.mainPhoto)}" onerror="this.style.display='none'">`:`<div style="height:100%;display:grid;place-items:center;color:var(--text-4);font-size:40px">?</div>`}
+      <div class="fav-mini ${state.favorites[u]?.[p.id]?'is-on':''}"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.6-9.5-9.4C1 8.3 2.7 5 6 5c2 0 3.3 1 4 2.2C10.7 6 12 5 14 5c3.3 0 5 3.3 3.5 6.6C19 16.4 12 21 12 21Z"/></svg></div>
+    </div>
+    <div class="duel-stats"><div class="wins">${n==null?'?':fmt(n)}</div><div class="wins-l">${blind?'Note masquée':'Ta note'}</div></div>
+    <div class="d-name">${esc(p.name)}</div>
+    <div class="d-sub">${p.birthday||''}${p.profession?(p.birthday?' · ':'')+esc(p.profession):''}</div>
+  </button>`;
+  const label=t.config.filter==='F'?'Femmes':t.config.filter==='M'?'Hommes':'Mixte';
+  $('#tour-body').innerHTML=`
+    <div class="tour-hero">
+      <div class="tico">🏆</div>
+      <div><h3>Tournoi ${label} ${t.config.size}</h3><p>${blind?"Mode aveugle : choisis à l'instinct, les notes sont masquées.":'Touche le visage préféré pour faire avancer le bracket.'}</p></div>
+    </div>
+    <div class="duel-actions">
+      ${blind?'<button class="btn btn-small" data-act="reveal">Révéler les notes</button>':''}
+      <button class="btn btn-small" data-act="bracket">Voir le bracket</button>
+      <button class="btn btn-small btn-danger" data-act="abandon">Abandonner</button>
+    </div>
+    <div class="duel-arena">${card(pA,nA)}${card(pB,nB)}</div>
+    <div style="margin-top:18px"><h3 style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);margin-bottom:8px">Bracket</h3>${renderBracketHtml(t)}</div>`;
+  $$('#tour-body [data-pick]').forEach(b=>b.addEventListener('click',()=>tourAdvance(b.getAttribute('data-pick'))));
+  $('#tour-body [data-act="reveal"]')?.addEventListener('click',()=>{ t.config.blind=false; renderTourPlay(); });
+  $('#tour-body [data-act="bracket"]')?.addEventListener('click',()=>$('#tour-body .bracket')?.scrollIntoView({behavior:'smooth'}));
+  $('#tour-body [data-act="abandon"]')?.addEventListener('click',()=>{
+    if(confirm('Abandonner ce tournoi ?\nLes résultats partiels seront perdus.')){
+      state.tournaments[u]=state.tournaments[u].filter(x=>x.id!==t.id);
+      saveState(); closeAllModals(); toast('Tournoi abandonné');
+    }
+  });
+}
+function renderBracketHtml(t){
+  const names=['Huitièmes','Quarts','Demi','Finale'];
+  const rounds=t.rounds.map((r,ri)=>{
+    const rev=t.rounds.length-ri;
+    const title=rev===1?'Finale':rev===2?'Demi':rev===3?'Quarts':'Huitièmes';
+    const ms=r.matches.map((m,mi)=>{
+      const cur=ri===t.currentRound&&mi===t.currentMatch&&t.status!=='complete';
+      const slot=(id)=>{
+        if(!id) return '<div class="bracket-slot is-tbd"><span class="bs-name">À déterminer</span></div>';
+        const p=state.people.find(x=>x.id===id);
+        if(!p) return '<div class="bracket-slot is-tbd"><span class="bs-name">?</span></div>';
+        const win=m.winner===id;
+        return `<div class="bracket-slot ${win?'is-winner':''}">
+          ${p.mainPhoto?`<img src="${esc(p.mainPhoto)}" onerror="this.style.display='none'">`:''}
+          <span class="bs-name">${esc(p.name)}</span>
+        </div>`;
+      };
+      return `<div class="bracket-match ${cur?'is-current':''}">${slot(m.a)}${slot(m.b)}</div>`;
+    }).join('');
+    return `<div class="bracket-round"><h4>${title}</h4>${ms}</div>`;
+  }).join('');
+  return `<div class="bracket">${rounds}</div>`;
+}
+function tourAdvance(winId){
+  const t=ui.tour.data;
+  const u=state.settings.currentUser;
+  const r=t.rounds[t.currentRound];
+  const m=r.matches[t.currentMatch];
+  m.winner=winId;
+  const loseId=m.a===winId?m.b:m.a;
+  updateElo(u,winId,loseId);
+  state.duels[u]=(state.duels[u]||0)+1;
+  state.duelHistory[u]=state.duelHistory[u]||[];
+  state.duelHistory[u].push({ winnerId:winId, loserId:loseId, t:Date.now(), source:'tournament' });
+  if(t.currentMatch+1<r.matches.length){ t.currentMatch+=1; }
+  else if(t.currentRound+1<t.rounds.length){
+    const nx=t.rounds[t.currentRound+1];
+    for(let i=0;i<r.matches.length;i+=2){
+      nx.matches[i/2].a=r.matches[i].winner;
+      nx.matches[i/2].b=r.matches[i+1]?.winner||null;
+    }
+    t.currentRound+=1; t.currentMatch=0;
+  } else {
+    t.status='complete'; t.winnerId=winId;
+    ui.tour.stage='podium';
+  }
+  saveState();
+  renderList();
+  renderTournament();
+}
+function renderTourPodium(){
+  const t=ui.tour.data;
+  const u=state.settings.currentUser;
+  const final=t.rounds[t.rounds.length-1].matches[0];
+  const champ=state.people.find(p=>p.id===final.winner);
+  const finalLoser=final.winner===final.a?state.people.find(p=>p.id===final.b):state.people.find(p=>p.id===final.a);
+  const semi=t.rounds[t.rounds.length-2]?.matches||[];
+  const thirds=semi.map(sm=>{
+    const loser=sm.winner===sm.a?sm.b:sm.a;
+    return state.people.find(p=>p.id===loser);
+  }).filter(Boolean);
+  $('#tour-title').textContent='Podium';
+  $('#tour-sub').textContent='Tournoi terminé';
+  $('#tour-body').innerHTML=`
+    <div class="tour-hero" style="background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(251,113,133,.12));border-color:rgba(245,158,11,.4)">
+      <div class="tico" style="background:rgba(245,158,11,.3);color:var(--amber-hi)">👑</div>
+      <div><h3>Champion${champ&&champ.gender==='F'?'ne':''} : ${esc(champ?.name||'?')}</h3><p>${esc(getUser(u).name)} a couronné ${t.config.filter==='F'?'une gagnante':t.config.filter==='M'?'un gagnant':'un(e) gagnant(e)'} en ${t.rounds.length} rounds.</p></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+      <div class="note-card" style="--user-color:#FBBF24">
+        <div class="nc-label">🥇 Or</div>
+        ${champ?.mainPhoto?`<img src="${esc(champ.mainPhoto)}" style="width:80px;height:110px;margin:8px auto;border-radius:10px;object-fit:cover" onerror="this.style.display='none'">`:''}
+        <div style="font-size:14px;font-weight:800">${esc(champ?.name||'?')}</div>
+      </div>
+      <div class="note-card" style="--user-color:#C0C4D1">
+        <div class="nc-label">🥈 Argent</div>
+        ${finalLoser?.mainPhoto?`<img src="${esc(finalLoser.mainPhoto)}" style="width:80px;height:110px;margin:8px auto;border-radius:10px;object-fit:cover" onerror="this.style.display='none'">`:''}
+        <div style="font-size:14px;font-weight:800">${esc(finalLoser?.name||'?')}</div>
+      </div>
+    </div>
+    ${thirds.length?`<div style="margin-bottom:14px"><h3 style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);margin-bottom:8px">🥉 Demi-finalistes</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${thirds.map(p=>`
+      <div class="top-item">${p.mainPhoto?`<img src="${esc(p.mainPhoto)}" onerror="this.style.display='none'">`:`<div style="width:30px;height:42px;background:var(--bg-3);border-radius:6px"></div>`}<div class="nm">${esc(p.name)}</div></div>
+    `).join('')}</div></div>`:''}
+    <div style="margin-top:14px"><h3 style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);margin-bottom:8px">Bracket complet</h3>${renderBracketHtml(t)}</div>
+    <div style="margin-top:14px"><button class="btn btn-primary btn-block" data-close>Terminer</button></div>
+  `;
+}
+
+
+/* ============ STATS MODAL ============ */
+function openStats(){ renderStats(); openModal('modal-stats'); }
+function renderStats(){
+  const u=state.settings.currentUser;
+  const user=getUser(u);
+  $('#stats-sub').textContent='Joueur : '+user.name;
+  const rated=state.people.filter(p=>computeNote(u,p.id)!=null);
+  const notes=rated.map(p=>computeNote(u,p.id));
+  const avg=notes.length?notes.reduce((a,b)=>a+b,0)/notes.length:null;
+  const nbF=state.people.filter(p=>p.gender==='F').length;
+  const nbM=state.people.filter(p=>p.gender==='M').length;
+  const ratedF=rated.filter(p=>p.gender==='F');
+  const ratedM=rated.filter(p=>p.gender==='M');
+  const avgF=ratedF.length?ratedF.map(p=>computeNote(u,p.id)).reduce((a,b)=>a+b,0)/ratedF.length:null;
+  const avgM=ratedM.length?ratedM.map(p=>computeNote(u,p.id)).reduce((a,b)=>a+b,0)/ratedM.length:null;
+  const nbFav=Object.values(state.favorites[u]||{}).filter(Boolean).length;
+  const nbDuels=state.duels[u]||0;
+  const nbTour=(state.tournaments[u]||[]).filter(t=>t.status==='complete').length;
+  const hist=new Array(10).fill(0);
+  notes.forEach(n=>{ const i=Math.min(9,Math.floor(n)); hist[i]++; });
+  const maxH=Math.max(...hist,1);
+  const top10=rated.slice().sort((a,b)=>computeNote(u,b.id)-computeNote(u,a.id)).slice(0,10);
+  const critAvg=TECH_CRITERIA.map(c=>{
+    const vals=rated.map(p=>getRating(u,p.id)?.technique?.[c.key]).filter(v=>typeof v==='number');
+    return { key:c.key, label:c.label, avg:vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null };
+  });
+  const tagCounts={};
+  rated.forEach(p=>{ const t=getRating(u,p.id)?.tag; if(t) tagCounts[t]=(tagCounts[t]||0)+1; });
+  const eloTop=rated.slice().sort((a,b)=>getElo(u,b.id)-getElo(u,a.id)).slice(0,5);
+  $('#stats-body').innerHTML=`
+    <div class="stat-hero">
+      <div class="box"><div class="v">${rated.length}</div><div class="l">Notées</div></div>
+      <div class="box"><div class="v">${avg==null?'-':fmt(avg)}</div><div class="l">Moyenne</div></div>
+      <div class="box"><div class="v">${nbFav}</div><div class="l">Coups cœur</div></div>
+      <div class="box"><div class="v">${nbDuels}</div><div class="l">Duels</div></div>
+    </div>
+    <div class="stat-hero">
+      <div class="box"><div class="v" style="color:var(--lily-hi)">${ratedF.length}<span style="font-size:10px;color:var(--text-3);font-weight:600">/${nbF}</span></div><div class="l">Femmes notées</div></div>
+      <div class="box"><div class="v" style="color:var(--lily-hi)">${avgF==null?'-':fmt(avgF)}</div><div class="l">Moy. Femmes</div></div>
+      <div class="box"><div class="v" style="color:var(--yannick-hi)">${ratedM.length}<span style="font-size:10px;color:var(--text-3);font-weight:600">/${nbM}</span></div><div class="l">Hommes notés</div></div>
+      <div class="box"><div class="v" style="color:var(--yannick-hi)">${avgM==null?'-':fmt(avgM)}</div><div class="l">Moy. Hommes</div></div>
+    </div>
+    ${rated.length?`<div class="stat-section">
+      <h3>Distribution des notes</h3>
+      <div class="histogram">${hist.map(v=>`<div class="hist-bar" style="height:${(v/maxH)*70+10}%" data-v="${v}"></div>`).join('')}</div>
+      <div class="hist-axis">${hist.map((_,i)=>`<span>${i}</span>`).join('')}</div>
+    </div>`:''}
+    ${top10.length?`<div class="stat-section">
+      <h3>Top 10</h3>
+      <div class="top-list">${top10.map((p,i)=>`<div class="top-item">
+        <div class="rk ${i===1?'silver':i===2?'bronze':i>2?'flat':''}">${i+1}</div>
+        ${p.mainPhoto?`<img src="${esc(p.mainPhoto)}" onerror="this.style.display='none'">`:`<div style="width:30px;height:42px;background:var(--bg-3);border-radius:6px"></div>`}
+        <div class="nm">${esc(p.name)}</div>
+        <div class="vl">${fmt(computeNote(u,p.id))}</div>
+      </div>`).join('')}</div>
+    </div>`:''}
+    ${eloTop.length?`<div class="stat-section">
+      <h3>Top ELO</h3>
+      <div class="top-list">${eloTop.map((p,i)=>`<div class="top-item">
+        <div class="rk flat">${i+1}</div>
+        ${p.mainPhoto?`<img src="${esc(p.mainPhoto)}" onerror="this.style.display='none'">`:`<div style="width:30px;height:42px;background:var(--bg-3);border-radius:6px"></div>`}
+        <div class="nm">${esc(p.name)}</div>
+        <div class="vl" style="color:var(--text-2)">${getElo(u,p.id)}</div>
+      </div>`).join('')}</div>
+    </div>`:''}
+    ${rated.length?`<div class="stat-section">
+      <h3>Moyennes par critère technique</h3>
+      <div class="top-list">${critAvg.map(c=>`<div class="top-item">
+        <div class="nm">${esc(c.label)}</div>
+        <div class="vl">${c.avg==null?'-':fmt(c.avg)}</div>
+      </div>`).join('')}</div>
+    </div>`:''}
+    ${Object.keys(tagCounts).length?`<div class="stat-section">
+      <h3>Tags attribués</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        ${Object.entries(tagCounts).map(([k,n])=>{
+          const t=BEAUTY_TAGS.find(x=>x.k===k);
+          if(!t) return '';
+          return `<span class="badge ${t.cls}">${icon(t.ic)}<span>${esc(t.label)} · ${n}</span></span>`;
+        }).join('')}
+      </div>
+    </div>`:''}
+    <div class="stat-section">
+      <h3>Activité</h3>
+      <div class="stat-hero">
+        <div class="box"><div class="v">${nbDuels}</div><div class="l">Duels joués</div></div>
+        <div class="box"><div class="v">${nbTour}</div><div class="l">Tournois finis</div></div>
+        <div class="box"><div class="v">${(state.tournaments[u]||[]).filter(t=>t.status!=='complete').length}</div><div class="l">En cours</div></div>
+        <div class="box"><div class="v">${state.people.length-rated.length}</div><div class="l">À noter</div></div>
+      </div>
+    </div>
+  `;
+}
+
+/* ============ COMPARE MODAL ============ */
+function openCompare(){ renderCompare(); openModal('modal-compare'); }
+function renderCompare(){
+  const a=state.settings.compareA;
+  const b=state.settings.compareB;
+  const uA=getUser(a), uB=getUser(b);
+  const topOf=(uid)=>state.people.filter(p=>computeNote(uid,p.id)!=null).sort((x,y)=>computeNote(uid,y.id)-computeNote(uid,x.id));
+  const topA=topOf(a), topB=topOf(b);
+  const maxRows=Math.max(topA.length, topB.length, 10);
+  const rows=[];
+  for(let i=0;i<Math.min(20,maxRows);i++){
+    const pA=topA[i];
+    const pB=topB[i];
+    rows.push({ i, pA, pB });
+  }
+  $('#compare-body').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:10px;margin-bottom:14px;align-items:center">
+      <button class="user-card" style="--user-color:${uA.color}" data-pick-a><div class="av" style="background:${uA.color}">${uA.initial}</div><div class="info"><div class="un">${uA.name}</div><div class="us">${topA.length} noté${topA.length>1?'s':''}</div></div></button>
+      <div style="font-size:11px;font-weight:800;letter-spacing:.15em;color:var(--text-3)">VS</div>
+      <button class="user-card" style="--user-color:${uB.color}" data-pick-b><div class="av" style="background:${uB.color}">${uB.initial}</div><div class="info"><div class="un">${uB.name}</div><div class="us">${topB.length} noté${topB.length>1?'s':''}</div></div></button>
+    </div>
+    ${topA.length||topB.length?`<div class="compare-rows">
+      ${rows.map(({i,pA,pB})=>{
+        const nA=pA?computeNote(a,pA.id):null;
+        const nB=pB?computeNote(b,pB.id):null;
+        return `<div class="comp-row">
+          <div class="comp-slot" ${pA?`data-detail="${pA.id}|${a}|${pB?pB.id:''}|${b}"`:''}>
+            ${pA?`${pA.mainPhoto?`<img src="${esc(pA.mainPhoto)}" onerror="this.style.display='none'">`:`<div style="width:32px;height:44px;background:var(--bg-3);border-radius:6px;flex:none"></div>`}<div><div class="nn">${esc(pA.name)}</div><div class="ss" style="color:${uA.color}">${fmt(nA)}</div></div>`:'<div class="ss">-</div>'}
+          </div>
+          <div class="comp-mid"><div class="rk">${i+1}</div></div>
+          <div class="comp-slot right" ${pB?`data-detail="${pB.id}|${b}|${pA?pA.id:''}|${a}"`:''}>
+            ${pB?`${pB.mainPhoto?`<img src="${esc(pB.mainPhoto)}" onerror="this.style.display='none'">`:`<div style="width:32px;height:44px;background:var(--bg-3);border-radius:6px;flex:none"></div>`}<div><div class="nn">${esc(pB.name)}</div><div class="ss" style="color:${uB.color}">${fmt(nB)}</div></div>`:'<div class="ss">-</div>'}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`:'<div class="empty-state"><div class="big">📋</div><h3>Aucune note chez ces utilisateurs</h3><p>Classe quelques personnes avant de comparer.</p></div>'}
+    <div style="margin-top:14px;font-size:12px;color:var(--text-3);text-align:center">Touche une ligne pour voir le duel détaillé avec toutes les notes de ${uA.name} et ${uB.name}.</div>
+  `;
+  $('[data-pick-a]').addEventListener('click',()=>pickUserFor('A'));
+  $('[data-pick-b]').addEventListener('click',()=>pickUserFor('B'));
+  $$('#compare-body [data-detail]').forEach(el=>el.addEventListener('click',()=>{
+    const [pA,uA_,pB,uB_]=el.getAttribute('data-detail').split('|');
+    openCompareDetail(pA,uA_,pB,uB_);
+  }));
+}
+function pickUserFor(slot){
+  const current=slot==='A'?state.settings.compareA:state.settings.compareB;
+  $('#compare-body').innerHTML=`
+    <h3 style="font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3);margin-bottom:10px">Choisis l'utilisateur ${slot}</h3>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      ${USERS.map(u=>{
+        const n=Object.keys(state.ratings[u.id]||{}).filter(pid=>computeNote(u.id,pid)!=null).length;
+        return `<button class="user-card ${u.id===current?'is-current':''}" style="--user-color:${u.color}" data-set="${u.id}">
+          <div class="av" style="background:${u.color}">${u.initial}</div>
+          <div class="info"><div class="un">${u.name}</div><div class="us">${n} noté${n>1?'s':''}</div></div>
+        </button>`;
+      }).join('')}
+    </div>
+    <div style="margin-top:12px"><button class="btn btn-block" data-back>Retour</button></div>
+  `;
+  $$('[data-set]').forEach(b=>b.addEventListener('click',()=>{
+    if(slot==='A') state.settings.compareA=b.getAttribute('data-set');
+    else state.settings.compareB=b.getAttribute('data-set');
+    saveState(); renderCompare();
+  }));
+  $('[data-back]').addEventListener('click',renderCompare);
+}
+function openCompareDetail(pAId,uAId,pBId,uBId){
+  const pA=state.people.find(x=>x.id===pAId);
+  const pB=pBId?state.people.find(x=>x.id===pBId):null;
+  const uA=getUser(uAId), uB=getUser(uBId);
+  const rA=getRating(uAId,pAId);
+  const rB=pB?getRating(uBId,pBId):null;
+  const nA=computeNoteForRating(rA), nB=computeNoteForRating(rB);
+  const subParts=p=>{ const s=[]; if(p.profession) s.push(p.profession); if(p.birthday) s.push(p.birthday); return s.join(' · '); };
+  const critRow=(lbl,vA,vB)=>{
+    const winA=vA!=null&&vB!=null&&vA>vB;
+    const winB=vB!=null&&vA!=null&&vB>vA;
+    return `<div class="comp-crit">
+      <div class="v left ${vA==null?'dim':winA?'win':''}">${vA==null?'-':fmt(vA)}</div>
+      <div class="lbl">${esc(lbl)}</div>
+      <div class="v right ${vB==null?'dim':winB?'win':''}">${vB==null?'-':fmt(vB)}</div>
+    </div>`;
+  };
+  $('#compare-body').innerHTML=`
+    <div class="comp-vs-detail">
+      <div class="heads">
+        <div class="head-slot">
+          ${pA.mainPhoto?`<img src="${esc(pA.mainPhoto)}" onerror="this.style.display='none'">`:`<div style="width:80px;height:110px;background:var(--bg-3);border-radius:10px;margin:0 auto 6px"></div>`}
+          <div class="nn">${esc(pA.name)}</div>
+          <div class="ss">${esc(subParts(pA))}</div>
+          <div style="margin-top:6px;font-size:20px;font-weight:800;color:${uA.color}">${fmt(nA)}</div>
+          <div class="ss">par ${uA.name}</div>
+        </div>
+        <div class="vs-lbl">VS</div>
+        <div class="head-slot">
+          ${pB?`${pB.mainPhoto?`<img src="${esc(pB.mainPhoto)}" onerror="this.style.display='none'">`:`<div style="width:80px;height:110px;background:var(--bg-3);border-radius:10px;margin:0 auto 6px"></div>`}
+          <div class="nn">${esc(pB.name)}</div>
+          <div class="ss">${esc(subParts(pB))}</div>
+          <div style="margin-top:6px;font-size:20px;font-weight:800;color:${uB.color}">${fmt(nB)}</div>
+          <div class="ss">par ${uB.name}</div>`:'<div class="ss">Pas de contrepartie</div>'}
+        </div>
+      </div>
+      ${pB?`
+      ${critRow('Note finale',nA,nB)}
+      ${critRow('Moyenne techniques',techMean(rA),techMean(rB))}
+      ${critRow('Coup de cœur',rA?.coup,rB?.coup)}
+      ${critRow('Préférence',rA?.pref,rB?.pref)}
+      ${TECH_CRITERIA.map(c=>critRow(c.label,rA?.technique?.[c.key],rB?.technique?.[c.key])).join('')}
+      ${critRow('ELO',getElo(uAId,pAId),getElo(uBId,pBId))}
+      `:`
+      <h3 style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);margin:12px 0 8px;text-align:center">Détail de ${esc(uA.name)}</h3>
+      ${TECH_CRITERIA.map(c=>{
+        const v=rA?.technique?.[c.key];
+        return `<div class="comp-crit"><div class="v left ${v==null?'dim':''}">${v==null?'-':fmt(v)}</div><div class="lbl">${esc(c.label)}</div><div class="v right dim">-</div></div>`;
+      }).join('')}
+      `}
+    </div>
+    <div style="margin-top:14px"><button class="btn btn-block" data-back>Retour</button></div>
+  `;
+  $('[data-back]').addEventListener('click',renderCompare);
+}
+
+/* ============ CONSULT MODAL ============ */
+function openConsult(){ renderConsult(); openModal('modal-consult'); }
+function renderConsult(){
+  const body=$('#consult-body');
+  const sortBy=state.settings.consultSort||'note';
+  const list=state.people.slice().sort((a,b)=>{
+    if(sortBy==='name') return a.name.localeCompare(b.name,'fr');
+    const na=USERS.reduce((s,u)=>{const n=computeNote(u.id,a.id); return n==null?s:s+n;},0);
+    const nb=USERS.reduce((s,u)=>{const n=computeNote(u.id,b.id); return n==null?s:s+n;},0);
+    return nb-na;
+  });
+  if(!list.length){ body.innerHTML='<div class="empty-state"><div class="big">👁</div><h3>Aucune personne</h3><p>Ajoute des profils pour consulter.</p></div>'; return; }
+  body.innerHTML=`
+    <div class="tour-opts c3" style="margin-bottom:14px">
+      <button class="${sortBy==='note'?'on':''}" data-cs="note">Moy. globale</button>
+      <button class="${sortBy==='name'?'on':''}" data-cs="name">Alphabétique</button>
+      <button class="${sortBy==='gender'?'on':''}" data-cs="gender">Par genre</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      ${list.map(p=>{
+        const per=USERS.map(usr=>{
+          const n=computeNote(usr.id,p.id);
+          return `<span class="chipn" style="padding:3px 8px;border-radius:999px;font-size:11px;font-weight:800;border:1px solid ${usr.color};color:${usr.color};display:inline-flex;align-items:center;gap:4px"><small style="font-size:9px;letter-spacing:.08em;text-transform:uppercase;opacity:.7;font-weight:700">${usr.initial}</small>${n==null?'-':fmt(n)}</span>`;
+        }).join('');
+        const avg=(()=>{
+          const arr=USERS.map(u=>computeNote(u.id,p.id)).filter(n=>n!=null);
+          return arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:null;
+        })();
+        return `<div class="consult-card" data-open="${p.id}">
+          ${p.mainPhoto?`<img src="${esc(p.mainPhoto)}" onerror="this.style.display='none'">`:`<div style="width:56px;height:76px;background:var(--bg-3);border-radius:8px;flex:none"></div>`}
+          <div class="ci">
+            <div class="n">${esc(p.name)} <span style="color:${p.gender==='F'?'var(--lily-hi)':'var(--yannick-hi)'};font-weight:600;font-size:11px;margin-left:4px">${p.gender==='F'?'F':'H'}</span></div>
+            <div class="s">${esc([p.profession,p.birthday,p.nationality].filter(Boolean).join(' · '))}</div>
+            <div class="bigs" style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">${per}</div>
+            ${avg!=null?`<div style="margin-top:6px;font-size:12px;color:var(--text-3)">Moyenne globale : <strong style="color:var(--amber)">${fmt(avg)}</strong></div>`:''}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+  $$('#consult-body [data-cs]').forEach(b=>b.addEventListener('click',()=>{ state.settings.consultSort=b.getAttribute('data-cs'); saveState(); renderConsult(); }));
+  $$('#consult-body [data-open]').forEach(c=>c.addEventListener('click',()=>{ const id=c.getAttribute('data-open'); closeAllModals(); setTimeout(()=>openDetails(id),120); }));
+}
+
+
+/* ============ SETTINGS MODAL ============ */
+function openSettings(){ renderSettings(); openModal('modal-settings'); }
+function renderSettings(){
+  const w=state.settings.weights;
+  const total=w.technique+w.coup+w.pref;
+  const totalOk=Math.abs(total-1)<0.005;
+  $('#settings-body').innerHTML=`
+    <div class="setting-section">
+      <h3>Pondération de la note finale</h3>
+      <div class="weight-row">
+        <label>Techniques</label>
+        <input class="slider" type="range" min="0" max="1" step="0.05" value="${w.technique}" data-wk="technique">
+        <div class="val">${Math.round(w.technique*100)}%</div>
+      </div>
+      <div class="weight-row">
+        <label>Coup de cœur</label>
+        <input class="slider" type="range" min="0" max="1" step="0.05" value="${w.coup}" data-wk="coup">
+        <div class="val">${Math.round(w.coup*100)}%</div>
+      </div>
+      <div class="weight-row">
+        <label>Préférence</label>
+        <input class="slider" type="range" min="0" max="1" step="0.05" value="${w.pref}" data-wk="pref">
+        <div class="val">${Math.round(w.pref*100)}%</div>
+      </div>
+      <div class="weight-total ${totalOk?'':'bad'}">Total : ${Math.round(total*100)}% ${totalOk?'✓':'(doit faire 100%)'}</div>
+      <div style="margin-top:8px;display:flex;gap:6px">
+        <button class="btn btn-small" data-wp="40-35-25">40 / 35 / 25</button>
+        <button class="btn btn-small" data-wp="50-25-25">50 / 25 / 25</button>
+        <button class="btn btn-small" data-wp="33-33-33">1/3 égal</button>
+      </div>
+    </div>
+
+    <div class="setting-section">
+      <h3>Utilisateurs</h3>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        ${USERS.map(u=>{
+          const n=Object.keys(state.ratings[u.id]||{}).filter(pid=>computeNote(u.id,pid)!=null).length;
+          const nF=Object.values(state.favorites[u.id]||{}).filter(Boolean).length;
+          const nD=state.duels[u.id]||0;
+          const act=u.id===state.settings.currentUser;
+          return `<button class="user-card ${act?'is-current':''}" style="--user-color:${u.color}" data-switch="${u.id}">
+            <div class="av" style="background:${u.color}">${u.initial}</div>
+            <div class="info"><div class="un">${u.name}</div><div class="us">${n} notés · ${nF} coups cœur · ${nD} duels</div></div>
+            ${act?`<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5 9-11" stroke="${u.color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`:''}
+          </button>`;
+        }).join('')}
+      </div>
+    </div>
+
+    <div class="setting-section">
+      <h3>Clé API TMDb</h3>
+      <div class="field full">
+        <input id="tmdb-key-input" type="text" placeholder="Clé v3 ou token v4" value="${esc(state.settings.tmdbKey||'')}" autocomplete="off">
+      </div>
+      <div class="search-hint" style="margin-top:8px">
+        Sans clé, seul Wikidata est utilisable. Récupère une clé gratuite sur <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noreferrer">themoviedb.org/settings/api</a>. Attribution requise : "This product uses the TMDB API but is not endorsed or certified by TMDB."
+      </div>
+      <div style="display:flex;gap:6px;margin-top:10px">
+        <button class="btn btn-small btn-primary" id="save-tmdb-key">Enregistrer la clé</button>
+        <button class="btn btn-small" id="test-tmdb-key">Tester</button>
+      </div>
+    </div>
+
+    <div class="setting-section">
+      <h3>Options d'affichage</h3>
+      <div class="setting-row">
+        <div class="sr-info"><div class="sr-name">Tri par défaut de la liste</div><div class="sr-desc">Applicable à la vue principale</div></div>
+        <select class="field" style="padding:7px 10px;border-radius:8px;background:var(--bg-3);border:1px solid var(--border)" id="sort-select">
+          <option value="note" ${state.settings.sortBy==='note'?'selected':''}>Note finale</option>
+          <option value="elo" ${state.settings.sortBy==='elo'?'selected':''}>ELO</option>
+          <option value="name" ${state.settings.sortBy==='name'?'selected':''}>Nom A-Z</option>
+          <option value="added" ${state.settings.sortBy==='added'?'selected':''}>Récemment ajouté</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="setting-section">
+      <h3>Données</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <button class="btn" id="export-data">Exporter JSON</button>
+        <button class="btn" id="import-data">Importer JSON</button>
+      </div>
+      <input type="file" id="import-file" accept=".json" style="display:none">
+      <button class="btn btn-danger btn-block" id="reset-data">Tout effacer</button>
+    </div>
+
+    <div class="setting-section">
+      <h3>À propos</h3>
+      <div style="font-size:12.5px;color:var(--text-3);line-height:1.6">
+        Classeur Beauté v1. Stockage local uniquement, rien n'est envoyé ailleurs. Les données d'acteurs et actrices viennent de TMDb. Les fiches de non-acteurs viennent de Wikidata et Wikimedia Commons. Cette application utilise l'API TMDB mais n'est ni supportée ni certifiée par TMDB.
+        <br><br>
+        <strong>${state.people.length}</strong> personne${state.people.length>1?'s':''} en banque · 
+        <strong>${USERS.reduce((s,u)=>s+Object.keys(state.ratings[u.id]||{}).length,0)}</strong> note${USERS.reduce((s,u)=>s+Object.keys(state.ratings[u.id]||{}).length,0)>1?'s':''} enregistrée${USERS.reduce((s,u)=>s+Object.keys(state.ratings[u.id]||{}).length,0)>1?'s':''} · 
+        <strong>${USERS.reduce((s,u)=>s+(state.duels[u.id]||0),0)}</strong> duel${USERS.reduce((s,u)=>s+(state.duels[u.id]||0),0)>1?'s':''}
+      </div>
+    </div>
+  `;
+  $$('#settings-body .slider[data-wk]').forEach(s=>s.addEventListener('input',e=>{
+    const k=e.target.getAttribute('data-wk');
+    state.settings.weights[k]=parseFloat(e.target.value);
+    renderSettings();
+  }));
+  $$('#settings-body [data-wp]').forEach(b=>b.addEventListener('click',()=>{
+    const [t,c,p]=b.getAttribute('data-wp').split('-').map(Number);
+    state.settings.weights={ technique:t/100, coup:c/100, pref:p/100 };
+    saveState(); renderSettings();
+    toast('Pondération mise à jour','ok');
+  }));
+  $$('#settings-body [data-switch]').forEach(b=>b.addEventListener('click',()=>{
+    state.settings.currentUser=b.getAttribute('data-switch');
+    saveState(); renderHeader(); renderList(); renderSettings();
+    toast('Utilisateur : '+getUser(state.settings.currentUser).name,'ok');
+  }));
+  $('#save-tmdb-key').addEventListener('click',()=>{
+    state.settings.tmdbKey=$('#tmdb-key-input').value.trim();
+    saveState(); toast('Clé TMDb enregistrée','ok');
+  });
+  $('#test-tmdb-key').addEventListener('click',async()=>{
+    const k=$('#tmdb-key-input').value.trim();
+    if(!k){ toast('Pas de clé à tester','err'); return; }
+    const prev=state.settings.tmdbKey;
+    state.settings.tmdbKey=k;
+    try{
+      await tmdbSearchPerson('test');
+      toast('Clé valide ✓','ok');
+    }catch(err){
+      toast('Clé invalide : '+err.message,'err');
+      state.settings.tmdbKey=prev;
+    }
+  });
+  $('#sort-select').addEventListener('change',e=>{
+    state.settings.sortBy=e.target.value;
+    saveState(); renderList();
+  });
+  $('#export-data').addEventListener('click',()=>{
+    const blob=new Blob([JSON.stringify({
+      people:state.people, ratings:state.ratings, favorites:state.favorites,
+      elo:state.elo, duels:state.duels, duelHistory:state.duelHistory,
+      tournaments:state.tournaments, settings:state.settings, exportedAt:Date.now(), v:1
+    },null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download='classeur-beaute-'+new Date().toISOString().slice(0,10)+'.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+    toast('Export téléchargé','ok');
+  });
+  $('#import-data').addEventListener('click',()=>$('#import-file').click());
+  $('#import-file').addEventListener('change',e=>{
+    const f=e.target.files?.[0]; if(!f) return;
+    const r=new FileReader();
+    r.onload=()=>{
+      try{
+        const d=JSON.parse(r.result);
+        if(!d.people) throw new Error('Fichier invalide');
+        if(!confirm('Remplacer toutes les données par celles du fichier ?')) return;
+        Object.assign(state,{
+          people:d.people||[], ratings:d.ratings||{}, favorites:d.favorites||{},
+          elo:d.elo||{}, duels:d.duels||{}, duelHistory:d.duelHistory||{},
+          tournaments:d.tournaments||{}, settings:Object.assign({currentUser:'lily',weights:{...DEFAULT_WEIGHTS},tmdbKey:'',sortBy:'note',filter:'all',query:'',consultSort:'note',compareA:'lily',compareB:'victor'},d.settings||{})
+        });
+        USERS.forEach(u=>ensureBuckets(u.id));
+        saveState(); renderHeader(); renderList(); renderSettings();
+        toast('Import terminé ('+state.people.length+' personnes)','ok');
+      }catch(err){ toast('Erreur import : '+err.message,'err'); }
+    };
+    r.readAsText(f);
+  });
+  $('#reset-data').addEventListener('click',()=>{
+    if(!confirm('Effacer TOUTES les données (personnes, notes, duels, tournois) ?\nCette action est irréversible.')) return;
+    if(!confirm('Vraiment tout effacer ?')) return;
+    localStorage.removeItem(STORAGE_KEY);
+    Object.assign(state,{
+      people:[], ratings:{}, favorites:{}, elo:{}, duels:{}, duelHistory:{}, tournaments:{},
+      settings:{ currentUser:'lily', weights:{...DEFAULT_WEIGHTS}, tmdbKey:'', sortBy:'note', filter:'all', query:'', consultSort:'note', compareA:'lily', compareB:'victor' }
+    });
+    USERS.forEach(u=>ensureBuckets(u.id));
+    saveState(); renderHeader(); renderList(); renderSettings();
+    toast('Données effacées','ok');
+  });
+}
+
+/* ============ INIT ============ */
+function attachEvents(){
+  // toolbar
+  $$('.tb-btn[data-act]').forEach(b=>b.addEventListener('click',()=>{
+    const a=b.getAttribute('data-act');
+    if(a==='add') openAdd();
+    else if(a==='consult') openConsult();
+    else if(a==='stats') openStats();
+    else if(a==='compare') openCompare();
+    else if(a==='duel') openDuel();
+    else if(a==='tournament') openTournament();
+    else if(a==='settings') openSettings();
+  }));
+  // user switch
+  $('#btn-user-switch').addEventListener('click',()=>{ renderUserSwitch(); openModal('modal-user-switch'); });
+  // search
+  $('#search').addEventListener('input',e=>{ state.settings.query=e.target.value; renderList(); });
+  // filters
+  $$('#chips .chip').forEach(c=>c.addEventListener('click',()=>{
+    $$('#chips .chip').forEach(x=>x.classList.remove('is-active'));
+    c.classList.add('is-active');
+    state.settings.filter=c.getAttribute('data-filter');
+    renderList();
+  }));
+  // sort
+  $('#sort-name').addEventListener('click',()=>{ state.settings.sortBy='name'; saveState(); renderList(); toast('Tri : nom A-Z'); });
+  $('#sort-note').addEventListener('click',()=>{ state.settings.sortBy='note'; saveState(); renderList(); toast('Tri : note finale'); });
+  $('#sort-elo').addEventListener('click',()=>{ state.settings.sortBy='elo'; saveState(); renderList(); toast('Tri : ELO'); });
+  // list row
+  document.addEventListener('click',e=>{
+    const open=e.target.closest('[data-open]');
+    if(open && !e.target.closest('[data-tag]') && !e.target.closest('[data-pick]') && !e.target.closest('[data-cs]') && !e.target.closest('[data-detail]')){
+      const id=open.getAttribute('data-open');
+      const inDetails=e.target.closest('#modal-details');
+      if(!inDetails && id.startsWith('p_')){ openDetails(id); }
+    }
+    if(e.target.closest('[data-close]')) closeAllModals();
+  });
+  // details actions
+  $('#detail-save').addEventListener('click',saveDetails);
+  $('#detail-delete').addEventListener('click',deletePerson);
+  // escape closes modals
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeAllModals(); });
+}
+function registerSW(){
+  if('serviceWorker' in navigator && location.protocol!=='file:'){
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  }
+}
+function init(){
+  try{ loadState(); }catch(e){}
+  USERS.forEach(u=>ensureBuckets(u.id));
+  renderHeader();
+  renderList();
+  attachEvents();
+  registerSW();
+}
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',init);
+} else {
+  init();
+}
+
+</script>
+</body>
+</html>
