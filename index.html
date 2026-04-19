@@ -195,7 +195,14 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .vent-section-label{font-size:12px;font-weight:700;color:var(--text-2);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
 .vent-section-label .vw{font-size:10px;font-weight:700;color:var(--text-3);background:var(--bg-3);padding:2px 7px;border-radius:999px}
 .slider-row{display:grid;grid-template-columns:1fr 50px;gap:10px;align-items:center;padding:6px 0}
-.slider-label{font-size:13px;color:var(--text)}
+.slider-label{font-size:13px;color:var(--text);display:flex;align-items:center;gap:6px;min-width:0}
+.slider-label .lbl-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crit-info-btn{flex:none;width:18px;height:18px;border-radius:50%;background:var(--bg-3);color:var(--text-3);display:grid;place-items:center;font-size:11px;font-weight:800;border:1px solid var(--border);transition:all .12s}
+.crit-info-btn:active{transform:scale(.9)}
+.crit-info-btn.is-on{background:var(--amber);color:#0B0F1E;border-color:var(--amber)}
+.crit-info{grid-column:1/-1;margin-top:6px;padding:10px 12px;background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.18);border-radius:10px;font-size:12.5px;color:var(--text-2);line-height:1.45}
+.crit-info .crit-ex{margin-top:6px;color:var(--amber);font-size:12px;display:flex;gap:6px;align-items:flex-start}
+.crit-info .crit-ex::before{content:"✨";flex:none}
 .slider-value{text-align:right;font-size:14px;font-weight:800;color:var(--amber)}
 .slider{grid-column:1/-1;margin-top:2px;-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:3px;background:var(--bg-3);outline:none}
 .slider::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:linear-gradient(180deg,var(--amber-hi),var(--amber));border:2px solid var(--bg);box-shadow:0 2px 6px rgba(245,158,11,.4);cursor:pointer}
@@ -211,6 +218,19 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .field input,.field select,.field textarea{background:var(--bg-2);border:1px solid var(--border);border-radius:10px;padding:11px 12px;font-size:14px;transition:border-color .15s}
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--amber)}
 .field textarea{resize:vertical;min-height:64px;font-family:inherit}
+.photo-pick{display:flex;gap:8px;align-items:center}
+.photo-pick input[type="url"]{flex:1;min-width:0}
+.photo-pick-btn{flex:none;display:inline-flex;align-items:center;gap:6px;padding:11px 12px;border-radius:10px;background:var(--bg-2);border:1px solid var(--border);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;transition:background .15s,border-color .15s}
+.photo-pick-btn:active{transform:scale(.97)}
+.photo-pick-btn:hover{border-color:var(--amber)}
+.photo-pick-btn svg{width:16px;height:16px}
+.photo-preview{margin-top:8px;display:flex;gap:10px;align-items:center;padding:8px;border-radius:10px;background:var(--bg-2);border:1px solid var(--border)}
+.photo-preview img{width:48px;height:64px;border-radius:6px;object-fit:cover;flex:none}
+.photo-preview .pp-info{flex:1;min-width:0;font-size:12px;color:var(--text-3)}
+.photo-preview .pp-clear{flex:none;width:28px;height:28px;border-radius:50%;background:var(--bg-3);display:grid;place-items:center;color:var(--text-3);border:1px solid var(--border)}
+.detail-photo .upload-photo{position:absolute;bottom:10px;left:10px;width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);display:grid;place-items:center;color:#fff;transition:all .15s;border:1px solid rgba(255,255,255,.15)}
+.detail-photo .upload-photo:active{transform:scale(.92)}
+.detail-photo .upload-photo svg{width:18px;height:18px}
 .seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--bg-2);border:1px solid var(--border);padding:4px;border-radius:10px}
 .seg button{padding:9px;border-radius:7px;font-size:13px;font-weight:700;color:var(--text-3);transition:all .15s}
 .seg button.on[data-g="M"]{background:rgba(6,182,212,.2);color:var(--yannick-hi)}
@@ -474,7 +494,18 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
               <button type="button" data-g="M">Homme</button>
             </div>
           </div>
-          <div class="field full"><label>URL de la photo</label><input id="m-photo" type="url" placeholder="https://..."></div>
+          <div class="field full">
+            <label>Photo</label>
+            <div class="photo-pick">
+              <input id="m-photo" type="url" placeholder="https://... (URL)">
+              <button type="button" class="photo-pick-btn" id="m-photo-upload-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Uploader
+              </button>
+              <input id="m-photo-file" type="file" accept="image/*" hidden>
+            </div>
+            <div id="m-photo-preview"></div>
+          </div>
           <div class="field"><label>Année de naissance</label><input id="m-year" type="number" placeholder="1990"></div>
           <div class="field"><label>Nationalité</label><input id="m-nat" type="text" placeholder="Française"></div>
           <div class="field full"><label>Profession</label><input id="m-prof" type="text" placeholder="Actrice, mannequin..."></div>
@@ -576,14 +607,30 @@ const USERS = [
   { id:'yannick', name:'Yannick', color:'#06B6D4', hi:'#22D3EE', initial:'Y' },
 ];
 const TECH_CRITERIA = [
-  { key:'symetrie',  label:'Symétrie et harmonie' },
-  { key:'structure', label:'Structure du visage' },
-  { key:'regard',    label:'Regard' },
-  { key:'sourire',   label:'Sourire' },
-  { key:'photogenie',label:'Photogénie' },
-  { key:'charisme',  label:'Présence et charisme' },
-  { key:'style',     label:'Style et allure' },
-  { key:'pic',       label:'Pic de forme' },
+  { key:'symetrie',  label:'Symétrie et harmonie',
+    desc:"Équilibre global du visage : proportions régulières, moitiés gauche/droite bien accordées, rapport œil/nez/bouche harmonieux.",
+    ex:"Henry Cavill, Charlize Theron — visages quasi parfaitement symétriques, souvent cités comme références académiques." },
+  { key:'structure', label:'Structure du visage',
+    desc:"Qualité des traits osseux : mâchoire définie, pommettes saillantes, front, arcades. Un visage \"sculpté\" qui accroche la lumière.",
+    ex:"Angelina Jolie, Michael B. Jordan — pommettes et mâchoires iconiques, structure forte immédiatement reconnaissable." },
+  { key:'regard',    label:'Regard',
+    desc:"Intensité, couleur, profondeur et expressivité des yeux. Un regard qui capte la caméra et transmet une émotion sans parler.",
+    ex:"Zendaya, Timothée Chalamet — regards souvent décrits comme hypnotiques, capables de porter un plan entier." },
+  { key:'sourire',   label:'Sourire',
+    desc:"Qualité du sourire : dentition, courbure naturelle, chaleur qu'il dégage. Un sourire qui illumine le visage entier.",
+    ex:"Julia Roberts, Jacob Elordi — sourires emblématiques, associés à leur image de marque." },
+  { key:'photogenie',label:'Photogénie',
+    desc:"Capacité à être magnifié(e) par l'objectif. Certaines personnes sont plus belles en photo qu'en vrai — le visage \"aime\" la caméra.",
+    ex:"Margot Robbie, Paul Mescal — réputés pour être encore plus frappants en photo et au cinéma qu'en personne." },
+  { key:'charisme',  label:'Présence et charisme',
+    desc:"Aura à l'écran ou en personne : ce magnétisme qui fait qu'on ne regarde que cette personne dans une pièce ou un plan.",
+    ex:"Denzel Washington, Cate Blanchett — présence écrasante, impossibles à ignorer dès qu'ils entrent dans le cadre." },
+  { key:'style',     label:'Style et allure',
+    desc:"Élégance, port, goût vestimentaire, façon de se tenir et de se déplacer. Le \"chic\" global, au-delà des traits.",
+    ex:"Tilda Swinton, Ryan Gosling — icônes de style à part entière, reconnus autant pour leur allure que pour leur visage." },
+  { key:'pic',       label:'Pic de forme',
+    desc:"Évaluation du sommet physique de la personne, tous âges confondus. Pas son état actuel, mais son meilleur moment.",
+    ex:"Brad Pitt fin années 90 (Fight Club), Monica Bellucci début 2000s — pics de forme devenus des références absolues." },
 ];
 const BEAUTY_TAGS = [
   { k:'coup',     label:'Coup de cœur',        cls:'badge-coup',     ic:'heart' },
@@ -597,6 +644,35 @@ const BEAUTY_TAGS = [
 const DEFAULT_WEIGHTS = { technique:0.40, coup:0.35, pref:0.25 };
 const STORAGE_KEY = 'classeur-beaute-v1';
 const TMDB_IMG = 'https://image.tmdb.org/t/p/w500';
+
+/* Reads an image File and returns a resized JPEG data URL (max ~800px, ~85% quality).
+   Keeps localStorage usage reasonable even for large phone photos. */
+function fileToDataURL(file, maxSize=800, quality=0.85){
+  return new Promise((resolve,reject)=>{
+    if(!file || !file.type.startsWith('image/')){ reject(new Error('Pas une image')); return; }
+    const r = new FileReader();
+    r.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width, h = img.height;
+        if(w > maxSize || h > maxSize){
+          const ratio = Math.min(maxSize/w, maxSize/h);
+          w = Math.round(w*ratio); h = Math.round(h*ratio);
+        }
+        const c = document.createElement('canvas');
+        c.width = w; c.height = h;
+        const ctx = c.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        try { resolve(c.toDataURL('image/jpeg', quality)); }
+        catch(e){ reject(e); }
+      };
+      img.onerror = () => reject(new Error('Image illisible'));
+      img.src = r.result;
+    };
+    r.onerror = () => reject(new Error('Lecture échouée'));
+    r.readAsDataURL(file);
+  });
+}
 const ICONS = {
   heart:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.6-9.5-9.4C1 8.3 2.7 5 6 5c2 0 3.3 1 4 2.2C10.7 6 12 5 14 5c3.3 0 5 3.3 3.5 6.6C19 16.4 12 21 12 21Z"/></svg>',
   eye:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2.5 12s3-7 9.5-7 9.5 7 9.5 7-3 7-9.5 7S2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3"/></svg>',
@@ -682,7 +758,12 @@ function saveState(){
     people:state.people, ratings:state.ratings, favorites:state.favorites,
     elo:state.elo, duels:state.duels, duelHistory:state.duelHistory,
     tournaments:state.tournaments, settings:state.settings,
-  })); }catch(e){}
+  })); return true; }catch(e){
+    if(e.name==='QuotaExceededError' || /quota/i.test(e.message||'')){
+      try{ toast('Stockage plein : retire quelques photos uploadées','err'); }catch(_){}
+    }
+    return false;
+  }
 }
 function loadState(){
   try{
@@ -882,6 +963,43 @@ function initAddOnce(){
     $$('#m-gender button').forEach(x=>x.classList.remove('on'));
     b.classList.add('on');
   }));
+  const mUploadBtn = $('#m-photo-upload-btn');
+  const mFileInput = $('#m-photo-file');
+  const mPhotoInput = $('#m-photo');
+  const mPreview = $('#m-photo-preview');
+  function renderManualPreview(){
+    const v = mPhotoInput.value.trim();
+    if(!v){ mPreview.innerHTML = ''; return; }
+    const isData = v.startsWith('data:image/');
+    const sizeKB = isData ? Math.round(v.length*0.75/1024) : null;
+    mPreview.innerHTML = `<div class="photo-preview">
+      <img src="${esc(v)}" onerror="this.style.display='none'">
+      <div class="pp-info">${isData?`Photo uploadée · ~${sizeKB} Ko`:'Depuis une URL'}</div>
+      <button type="button" class="pp-clear" id="m-photo-clear" aria-label="Retirer">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </div>`;
+    $('#m-photo-clear')?.addEventListener('click',()=>{
+      mPhotoInput.value='';
+      mFileInput.value='';
+      renderManualPreview();
+    });
+  }
+  mPhotoInput.addEventListener('input', renderManualPreview);
+  mUploadBtn?.addEventListener('click',()=>mFileInput.click());
+  mFileInput?.addEventListener('change', async e=>{
+    const f = e.target.files?.[0];
+    if(!f) return;
+    try {
+      toast('Traitement de l\'image...');
+      const dataUrl = await fileToDataURL(f);
+      mPhotoInput.value = dataUrl;
+      renderManualPreview();
+      toast('Photo prête','ok');
+    } catch(err){
+      toast('Erreur : '+err.message,'err');
+    }
+  });
   $('#add-manual-save').addEventListener('click',()=>{
     const name=$('#m-name').value.trim();
     const g=$('#m-gender button.on');
@@ -896,6 +1014,8 @@ function initAddOnce(){
     saveState(); renderList(); closeAllModals();
     toast('Ajouté : '+name,'ok');
     ['m-name','m-photo','m-year','m-nat','m-prof','m-bio'].forEach(id=>$('#'+id).value='');
+    if(mFileInput) mFileInput.value='';
+    renderManualPreview();
     $$('#m-gender button').forEach(x=>x.classList.remove('on'));
   });
 }
@@ -1009,12 +1129,18 @@ function renderDetails(){
       ${hd?`<div class="nc-tiny">T ${tm==null?'-':fmt(tm)} · C ${r.coup==null?'-':fmt(r.coup)} · P ${r.pref==null?'-':fmt(r.pref)}</div>`:''}
     </div>`;
   }).join('');
+  ui.critOpen = ui.critOpen || {};
   const techRows=TECH_CRITERIA.map(c=>{
     const v=d.technique?.[c.key];
+    const open=!!ui.critOpen[c.key];
     return `<div class="slider-row">
-      <span class="slider-label">${c.label}</span>
+      <span class="slider-label">
+        <button type="button" class="crit-info-btn ${open?'is-on':''}" data-crit-info="${c.key}" aria-label="Info ${esc(c.label)}">?</button>
+        <span class="lbl-text">${c.label}</span>
+      </span>
       <span class="slider-value" data-v-for="${c.key}">${v==null?'-':Number(v).toFixed(1)}</span>
       <input class="slider" type="range" min="0" max="10" step="0.1" value="${v||0}" data-crit="${c.key}">
+      ${open?`<div class="crit-info">${esc(c.desc)}${c.ex?`<div class="crit-ex">${esc(c.ex)}</div>`:''}</div>`:''}
     </div>`;
   }).join('');
   const tagRow=BEAUTY_TAGS.map(t=>{
@@ -1043,6 +1169,10 @@ function renderDetails(){
         </div>
         <div class="photo-dots">${photos.map((_,i)=>`<span class="${i===idx?'on':''}"></span>`).join('')}</div>
       `:''}
+      <button class="upload-photo" id="upload-photo-btn" aria-label="Uploader une photo" title="Uploader une photo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      </button>
+      <input id="upload-photo-file" type="file" accept="image/*" hidden>
     </div>
     <div class="detail-title-wrap">
       <div class="detail-title">${esc(p.name)}</div>
@@ -1099,6 +1229,35 @@ function renderDetails(){
     renderDetails();
     toast('Photo par défaut mise à jour');
   });
+  $('#upload-photo-btn')?.addEventListener('click',()=>$('#upload-photo-file')?.click());
+  $('#upload-photo-file')?.addEventListener('change', async e=>{
+    const f = e.target.files?.[0];
+    if(!f) return;
+    try {
+      toast('Traitement de l\'image...');
+      const dataUrl = await fileToDataURL(f);
+      if(!p.photos) p.photos = p.mainPhoto?[p.mainPhoto]:[];
+      const prevMain = p.mainPhoto;
+      const prevPhotos = p.photos.slice();
+      p.photos.push(dataUrl);
+      p.mainPhoto = dataUrl;
+      ui.photoIdx = p.photos.length - 1;
+      const ok = saveState();
+      if(!ok){
+        // Rollback
+        p.photos = prevPhotos;
+        p.mainPhoto = prevMain;
+        ui.photoIdx = 0;
+        renderDetails();
+        return;
+      }
+      renderList();
+      renderDetails();
+      toast('Photo ajoutée','ok');
+    } catch(err){
+      toast('Erreur : '+err.message,'err');
+    }
+  });
   $$('#detail-body .slider[data-crit]').forEach(s=>s.addEventListener('input',e=>{
     const k=e.target.getAttribute('data-crit');
     d.technique=d.technique||{};
@@ -1115,6 +1274,11 @@ function renderDetails(){
   $$('#detail-body [data-tag]').forEach(b=>b.addEventListener('click',()=>{
     const t=b.getAttribute('data-tag');
     d.tag=d.tag===t?null:t;
+    renderDetails();
+  }));
+  $$('#detail-body [data-crit-info]').forEach(b=>b.addEventListener('click',()=>{
+    const k=b.getAttribute('data-crit-info');
+    ui.critOpen[k]=!ui.critOpen[k];
     renderDetails();
   }));
 }
