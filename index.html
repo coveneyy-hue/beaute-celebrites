@@ -302,13 +302,28 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .duel-arena{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
 .duel-card{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;transition:transform .15s,border-color .15s;text-align:left;width:100%}
 .duel-card:active{transform:scale(.98);border-color:var(--amber)}
-.duel-photo{aspect-ratio:3/4;background:var(--bg-3);position:relative}
-.duel-photo img{width:100%;height:100%;object-fit:cover}
-.duel-photo .fav-mini{position:absolute;top:8px;left:8px;width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);display:grid;place-items:center;color:#fff}
+.duel-photo{aspect-ratio:3/4;background:var(--bg-3);position:relative;overflow:hidden}
+.duel-photo img{width:100%;height:100%;object-fit:cover;object-position:center 15%}
+.duel-photo .fav-mini{position:absolute;top:8px;left:8px;width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);display:grid;place-items:center;color:#fff;z-index:2}
 .duel-photo .fav-mini.is-on{background:var(--lily);color:#fff}
 .duel-photo .trash-mini{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;background:rgba(239,68,68,.75);backdrop-filter:blur(6px);display:grid;place-items:center;color:#fff;border:1px solid rgba(239,68,68,.55);z-index:2}
 .duel-photo .trash-mini:active{transform:scale(.92)}
 .duel-photo .trash-mini svg{width:14px;height:14px}
+/* Photo navigation: arrows on left/right edges */
+.duel-photo .photo-arrow{position:absolute;top:50%;transform:translateY(-50%);width:30px;height:48px;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);display:grid;place-items:center;color:#fff;border:none;z-index:2;transition:background .15s}
+.duel-photo .photo-arrow:active{background:rgba(0,0,0,.75)}
+.duel-photo .photo-arrow.prev{left:0;border-radius:0 8px 8px 0}
+.duel-photo .photo-arrow.next{right:0;border-radius:8px 0 0 8px}
+.duel-photo .photo-arrow svg{width:14px;height:14px}
+/* Photo counter + upload + set-default, bottom row */
+.duel-photo .photo-toolbar{position:absolute;bottom:6px;left:6px;right:6px;display:flex;justify-content:space-between;align-items:center;gap:6px;z-index:2;pointer-events:none}
+.duel-photo .photo-toolbar > *{pointer-events:auto}
+.duel-photo .photo-counter{padding:2px 8px;border-radius:999px;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);color:#fff;font-size:10px;font-weight:700}
+.duel-photo .photo-tool-btn{width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);display:grid;place-items:center;color:#fff;border:1px solid rgba(255,255,255,.12);transition:all .15s}
+.duel-photo .photo-tool-btn:active{transform:scale(.92)}
+.duel-photo .photo-tool-btn.is-default{background:rgba(251,191,36,.9);color:#1A1200;border-color:rgba(251,191,36,1)}
+.duel-photo .photo-tool-btn svg{width:13px;height:13px}
+.duel-photo .photo-tools-row{display:flex;gap:4px}
 .duel-stats{padding:10px;background:var(--bg-2);text-align:center;border-top:1px solid var(--border)}
 .duel-stats .wins{font-size:30px;font-weight:800;color:var(--amber);line-height:1}
 .duel-stats .wins-l{font-size:10px;font-weight:700;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;margin-top:4px}
@@ -861,6 +876,134 @@ function recompressDataUrl(originalDataUrl, targetBytes=40*1024, maxSize=480){
     img.onerror = () => reject(new Error('Image illisible'));
     img.src = originalDataUrl;
   });
+}
+
+/* ============ SHARED CARD PHOTO NAV (for duel & tournament cards) ============
+   Generates the HTML for photo navigation controls overlaid on a card photo,
+   and provides a wiring function so the parent can attach handlers in one line.
+
+   `ctx` is a namespace string ('duel' or 'tour') used for data-attributes so
+   multiple cards on screen don't collide.
+*/
+function cardPhotos(p){
+  return p.photos?.length ? p.photos : (p.mainPhoto ? [p.mainPhoto] : []);
+}
+function cardPhotoControlsHtml(p, ctx, currentIdx){
+  const photos = cardPhotos(p);
+  if(!photos.length) return '';
+  const idx = Math.max(0, Math.min(currentIdx||0, photos.length-1));
+  const current = photos[idx];
+  const isDefault = p.mainPhoto === current;
+  const hasMultiple = photos.length > 1;
+  const starFilled = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 7 7 .8-5.3 4.9 1.6 7.1L12 18.3 5.7 21.8l1.6-7.1L2 9.8 9 9z"/></svg>';
+  const starOutline = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/></svg>';
+  const uploadSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>';
+  const prevArrow = hasMultiple ? `<button type="button" class="photo-arrow prev" data-${ctx}-arrow="prev" data-${ctx}-pid="${p.id}" aria-label="Précédente"><svg viewBox="0 0 12 12"><path d="M8 2 L4 6 L8 10" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></button>` : '';
+  const nextArrow = hasMultiple ? `<button type="button" class="photo-arrow next" data-${ctx}-arrow="next" data-${ctx}-pid="${p.id}" aria-label="Suivante"><svg viewBox="0 0 12 12"><path d="M4 2 L8 6 L4 10" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></button>` : '';
+  const counter = hasMultiple ? `<span class="photo-counter">${idx+1}/${photos.length}</span>` : '<span></span>';
+  return `
+    ${prevArrow}${nextArrow}
+    <div class="photo-toolbar">
+      ${counter}
+      <div class="photo-tools-row">
+        <button type="button" class="photo-tool-btn ${isDefault?'is-default':''}" data-${ctx}-setdefault="${p.id}" aria-label="${isDefault?'Photo par défaut':'Définir par défaut'}" title="${isDefault?'Photo par défaut':'Définir par défaut'}">
+          ${isDefault?starFilled:starOutline}
+        </button>
+        <button type="button" class="photo-tool-btn" data-${ctx}-upload="${p.id}" aria-label="Uploader une photo" title="Uploader une photo">${uploadSvg}</button>
+      </div>
+    </div>`;
+}
+// Returns the img src to display for this card given the current photoIdx state.
+function cardCurrentPhoto(p, photoIdxMap){
+  const photos = cardPhotos(p);
+  if(!photos.length) return null;
+  const idx = Math.max(0, Math.min((photoIdxMap && photoIdxMap[p.id]) || 0, photos.length-1));
+  return photos[idx];
+}
+// Wires up handlers for the photo navigation controls in a given container.
+// `ctx` must match the data-attributes used by cardPhotoControlsHtml ('duel' or 'tour').
+// `photoIdxMap` is the object that tracks the current photo index per person.
+// `onChange` is called after any state change so the caller can re-render just the affected part.
+function wireCardPhotoControls(container, ctx, photoIdxMap, onChange){
+  const $$in = sel => Array.from(container.querySelectorAll(sel));
+  // Arrow navigation
+  $$in(`[data-${ctx}-arrow]`).forEach(btn => btn.addEventListener('click', e => {
+    e.stopPropagation(); e.preventDefault();
+    const dir = btn.getAttribute(`data-${ctx}-arrow`);
+    const pid = btn.getAttribute(`data-${ctx}-pid`);
+    const p = state.people.find(x=>x.id===pid);
+    if(!p) return;
+    const photos = cardPhotos(p);
+    const cur = (photoIdxMap[pid]||0);
+    const next = dir==='next' ? (cur+1) % photos.length : (cur-1+photos.length) % photos.length;
+    photoIdxMap[pid] = next;
+    onChange(pid);
+  }));
+  // Set as default
+  $$in(`[data-${ctx}-setdefault]`).forEach(btn => btn.addEventListener('click', e => {
+    e.stopPropagation(); e.preventDefault();
+    const pid = btn.getAttribute(`data-${ctx}-setdefault`);
+    const p = state.people.find(x=>x.id===pid);
+    if(!p) return;
+    const photos = cardPhotos(p);
+    const cur = (photoIdxMap[pid]||0);
+    const target = photos[cur];
+    if(!target) return;
+    if(p.mainPhoto === target){ toast('Déjà la photo par défaut'); return; }
+    p.mainPhoto = target;
+    saveState();
+    renderList(); // update thumbnail in the main list
+    onChange(pid);
+    toast('Photo par défaut mise à jour','ok');
+  }));
+  // Upload
+  $$in(`[data-${ctx}-upload]`).forEach(btn => btn.addEventListener('click', e => {
+    e.stopPropagation(); e.preventDefault();
+    const pid = btn.getAttribute(`data-${ctx}-upload`);
+    // Create a hidden file input and trigger it
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.addEventListener('change', async evt => {
+      const f = evt.target.files?.[0];
+      if(!f) return;
+      const p = state.people.find(x=>x.id===pid);
+      if(!p) return;
+      try {
+        toast("Traitement de l'image...");
+        const dataUrl = await fileToDataURL(f);
+        const imageBytes = dataUrl.length * 0.75;
+        const st = computeStorageStats();
+        const freeBytes = (st.quotaMB * 1024 * 1024) - st.bytes;
+        if(imageBytes > freeBytes * 0.9){
+          const needKb = Math.ceil(imageBytes/1024);
+          const freeKb = Math.max(0, Math.floor(freeBytes/1024));
+          if(!confirm(`Pas assez d'espace (besoin ${needKb} Ko, libre ${freeKb} Ko).\nTenter quand même ?`)) return;
+        }
+        if(!p.photos) p.photos = p.mainPhoto ? [p.mainPhoto] : [];
+        const prevMain = p.mainPhoto;
+        const prevPhotos = p.photos.slice();
+        p.photos.push(dataUrl);
+        p.mainPhoto = dataUrl;
+        photoIdxMap[pid] = p.photos.length - 1;
+        const ok = saveState();
+        if(!ok){
+          // Rollback
+          p.photos = prevPhotos;
+          p.mainPhoto = prevMain;
+          photoIdxMap[pid] = 0;
+          return;
+        }
+        renderList();
+        onChange(pid);
+        const sizeKb = Math.round(imageBytes/1024);
+        toast(`Photo ajoutée (${sizeKb} Ko)`,'ok');
+      } catch(err){
+        toast('Erreur : '+err.message,'err');
+      }
+    });
+    input.click();
+  }));
 }
 const ICONS = {
   heart:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.6-9.5-9.4C1 8.3 2.7 5 6 5c2 0 3.3 1 4 2.2C10.7 6 12 5 14 5c3.3 0 5 3.3 3.5 6.6C19 16.4 12 21 12 21Z"/></svg>',
@@ -2079,7 +2222,7 @@ function deletePerson(){
 
 /* ============ DUEL MODAL ============ */
 function openDuel(){
-  ui.duel={ filter:'all', pair:null };
+  ui.duel={ filter:'all', pair:null, photoIdx:{} };
   renderDuel();
   openModal('modal-duel');
 }
@@ -2120,16 +2263,24 @@ function renderDuel(){
   const wA=state.duelHistory[u]?.filter(d=>d.winnerId===a.id).length||0;
   const wB=state.duelHistory[u]?.filter(d=>d.winnerId===b.id).length||0;
   const trashSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
-  const card=(p,wins)=>`<button class="duel-card" data-pick="${p.id}">
-    <div class="duel-photo">
-      ${p.mainPhoto?`<img src="${esc(p.mainPhoto)}" alt="${esc(p.name)}" onerror="this.style.display='none'">`:`<div style="height:100%;display:grid;place-items:center;color:var(--text-4);font-size:40px">?</div>`}
-      <div class="fav-mini ${state.favorites[u]?.[p.id]?'is-on':''}"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.6-9.5-9.4C1 8.3 2.7 5 6 5c2 0 3.3 1 4 2.2C10.7 6 12 5 14 5c3.3 0 5 3.3 3.5 6.6C19 16.4 12 21 12 21Z"/></svg></div>
-      <span class="trash-mini" data-trash="${p.id}" role="button" aria-label="Supprimer de la banque">${trashSvg}</span>
-    </div>
-    <div class="duel-stats"><div class="wins">${wins}</div><div class="wins-l">Victoires</div></div>
-    <div class="d-name">${esc(p.name)}</div>
-    <div class="d-sub">ELO ${getElo(u,p.id)}</div>
-  </button>`;
+  if(!ui.duel.photoIdx) ui.duel.photoIdx = {};
+  const card=(p,wins)=>{
+    const photoSrc = cardCurrentPhoto(p, ui.duel.photoIdx) || p.mainPhoto;
+    const currentIdx = ui.duel.photoIdx[p.id] || 0;
+    return `<div class="duel-card" data-card-pid="${p.id}">
+      <div class="duel-photo">
+        ${photoSrc?`<img src="${esc(photoSrc)}" alt="${esc(p.name)}" onerror="this.style.display='none'">`:`<div style="height:100%;display:grid;place-items:center;color:var(--text-4);font-size:40px">?</div>`}
+        <div class="fav-mini ${state.favorites[u]?.[p.id]?'is-on':''}"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.6-9.5-9.4C1 8.3 2.7 5 6 5c2 0 3.3 1 4 2.2C10.7 6 12 5 14 5c3.3 0 5 3.3 3.5 6.6C19 16.4 12 21 12 21Z"/></svg></div>
+        <span class="trash-mini" data-trash="${p.id}" role="button" aria-label="Supprimer de la banque">${trashSvg}</span>
+        ${cardPhotoControlsHtml(p, 'duel', currentIdx)}
+      </div>
+      <button type="button" class="duel-card-pick" data-pick="${p.id}" style="display:block;width:100%;border:none;background:transparent;padding:0;text-align:left;cursor:pointer">
+        <div class="duel-stats"><div class="wins">${wins}</div><div class="wins-l">Victoires</div></div>
+        <div class="d-name">${esc(p.name)}</div>
+        <div class="d-sub">ELO ${getElo(u,p.id)}</div>
+      </button>
+    </div>`;
+  };
   body.innerHTML=filterBar+`
     <div class="duel-hero-card">
       <div class="hico">⚔</div>
@@ -2164,6 +2315,39 @@ function renderDuel(){
   }));
   $('#duel-body [data-act="skip"]')?.addEventListener('click',()=>{ ui.duel.pair=null; renderDuel(); });
   $('#duel-body [data-act="close"]')?.addEventListener('click',closeAllModals);
+  // Photo nav controls (arrows, set default, upload) — operate without re-rolling the pair
+  const rerenderCard = (pid) => {
+    const updated = state.people.find(x=>x.id===pid);
+    if(!updated) return;
+    const cardEl = $(`#duel-body .duel-card[data-card-pid="${pid}"]`);
+    if(!cardEl) return;
+    const wins = state.duelHistory[u]?.filter(d=>d.winnerId===updated.id).length || 0;
+    const newHtml = card(updated, wins);
+    const tmp = document.createElement('div');
+    tmp.innerHTML = newHtml;
+    const newCard = tmp.firstElementChild;
+    cardEl.replaceWith(newCard);
+    // Re-wire handlers on the replacement
+    newCard.querySelector('[data-trash]')?.addEventListener('click', e => {
+      e.stopPropagation(); e.preventDefault();
+      const person = state.people.find(x=>x.id===pid);
+      if(!person) return;
+      if(!confirm(`Supprimer ${person.name} de la banque ?\nIl/elle sera remplacé(e) par un(e) autre candidat(e).\nLes notes de tous les utilisateurs pour cette personne seront effacées.`)) return;
+      removePersonFromBank(pid);
+      saveState();
+      renderList();
+      ui.duel.pair = null;
+      renderDuel();
+      toast(`Supprimé : ${person.name}`);
+    });
+    newCard.querySelector('[data-pick]')?.addEventListener('click', () => {
+      const winId = pid;
+      const loseId = winId === a.id ? b.id : a.id;
+      recordDuel(winId, loseId);
+    });
+    wireCardPhotoControls(newCard, 'duel', ui.duel.photoIdx, rerenderCard);
+  };
+  wireCardPhotoControls($('#duel-body'), 'duel', ui.duel.photoIdx, rerenderCard);
 }
 function recordDuel(w,l){
   const u=state.settings.currentUser;
@@ -2179,7 +2363,7 @@ function recordDuel(w,l){
 
 /* ============ TOURNAMENT ============ */
 function openTournament(){
-  ui.tour={ stage:'setup', config:{ filter:'F', size:8, blind:false, seeding:'note' }, data:null };
+  ui.tour={ stage:'setup', config:{ filter:'F', size:8, blind:false, seeding:'note' }, data:null, photoIdx:{} };
   renderTournament();
   openModal('modal-tournament');
 }
@@ -2287,16 +2471,24 @@ function renderTourPlay(){
   $('#tour-title').textContent='Tournoi en cours';
   $('#tour-sub').textContent='Round '+(t.currentRound+1)+'/'+t.rounds.length+' · Match '+(t.currentMatch+1)+'/'+t.rounds[t.currentRound].matches.length;
   const tTrashSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
-  const card=(p,n)=>`<button class="duel-card" data-pick="${p.id}">
-    <div class="duel-photo">
-      ${p.mainPhoto?`<img src="${esc(p.mainPhoto)}" onerror="this.style.display='none'">`:`<div style="height:100%;display:grid;place-items:center;color:var(--text-4);font-size:40px">?</div>`}
-      <div class="fav-mini ${state.favorites[u]?.[p.id]?'is-on':''}"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.6-9.5-9.4C1 8.3 2.7 5 6 5c2 0 3.3 1 4 2.2C10.7 6 12 5 14 5c3.3 0 5 3.3 3.5 6.6C19 16.4 12 21 12 21Z"/></svg></div>
-      <span class="trash-mini" data-t-trash="${p.id}" role="button" aria-label="Supprimer de la banque">${tTrashSvg}</span>
-    </div>
-    <div class="duel-stats"><div class="wins">${n==null?'?':fmt(n)}</div><div class="wins-l">${blind?'Note masquée':'Ta note'}</div></div>
-    <div class="d-name">${esc(p.name)}</div>
-    <div class="d-sub">${p.birthday||''}${p.profession?(p.birthday?' · ':'')+esc(p.profession):''}</div>
-  </button>`;
+  if(!ui.tour.photoIdx) ui.tour.photoIdx = {};
+  const card=(p,n)=>{
+    const photoSrc = cardCurrentPhoto(p, ui.tour.photoIdx) || p.mainPhoto;
+    const currentIdx = ui.tour.photoIdx[p.id] || 0;
+    return `<div class="duel-card" data-card-pid="${p.id}">
+      <div class="duel-photo">
+        ${photoSrc?`<img src="${esc(photoSrc)}" onerror="this.style.display='none'">`:`<div style="height:100%;display:grid;place-items:center;color:var(--text-4);font-size:40px">?</div>`}
+        <div class="fav-mini ${state.favorites[u]?.[p.id]?'is-on':''}"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.6-9.5-9.4C1 8.3 2.7 5 6 5c2 0 3.3 1 4 2.2C10.7 6 12 5 14 5c3.3 0 5 3.3 3.5 6.6C19 16.4 12 21 12 21Z"/></svg></div>
+        <span class="trash-mini" data-t-trash="${p.id}" role="button" aria-label="Supprimer de la banque">${tTrashSvg}</span>
+        ${cardPhotoControlsHtml(p, 'tour', currentIdx)}
+      </div>
+      <button type="button" data-pick="${p.id}" style="display:block;width:100%;border:none;background:transparent;padding:0;text-align:left;cursor:pointer">
+        <div class="duel-stats"><div class="wins">${n==null?'?':fmt(n)}</div><div class="wins-l">${blind?'Note masquée':'Ta note'}</div></div>
+        <div class="d-name">${esc(p.name)}</div>
+        <div class="d-sub">${p.birthday||''}${p.profession?(p.birthday?' · ':'')+esc(p.profession):''}</div>
+      </button>
+    </div>`;
+  };
   const label=t.config.filter==='F'?'Femmes':t.config.filter==='M'?'Hommes':'Mixte';
   $('#tour-body').innerHTML=`
     <div class="tour-hero">
@@ -2344,6 +2536,43 @@ function renderTourPlay(){
       saveState(); closeAllModals(); toast('Tournoi abandonné');
     }
   });
+  // Photo nav controls (arrows, set default, upload) — partial re-render so tournament state is preserved
+  const rerenderTourCard = (pid) => {
+    const updated = state.people.find(x=>x.id===pid);
+    if(!updated) return;
+    const cardEl = $(`#tour-body .duel-card[data-card-pid="${pid}"]`);
+    if(!cardEl) return;
+    const n = blind ? null : computeNote(u, updated.id);
+    const newHtml = card(updated, n);
+    const tmp = document.createElement('div');
+    tmp.innerHTML = newHtml;
+    const newCard = tmp.firstElementChild;
+    cardEl.replaceWith(newCard);
+    // Re-wire handlers
+    newCard.querySelector('[data-pick]')?.addEventListener('click', () => tourAdvance(pid));
+    newCard.querySelector('[data-t-trash]')?.addEventListener('click', e => {
+      e.stopPropagation(); e.preventDefault();
+      const person = state.people.find(x=>x.id===pid);
+      if(!person) return;
+      const otherId = cm.a === pid ? cm.b : cm.a;
+      const other = state.people.find(x=>x.id===otherId);
+      const otherName = other ? other.name : 'l\'autre candidat(e)';
+      if(!confirm(`Supprimer ${person.name} de la banque ?\n\n${otherName} passera automatiquement au round suivant.\nLes notes de tous les utilisateurs pour cette personne seront effacées.`)) return;
+      removePersonFromBank(pid);
+      if(other){
+        tourAdvance(otherId);
+      } else {
+        saveState();
+        renderList();
+        closeAllModals();
+        toast('Tournoi interrompu','err');
+        return;
+      }
+      toast(`Supprimé : ${person.name}`);
+    });
+    wireCardPhotoControls(newCard, 'tour', ui.tour.photoIdx, rerenderTourCard);
+  };
+  wireCardPhotoControls($('#tour-body'), 'tour', ui.tour.photoIdx, rerenderTourCard);
 }
 function renderBracketHtml(t){
   const names=['Huitièmes','Quarts','Demi','Finale'];
