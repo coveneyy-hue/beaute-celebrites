@@ -1025,8 +1025,11 @@ function downloadJson(obj, filename){
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url; a.download = filename;
-  document.body.appendChild(a); a.click(); a.remove();
-  URL.revokeObjectURL(url);
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  // Delay revoke so Android has time to initiate the download
+  setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 2000);
 }
 function countUploadedPhotos(){
   let n = 0;
@@ -2038,8 +2041,16 @@ function pickPair(){
   const pool=state.people.filter(p=>f==='all'||p.gender===f);
   if(pool.length<2) return null;
   const u=state.settings.currentUser;
-  const a=pool[Math.floor(Math.random()*pool.length)];
+  const hist=state.duelHistory[u]||[];
+  // Count combats per person
+  const combatCount=id=>hist.filter(d=>d.winnerId===id||d.loserId===id).length;
+  // Sort pool by number of combats asc, pick from the least-fought quartile (min 4)
+  const sorted=[...pool].sort((a,b)=>combatCount(a.id)-combatCount(b.id));
+  const sliceSize=Math.max(4,Math.ceil(sorted.length*0.25));
+  const candidates=sorted.slice(0,sliceSize);
+  const a=candidates[Math.floor(Math.random()*candidates.length)];
   const ae=getElo(u,a.id);
+  // Among remaining pool, pick within 8 closest ELO
   const rest=pool.filter(p=>p.id!==a.id).map(p=>({p,d:Math.abs(getElo(u,p.id)-ae)}));
   rest.sort((x,y)=>x.d-y.d);
   const near=rest.slice(0,Math.min(8,rest.length));
@@ -2554,13 +2565,15 @@ function renderConsult(){
     </div>
     <div style="display:flex;flex-direction:column;gap:10px">
       ${list.map(p=>{
-        const combats=(state.duelHistory[u]||[]).filter(d=>d.winnerId===p.id || d.loserId===p.id).length;
+        const hist=(state.duelHistory[u]||[]).filter(d=>d.winnerId===p.id||d.loserId===p.id);
+        const wins=hist.filter(d=>d.winnerId===p.id).length;
+        const losses=hist.filter(d=>d.loserId===p.id).length;
         return `<div class="consult-card" data-open="${p.id}">
           ${p.mainPhoto?`<img src="${esc(p.mainPhoto)}" onerror="this.style.display='none'">`:`<div style="width:56px;height:76px;background:var(--bg-3);border-radius:8px;flex:none"></div>`}
           <div class="ci">
             <div class="n">${esc(p.name)} <span style="color:${p.gender==='F'?'var(--lily-hi)':'var(--yannick-hi)'};font-weight:600;font-size:11px;margin-left:4px">${p.gender==='F'?'F':'H'}</span></div>
             <div class="s">${esc([p.profession,p.birthday,p.nationality].filter(Boolean).join(' · '))}</div>
-            <div style="margin-top:6px;font-size:12px;color:var(--text-3)">ELO : <strong style="color:var(--amber)">${getElo(u,p.id)}</strong> · Combats : <strong style="color:var(--text)">${combats}</strong></div>
+            <div style="margin-top:6px;font-size:12px;color:var(--text-3)">ELO : <strong style="color:var(--amber)">${getElo(u,p.id)}</strong> · Combats : <strong style="color:var(--green)">${wins}V</strong> <strong style="color:var(--coral)">${losses}D</strong></div>
           </div>
         </div>`;
       }).join('')}
