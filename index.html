@@ -2315,18 +2315,18 @@ function renderDuel(){
   const card=(p,wins)=>{
     const photoSrc = cardCurrentPhoto(p, ui.duel.photoIdx) || p.mainPhoto;
     const currentIdx = cardEffectiveIdx(p, ui.duel.photoIdx);
-    return `<div class="duel-card" data-card-pid="${p.id}">
+    return `<div class="duel-card" data-card-pid="${p.id}" data-pick="${p.id}" role="button" tabindex="0">
       <div class="duel-photo">
         ${photoSrc?`<img src="${esc(photoSrc)}" alt="${esc(p.name)}" onerror="this.style.display='none'">`:`<div style="height:100%;display:grid;place-items:center;color:var(--text-4);font-size:40px">?</div>`}
         <div class="fav-mini ${state.favorites[u]?.[p.id]?'is-on':''}"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.6-9.5-9.4C1 8.3 2.7 5 6 5c2 0 3.3 1 4 2.2C10.7 6 12 5 14 5c3.3 0 5 3.3 3.5 6.6C19 16.4 12 21 12 21Z"/></svg></div>
         <span class="trash-mini" data-trash="${p.id}" role="button" aria-label="Supprimer de la banque">${trashSvg}</span>
         ${cardPhotoControlsHtml(p, 'duel', currentIdx)}
       </div>
-      <button type="button" class="duel-card-pick" data-pick="${p.id}" style="display:block;width:100%;border:none;background:transparent;padding:0;text-align:left;cursor:pointer">
+      <div>
         <div class="duel-stats"><div class="wins">${wins}</div><div class="wins-l">Victoires</div></div>
         <div class="d-name">${esc(p.name)}</div>
         <div class="d-sub">ELO ${getElo(u,p.id)}</div>
-      </button>
+      </div>
     </div>`;
   };
   body.innerHTML=filterBar+`
@@ -2523,18 +2523,18 @@ function renderTourPlay(){
   const card=(p,n)=>{
     const photoSrc = cardCurrentPhoto(p, ui.tour.photoIdx) || p.mainPhoto;
     const currentIdx = cardEffectiveIdx(p, ui.tour.photoIdx);
-    return `<div class="duel-card" data-card-pid="${p.id}">
+    return `<div class="duel-card" data-card-pid="${p.id}" data-pick="${p.id}" role="button" tabindex="0">
       <div class="duel-photo">
         ${photoSrc?`<img src="${esc(photoSrc)}" onerror="this.style.display='none'">`:`<div style="height:100%;display:grid;place-items:center;color:var(--text-4);font-size:40px">?</div>`}
         <div class="fav-mini ${state.favorites[u]?.[p.id]?'is-on':''}"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.6-9.5-9.4C1 8.3 2.7 5 6 5c2 0 3.3 1 4 2.2C10.7 6 12 5 14 5c3.3 0 5 3.3 3.5 6.6C19 16.4 12 21 12 21Z"/></svg></div>
         <span class="trash-mini" data-t-trash="${p.id}" role="button" aria-label="Supprimer de la banque">${tTrashSvg}</span>
         ${cardPhotoControlsHtml(p, 'tour', currentIdx)}
       </div>
-      <button type="button" data-pick="${p.id}" style="display:block;width:100%;border:none;background:transparent;padding:0;text-align:left;cursor:pointer">
+      <div>
         <div class="duel-stats"><div class="wins">${n==null?'?':fmt(n)}</div><div class="wins-l">${blind?'Note masquée':'Ta note'}</div></div>
         <div class="d-name">${esc(p.name)}</div>
         <div class="d-sub">${p.birthday||''}${p.profession?(p.birthday?' · ':'')+esc(p.profession):''}</div>
-      </button>
+      </div>
     </div>`;
   };
   const label=t.config.filter==='F'?'Femmes':t.config.filter==='M'?'Hommes':'Mixte';
