@@ -1056,10 +1056,6 @@ function ensureBuckets(u){
   if(!state.duelHistory[u]) state.duelHistory[u]=[];
   if(!state.tournaments[u]) state.tournaments[u]=[];
 }
-  if(c!=null){s+=c*wt.coup;ws+=wt.coup;}
-  if(p!=null){s+=p*wt.pref;ws+=wt.pref;}
-  return ws?s/ws:null;
-}
 function getElo(u,p){ return state.elo[u]?.[p]??1500; }
 function getHeadToHeadWins(u,a,b){
   const hist = state.duelHistory[u]||[];
