@@ -119,6 +119,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .empty-state p{font-size:13px}
 
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 16px;border-radius:12px;background:var(--card);border:1px solid var(--border);color:var(--text);font-size:14px;font-weight:700;letter-spacing:-.01em;transition:transform .1s,background .15s,border-color .15s;white-space:nowrap}
+[hidden]{display:none !important}
 .btn:active{transform:scale(.97)}
 .btn svg{width:16px;height:16px}
 .btn-primary{background:linear-gradient(180deg,var(--amber-hi),var(--amber));color:#1A1200;border-color:rgba(0,0,0,.15);box-shadow:0 6px 14px rgba(245,158,11,.3),inset 0 1px 0 rgba(255,255,255,.35)}
@@ -754,32 +755,107 @@ const DEFAULT_WEIGHTS = { technique:0.40, coup:0.35, pref:0.25 };
 const STORAGE_KEY = 'classeur-beaute-v1';
 const TMDB_IMG = 'https://image.tmdb.org/t/p/w500';
 
-/* Reads an image File and returns a resized JPEG data URL (max ~800px, ~85% quality).
-   Keeps localStorage usage reasonable even for large phone photos. */
-function fileToDataURL(file, maxSize=800, quality=0.85){
+/* Reads an image File and returns a resized JPEG data URL.
+   Progressively reduces dimensions and quality until target size is met.
+   Default target: 60 KB — enough for a phone avatar, respectful of the 5 MB localStorage quota. */
+function fileToDataURL(file, targetBytes=60*1024, maxSize=640){
   return new Promise((resolve,reject)=>{
     if(!file || !file.type.startsWith('image/')){ reject(new Error('Pas une image')); return; }
     const r = new FileReader();
     r.onload = () => {
       const img = new Image();
       img.onload = () => {
-        let w = img.width, h = img.height;
-        if(w > maxSize || h > maxSize){
-          const ratio = Math.min(maxSize/w, maxSize/h);
-          w = Math.round(w*ratio); h = Math.round(h*ratio);
-        }
-        const c = document.createElement('canvas');
-        c.width = w; c.height = h;
-        const ctx = c.getContext('2d');
-        ctx.drawImage(img, 0, 0, w, h);
-        try { resolve(c.toDataURL('image/jpeg', quality)); }
-        catch(e){ reject(e); }
+        // Attempts in order of preference: (maxDim, quality)
+        const attempts = [
+          [maxSize, 0.82],
+          [maxSize, 0.72],
+          [520, 0.72],
+          [520, 0.62],
+          [420, 0.62],
+          [420, 0.52],
+          [340, 0.52],
+          [280, 0.45],
+        ];
+        const render = (dim, q) => {
+          let w = img.width, h = img.height;
+          if(w > dim || h > dim){
+            const ratio = Math.min(dim/w, dim/h);
+            w = Math.round(w*ratio); h = Math.round(h*ratio);
+          }
+          const c = document.createElement('canvas');
+          c.width = w; c.height = h;
+          const ctx = c.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          return c.toDataURL('image/jpeg', q);
+        };
+        try {
+          let best = null;
+          for(const [dim, q] of attempts){
+            const url = render(dim, q);
+            // data URL length * 0.75 ≈ bytes (base64 overhead)
+            const bytes = url.length * 0.75;
+            best = url; // keep last as fallback
+            if(bytes <= targetBytes){ resolve(url); return; }
+          }
+          // Could not meet target; return the smallest attempt we made
+          resolve(best);
+        } catch(e){ reject(e); }
       };
       img.onerror = () => reject(new Error('Image illisible'));
       img.src = r.result;
     };
     r.onerror = () => reject(new Error('Lecture échouée'));
     r.readAsDataURL(file);
+  });
+}
+
+/* Recompresses an existing data: image URL to a smaller target size.
+   Returns {url: newDataUrl, oldBytes, newBytes}. */
+function recompressDataUrl(originalDataUrl, targetBytes=40*1024, maxSize=480){
+  return new Promise((resolve, reject)=>{
+    if(!originalDataUrl || !originalDataUrl.startsWith('data:image/')){
+      reject(new Error('Pas une image encodée')); return;
+    }
+    const oldBytes = originalDataUrl.length * 0.75;
+    const img = new Image();
+    img.onload = () => {
+      const attempts = [
+        [maxSize, 0.72],
+        [maxSize, 0.62],
+        [400, 0.62],
+        [400, 0.52],
+        [340, 0.52],
+        [280, 0.45],
+        [220, 0.40],
+      ];
+      const render = (dim, q) => {
+        let w = img.width, h = img.height;
+        if(w > dim || h > dim){
+          const ratio = Math.min(dim/w, dim/h);
+          w = Math.round(w*ratio); h = Math.round(h*ratio);
+        }
+        const c = document.createElement('canvas');
+        c.width = w; c.height = h;
+        c.getContext('2d').drawImage(img, 0, 0, w, h);
+        return c.toDataURL('image/jpeg', q);
+      };
+      try {
+        let best = null;
+        for(const [dim, q] of attempts){
+          const url = render(dim, q);
+          const bytes = url.length * 0.75;
+          best = url;
+          if(bytes <= targetBytes){
+            resolve({ url, oldBytes, newBytes: bytes });
+            return;
+          }
+        }
+        // Fallback: even the smallest attempt didn't hit target; keep it
+        resolve({ url: best, oldBytes, newBytes: best.length * 0.75 });
+      } catch(e){ reject(e); }
+    };
+    img.onerror = () => reject(new Error('Image illisible'));
+    img.src = originalDataUrl;
   });
 }
 const ICONS = {
@@ -901,7 +977,7 @@ function saveState(){
     tournaments:state.tournaments, settings:state.settings,
   })); return true; }catch(e){
     if(e.name==='QuotaExceededError' || /quota/i.test(e.message||'')){
-      try{ toast('Stockage plein : retire quelques photos uploadées','err'); }catch(_){}
+      try{ toast('Stockage plein — voir Réglages → 🧹 Vider photos','err'); }catch(_){}
     }
     return false;
   }
@@ -1869,6 +1945,20 @@ function renderDetails(){
     try {
       toast('Traitement de l\'image...');
       const dataUrl = await fileToDataURL(f);
+      const imageBytes = dataUrl.length * 0.75;
+      // Pre-flight check: is there room?
+      const st = computeStorageStats();
+      const freeBytes = (st.quotaMB * 1024 * 1024) - st.bytes;
+      if(imageBytes > freeBytes * 0.9){ // keep 10% margin
+        const needKb = Math.ceil(imageBytes/1024);
+        const freeKb = Math.max(0, Math.floor(freeBytes/1024));
+        const msg = `Pas assez d'espace (besoin ${needKb} Ko, libre ${freeKb} Ko).\n\n`
+                  + `Tu peux libérer de l'espace en :\n`
+                  + `• Réglages → 🧹 Vider photos (supprime toutes les photos uploadées)\n`
+                  + `• Réglages → Exporter puis Tout effacer, et ne réimporter que l'essentiel\n\n`
+                  + `Tenter l'ajout quand même ?`;
+        if(!confirm(msg)) { e.target.value=''; return; }
+      }
       if(!p.photos) p.photos = p.mainPhoto?[p.mainPhoto]:[];
       const prevMain = p.mainPhoto;
       const prevPhotos = p.photos.slice();
@@ -1882,11 +1972,13 @@ function renderDetails(){
         p.mainPhoto = prevMain;
         ui.photoIdx = 0;
         renderDetails();
+        // saveState already toasts the quota error
         return;
       }
       renderList();
       renderDetails();
-      toast('Photo ajoutée','ok');
+      const sizeKb = Math.round(imageBytes/1024);
+      toast(`Photo ajoutée (${sizeKb} Ko)`,'ok');
     } catch(err){
       toast('Erreur : '+err.message,'err');
     }
@@ -2637,8 +2729,12 @@ function renderSettings(){
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
         <button class="btn" id="import-data">📥 Importer JSON</button>
-        <button class="btn" id="clear-uploads">🧹 Vider photos</button>
+        <button class="btn" id="compress-uploads">🗜️ Compresser photos</button>
       </div>
+      <div style="font-size:11px;color:var(--text-4);margin-bottom:10px;line-height:1.4">
+        <strong>Compresser photos</strong> recompresse tes photos uploadées pour libérer de l'espace (cible ~40 Ko/photo).
+      </div>
+      <button class="btn btn-block" id="clear-uploads" style="margin-bottom:8px">🧹 Vider toutes les photos uploadées</button>
       <div style="font-size:11px;color:var(--text-4);margin-bottom:10px;line-height:1.4">
         <strong>Vider photos</strong> supprime toutes les photos uploadées depuis ce téléphone (garde les URLs TMDb/Wikidata).
       </div>
@@ -2759,6 +2855,75 @@ function renderSettings(){
     });
     saveState(); renderList(); renderSettings();
     toast(`${n} photo${n>1?'s':''} supprimée${n>1?'s':''}`,'ok');
+  });
+  // ==== Compresser toutes les photos uploadées existantes ====
+  $('#compress-uploads').addEventListener('click', async ()=>{
+    const n = countUploadedPhotos();
+    if(!n){ toast('Aucune photo uploadée à compresser'); return; }
+    if(!confirm(`Recompresser les ${n} photo${n>1?'s':''} uploadée${n>1?'s':''} ?\nCible : environ 40 Ko par photo.\nLa qualité peut baisser légèrement mais libère de l'espace.`)) return;
+    const btn = $('#compress-uploads');
+    btn.disabled = true;
+    let processed = 0, skipped = 0, failed = 0;
+    let totalOldBytes = 0, totalNewBytes = 0;
+    // Build dedup cache so the same data URL is only recompressed once across people
+    const cache = new Map();
+
+    // First pass: collect unique data URLs (photos + mainPhoto if data)
+    const dataUrls = new Set();
+    state.people.forEach(p=>{
+      if(p.mainPhoto && p.mainPhoto.startsWith('data:')) dataUrls.add(p.mainPhoto);
+      if(Array.isArray(p.photos)){
+        p.photos.forEach(u => { if(typeof u==='string' && u.startsWith('data:')) dataUrls.add(u); });
+      }
+    });
+    const total = dataUrls.size;
+
+    // Second pass: recompress each unique URL
+    for(const oldUrl of dataUrls){
+      processed++;
+      btn.textContent = `⏳ ${processed}/${total}`;
+      try {
+        const { url: newUrl, oldBytes, newBytes } = await recompressDataUrl(oldUrl);
+        // Only keep the new one if it actually saved space (>5% smaller)
+        if(newBytes < oldBytes * 0.95){
+          cache.set(oldUrl, newUrl);
+          totalOldBytes += oldBytes;
+          totalNewBytes += newBytes;
+        } else {
+          skipped++;
+          totalOldBytes += oldBytes;
+          totalNewBytes += oldBytes;
+        }
+      } catch(err){
+        failed++;
+      }
+      // Small yield so the UI can repaint
+      if(processed % 3 === 0) await new Promise(r=>setTimeout(r,10));
+    }
+
+    // Third pass: replace old URLs with new ones in state
+    if(cache.size){
+      state.people.forEach(p=>{
+        if(p.mainPhoto && cache.has(p.mainPhoto)) p.mainPhoto = cache.get(p.mainPhoto);
+        if(Array.isArray(p.photos)){
+          p.photos = p.photos.map(u => cache.get(u) || u);
+        }
+      });
+    }
+
+    const ok = saveState();
+    renderList(); renderSettings();
+    btn.disabled = false;
+    btn.textContent = '🗜️ Compresser photos';
+    const savedKb = Math.round((totalOldBytes - totalNewBytes) / 1024);
+    const compressed = cache.size;
+    if(!ok){
+      toast(`Compression faite mais sauvegarde échouée`,'err');
+    } else if(compressed === 0){
+      toast('Déjà compressées au maximum','ok');
+    } else {
+      toast(`${compressed} recompressée${compressed>1?'s':''} · ${savedKb} Ko libérés${failed?' · '+failed+' échec'+(failed>1?'s':''):''}`,'ok');
+    }
   });
   // ==== Import intelligent ====
   $('#import-data').addEventListener('click',()=>$('#import-file').click());
