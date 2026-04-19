@@ -2171,7 +2171,7 @@ function recordDuel(w,l){
 
 /* ============ TOURNAMENT ============ */
 function openTournament(){
-  ui.tour={ stage:'setup', config:{ filter:'F', size:8, blind:false, seeding:'elo' }, data:null, photoIdx:{} };
+  ui.tour={ stage:'setup', config:{ filter:'F', size:32, blind:false, seeding:'random' }, data:null, photoIdx:{} };
   renderTournament();
   openModal('modal-tournament');
 }
@@ -2186,50 +2186,32 @@ function renderTourSetup(){
   const pF=state.people.filter(p=>p.gender==='F').length;
   const pM=state.people.filter(p=>p.gender==='M').length;
   const pA=state.people.length;
+  t.config.size=32;
+  t.config.seeding='random';
   const cur=t.config.filter==='all'?pA:t.config.filter==='F'?pF:pM;
   $('#tour-title').textContent='Nouveau tournoi';
   $('#tour-sub').textContent='Joueur : '+getUser(u).name;
   $('#tour-body').innerHTML=`
     <div class="tour-hero">
       <div class="tico">🏆</div>
-      <div><h3>Tournoi par utilisateur</h3><p>Chaque combat est journalisé et seul l'ELO est mis à jour.</p></div>
+      <div><h3>Tournoi 32 — tirage aléatoire</h3><p>Chaque combat est journalisé et l'ELO est mis à jour.</p></div>
     </div>
     <div class="field" style="margin-bottom:12px">
       <label>Catégorie</label>
-      <div class="tour-opts" style="grid-template-columns:1fr 1fr">
+      <div class="tour-opts" style="grid-template-columns:1fr 1fr 1fr">
         <button class="${t.config.filter==='F'?'on f':''}" data-tf="F">Femmes (${pF})</button>
         <button class="${t.config.filter==='M'?'on m':''}" data-tf="M">Hommes (${pM})</button>
         <button class="${t.config.filter==='all'?'on':''}" data-tf="all">Mixte (${pA})</button>
       </div>
     </div>
-    <div class="field" style="margin-bottom:12px">
-      <label>Taille du bracket</label>
-      <div class="tour-opts c4">
-        ${[4,8,16,32].map(n=>`<button class="${t.config.size===n?'on':''}" data-ts="${n}" ${n>cur?'disabled':''}>${n}</button>`).join('')}
-      </div>
-    </div>
-    <div class="field" style="margin-bottom:12px">
-      <label>Sélection des participants</label>
-      <div class="tour-opts c3">
-        <button class="${t.config.seeding==='elo'?'on':''}" data-tseed="elo">Top ELO</button>
-        <button class="${t.config.seeding==='random'?'on':''}" data-tseed="random">Aléatoire</button>
-      </div>
-    </div>
-    <div class="setting-row">
-      <div class="sr-info"><div class="sr-name">Mode aveugle</div><div class="sr-desc">Cache les notes pendant le tournoi, choix à l'instinct</div></div>
-      <button class="btn btn-small ${t.config.blind?'btn-primary':''}" data-blind>${t.config.blind?'Activé':'Désactivé'}</button>
-    </div>
     <div style="margin-top:6px">
-      <button class="btn btn-primary btn-block" id="tour-start" ${cur<t.config.size?'disabled':''}>
-        ${cur<t.config.size?'Pas assez de personnes ('+cur+'/'+t.config.size+')':'Lancer le tournoi'}
+      <button class="btn btn-primary btn-block" id="tour-start" ${cur<32?'disabled':''}>
+        ${cur<32?'Pas assez de personnes ('+cur+'/32)':'Lancer le tournoi'}
       </button>
     </div>
     ${state.tournaments[u]?.length?`<div style="margin-top:18px"><h3 style="font-size:12.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3);margin-bottom:10px">Historique</h3><div id="tour-history"></div></div>`:''}
   `;
   $$('#tour-body [data-tf]').forEach(b=>b.addEventListener('click',()=>{ t.config.filter=b.getAttribute('data-tf'); renderTourSetup(); }));
-  $$('#tour-body [data-ts]').forEach(b=>b.addEventListener('click',()=>{ if(!b.disabled){ t.config.size=parseInt(b.getAttribute('data-ts')); renderTourSetup(); }}));
-  $$('#tour-body [data-tseed]').forEach(b=>b.addEventListener('click',()=>{ t.config.seeding=b.getAttribute('data-tseed'); renderTourSetup(); }));
-  $('[data-blind]').addEventListener('click',()=>{ t.config.blind=!t.config.blind; renderTourSetup(); });
   $('#tour-start').addEventListener('click',()=>startTournament(t.config));
   const hist=$('#tour-history');
   if(hist && state.tournaments[u]?.length){
@@ -2271,7 +2253,6 @@ function renderTourPlay(){
   const cm=t.rounds[t.currentRound].matches[t.currentMatch];
   const pA=state.people.find(p=>p.id===cm.a);
   const pB=state.people.find(p=>p.id===cm.b);
-  const blind=t.config.blind;
   const h2h=getHeadToHeadWins(u,pA.id,pB.id);
   const nA=h2h.aWins;
   const nB=h2h.bWins;
@@ -2303,7 +2284,7 @@ function renderTourPlay(){
       <div><h3>Tournoi ${label} ${t.config.size}</h3><p>Le nombre affiché au-dessus de chaque poster correspond aux victoires en face-à-face entre les deux participants.</p></div>
     </div>
     <div class="duel-actions">
-      ${blind?'<button class="btn btn-small" data-act="reveal">Révéler les notes</button>':''}
+
       <button class="btn btn-small" data-act="bracket">Voir le bracket</button>
       <button class="btn btn-small btn-danger" data-act="abandon">Abandonner</button>
     </div>
@@ -2335,7 +2316,6 @@ function renderTourPlay(){
     }
     toast(`Supprimé : ${person.name}`);
   }));
-  $('#tour-body [data-act="reveal"]')?.addEventListener('click',()=>{ t.config.blind=false; renderTourPlay(); });
   $('#tour-body [data-act="bracket"]')?.addEventListener('click',()=>$('#tour-body .bracket')?.scrollIntoView({behavior:'smooth'}));
   $('#tour-body [data-act="abandon"]')?.addEventListener('click',()=>{
     if(confirm('Abandonner ce tournoi ?\nLes résultats partiels seront perdus.')){
