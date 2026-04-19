@@ -93,7 +93,9 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .thumb.placeholder{display:grid;place-items:center;color:var(--text-4);font-size:11px}
 .row-info{min-width:0;flex:1}
 .row-name{font-size:15px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.row-badge{margin-top:4px;display:inline-flex}
+.row-badge{margin-top:4px;display:inline-flex;max-width:100%;min-width:0}
+.row-badge .badge{max-width:100%;padding:2px 7px;font-size:10.5px;gap:4px}
+.row-badge .badge svg{width:10px;height:10px}
 
 .badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;font-size:11.5px;font-weight:700;line-height:1.2;max-width:220px}
 .badge svg{width:12px;height:12px;flex:none}
@@ -160,6 +162,10 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .detail-photo img{width:100%;height:100%;object-fit:cover}
 .detail-photo .fav{position:absolute;top:10px;left:10px;width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);display:grid;place-items:center;color:#fff;transition:all .15s}
 .detail-photo .fav.is-on{background:var(--lily);color:#fff}
+.detail-photo .set-default{position:absolute;top:10px;right:10px;height:32px;padding:0 12px;border-radius:999px;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);display:flex;align-items:center;gap:6px;color:#fff;font-size:12px;font-weight:700;transition:all .15s;border:1px solid rgba(255,255,255,.15)}
+.detail-photo .set-default:active{transform:scale(.95)}
+.detail-photo .set-default.is-current{background:rgba(251,191,36,.9);color:#0B0F1E;border-color:rgba(251,191,36,1)}
+.detail-photo .set-default svg{width:14px;height:14px}
 .detail-photo .photo-nav{position:absolute;bottom:10px;right:10px;display:flex;gap:6px;padding:6px 10px;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);border-radius:999px;font-size:12px;font-weight:700;color:#fff;align-items:center}
 .detail-photo .photo-nav button{color:#fff;padding:0 3px;display:grid;place-items:center}
 .detail-photo .photo-dots{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:4px}
@@ -341,6 +347,8 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
   .row{grid-template-columns:44px 1fr 62px 50px;gap:6px;padding:9px 10px}
   .list-head{grid-template-columns:44px 1fr 62px 50px;gap:6px;padding:10px 10px}
   .thumb{width:36px;height:50px}
+  .row-badge .badge{padding:2px 6px;font-size:10px}
+  .row-badge .badge svg{width:9px;height:9px}
   .stat-hero{grid-template-columns:repeat(2,1fr)}
 }
 @media (min-width:700px){
@@ -1019,6 +1027,14 @@ function renderDetails(){
       <button class="fav ${fav?'is-on':''}" id="fav-toggle" aria-label="Favori">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.6-9.5-9.4C1 8.3 2.7 5 6 5c2 0 3.3 1 4 2.2C10.7 6 12 5 14 5c3.3 0 5 3.3 3.5 6.6C19 16.4 12 21 12 21Z"/></svg>
       </button>
+      ${photos.length>1&&main?`
+        <button class="set-default ${p.mainPhoto===main?'is-current':''}" id="set-default-photo" aria-label="Photo par défaut">
+          ${p.mainPhoto===main
+            ?`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg><span>Par défaut</span>`
+            :`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/></svg><span>Par défaut</span>`
+          }
+        </button>
+      `:''}
       ${photos.length>1?`
         <div class="photo-nav">
           <button id="photo-prev" aria-label="Précédente"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M8 2 L4 6 L8 10" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></button>
@@ -1075,6 +1091,14 @@ function renderDetails(){
   });
   $('#photo-prev')?.addEventListener('click',()=>{ ui.photoIdx=(ui.photoIdx-1+photos.length)%photos.length; renderDetails(); });
   $('#photo-next')?.addEventListener('click',()=>{ ui.photoIdx=(ui.photoIdx+1)%photos.length; renderDetails(); });
+  $('#set-default-photo')?.addEventListener('click',()=>{
+    if(p.mainPhoto===main){ toast('Déjà la photo par défaut'); return; }
+    p.mainPhoto=main;
+    saveState();
+    renderList();
+    renderDetails();
+    toast('Photo par défaut mise à jour');
+  });
   $$('#detail-body .slider[data-crit]').forEach(s=>s.addEventListener('input',e=>{
     const k=e.target.getAttribute('data-crit');
     d.technique=d.technique||{};
