@@ -155,8 +155,9 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .search-result .sr-meta{font-size:12px;color:var(--text-3);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .search-result .sr-badge{padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;background:var(--bg-3);color:var(--text-2);flex:none}
 
-.tabs{display:flex;gap:6px;background:var(--bg-2);padding:4px;border-radius:12px;border:1px solid var(--border);margin-bottom:14px}
-.tab{flex:1;padding:9px;border-radius:9px;font-size:13px;font-weight:700;color:var(--text-3);text-align:center;transition:all .15s}
+.tabs{display:flex;gap:6px;background:var(--bg-2);padding:4px;border-radius:12px;border:1px solid var(--border);margin-bottom:14px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:1 0 auto;min-width:max-content;padding:9px 12px;border-radius:9px;font-size:12.5px;font-weight:700;color:var(--text-3);text-align:center;transition:all .15s;white-space:nowrap}
 .tab.is-active{background:var(--card-hi);color:var(--text);box-shadow:var(--shadow-sm)}
 
 .detail-photo{position:relative;width:100%;aspect-ratio:2/3;max-height:380px;border-radius:var(--radius-lg);overflow:hidden;background:var(--bg-3);margin-bottom:14px}
@@ -305,6 +306,9 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .duel-photo img{width:100%;height:100%;object-fit:cover}
 .duel-photo .fav-mini{position:absolute;top:8px;left:8px;width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);display:grid;place-items:center;color:#fff}
 .duel-photo .fav-mini.is-on{background:var(--lily);color:#fff}
+.duel-photo .trash-mini{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;background:rgba(239,68,68,.75);backdrop-filter:blur(6px);display:grid;place-items:center;color:#fff;border:1px solid rgba(239,68,68,.55);z-index:2}
+.duel-photo .trash-mini:active{transform:scale(.92)}
+.duel-photo .trash-mini svg{width:14px;height:14px}
 .duel-stats{padding:10px;background:var(--bg-2);text-align:center;border-top:1px solid var(--border)}
 .duel-stats .wins{font-size:30px;font-weight:800;color:var(--amber);line-height:1}
 .duel-stats .wins-l{font-size:10px;font-weight:700;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;margin-top:4px}
@@ -2050,16 +2054,24 @@ function saveDetails(){
   saveState(); renderList(); closeAllModals();
   toast('Notes enregistrées','ok');
 }
+function removePersonFromBank(pid){
+  // Removes a person from the bank and strips all per-user data.
+  // Returns the removed person object (or null if not found).
+  const p = state.people.find(x => x.id === pid);
+  if(!p) return null;
+  state.people = state.people.filter(x => x.id !== pid);
+  USERS.forEach(u => {
+    if(state.ratings[u.id])   delete state.ratings[u.id][pid];
+    if(state.favorites[u.id]) delete state.favorites[u.id][pid];
+    if(state.elo[u.id])       delete state.elo[u.id][pid];
+  });
+  return p;
+}
 function deletePerson(){
   const p=state.people.find(x=>x.id===ui.currentPersonId);
   if(!p) return;
   if(!confirm('Supprimer '+p.name+' de la banque commune ?\nLes notes de tous les utilisateurs seront effacées.')) return;
-  state.people=state.people.filter(x=>x.id!==p.id);
-  USERS.forEach(u=>{
-    if(state.ratings[u.id]) delete state.ratings[u.id][p.id];
-    if(state.favorites[u.id]) delete state.favorites[u.id][p.id];
-    if(state.elo[u.id]) delete state.elo[u.id][p.id];
-  });
+  removePersonFromBank(p.id);
   saveState(); renderList(); closeAllModals();
   toast('Supprimé : '+p.name);
 }
@@ -2107,10 +2119,12 @@ function renderDuel(){
   const [a,b]=pair;
   const wA=state.duelHistory[u]?.filter(d=>d.winnerId===a.id).length||0;
   const wB=state.duelHistory[u]?.filter(d=>d.winnerId===b.id).length||0;
+  const trashSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
   const card=(p,wins)=>`<button class="duel-card" data-pick="${p.id}">
     <div class="duel-photo">
       ${p.mainPhoto?`<img src="${esc(p.mainPhoto)}" alt="${esc(p.name)}" onerror="this.style.display='none'">`:`<div style="height:100%;display:grid;place-items:center;color:var(--text-4);font-size:40px">?</div>`}
       <div class="fav-mini ${state.favorites[u]?.[p.id]?'is-on':''}"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.6-9.5-9.4C1 8.3 2.7 5 6 5c2 0 3.3 1 4 2.2C10.7 6 12 5 14 5c3.3 0 5 3.3 3.5 6.6C19 16.4 12 21 12 21Z"/></svg></div>
+      <span class="trash-mini" data-trash="${p.id}" role="button" aria-label="Supprimer de la banque">${trashSvg}</span>
     </div>
     <div class="duel-stats"><div class="wins">${wins}</div><div class="wins-l">Victoires</div></div>
     <div class="d-name">${esc(p.name)}</div>
@@ -2128,6 +2142,21 @@ function renderDuel(){
     <div class="duel-arena">${card(a,wA)}${card(b,wB)}</div>
     <div style="margin-top:14px;text-align:center;font-size:12px;color:var(--text-3)">${state.duels[u]||0} duel${(state.duels[u]||0)>1?'s':''} au total</div>`;
   $$('#duel-body [data-f]').forEach(x=>x.addEventListener('click',()=>{ ui.duel.filter=x.getAttribute('data-f'); ui.duel.pair=null; renderDuel(); }));
+  $$('#duel-body [data-trash]').forEach(el=>el.addEventListener('click',e=>{
+    // Prevent the parent duel-card button from firing (which would count as a vote)
+    e.stopPropagation();
+    e.preventDefault();
+    const pid = el.getAttribute('data-trash');
+    const person = state.people.find(x=>x.id===pid);
+    if(!person) return;
+    if(!confirm(`Supprimer ${person.name} de la banque ?\nIl/elle sera remplacé(e) par un(e) autre candidat(e).\nLes notes de tous les utilisateurs pour cette personne seront effacées.`)) return;
+    removePersonFromBank(pid);
+    saveState();
+    renderList();
+    ui.duel.pair = null; // force picking a fresh pair
+    renderDuel();
+    toast(`Supprimé : ${person.name}`);
+  }));
   $$('#duel-body [data-pick]').forEach(btn=>btn.addEventListener('click',()=>{
     const winId=btn.getAttribute('data-pick');
     const loseId=winId===a.id?b.id:a.id;
@@ -2257,10 +2286,12 @@ function renderTourPlay(){
   const nB=blind?null:computeNote(u,pB.id);
   $('#tour-title').textContent='Tournoi en cours';
   $('#tour-sub').textContent='Round '+(t.currentRound+1)+'/'+t.rounds.length+' · Match '+(t.currentMatch+1)+'/'+t.rounds[t.currentRound].matches.length;
+  const tTrashSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
   const card=(p,n)=>`<button class="duel-card" data-pick="${p.id}">
     <div class="duel-photo">
       ${p.mainPhoto?`<img src="${esc(p.mainPhoto)}" onerror="this.style.display='none'">`:`<div style="height:100%;display:grid;place-items:center;color:var(--text-4);font-size:40px">?</div>`}
       <div class="fav-mini ${state.favorites[u]?.[p.id]?'is-on':''}"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.6-9.5-9.4C1 8.3 2.7 5 6 5c2 0 3.3 1 4 2.2C10.7 6 12 5 14 5c3.3 0 5 3.3 3.5 6.6C19 16.4 12 21 12 21Z"/></svg></div>
+      <span class="trash-mini" data-t-trash="${p.id}" role="button" aria-label="Supprimer de la banque">${tTrashSvg}</span>
     </div>
     <div class="duel-stats"><div class="wins">${n==null?'?':fmt(n)}</div><div class="wins-l">${blind?'Note masquée':'Ta note'}</div></div>
     <div class="d-name">${esc(p.name)}</div>
@@ -2280,6 +2311,31 @@ function renderTourPlay(){
     <div class="duel-arena">${card(pA,nA)}${card(pB,nB)}</div>
     <div style="margin-top:18px"><h3 style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);margin-bottom:8px">Bracket</h3>${renderBracketHtml(t)}</div>`;
   $$('#tour-body [data-pick]').forEach(b=>b.addEventListener('click',()=>tourAdvance(b.getAttribute('data-pick'))));
+  $$('#tour-body [data-t-trash]').forEach(el=>el.addEventListener('click',e=>{
+    e.stopPropagation();
+    e.preventDefault();
+    const pid = el.getAttribute('data-t-trash');
+    const person = state.people.find(x=>x.id===pid);
+    if(!person) return;
+    // The other candidate in the current match gets an automatic pass to the next round.
+    const otherId = cm.a === pid ? cm.b : cm.a;
+    const other = state.people.find(x=>x.id===otherId);
+    const otherName = other ? other.name : 'l\'autre candidat(e)';
+    if(!confirm(`Supprimer ${person.name} de la banque ?\n\n${otherName} passera automatiquement au round suivant.\nLes notes de tous les utilisateurs pour cette personne seront effacées.`)) return;
+    removePersonFromBank(pid);
+    // Auto-advance: give the win to the other candidate
+    if(other){
+      tourAdvance(otherId);
+    } else {
+      // Edge case: if we somehow don't have "the other", abandon cleanly
+      saveState();
+      renderList();
+      closeAllModals();
+      toast('Tournoi interrompu','err');
+      return;
+    }
+    toast(`Supprimé : ${person.name}`);
+  }));
   $('#tour-body [data-act="reveal"]')?.addEventListener('click',()=>{ t.config.blind=false; renderTourPlay(); });
   $('#tour-body [data-act="bracket"]')?.addEventListener('click',()=>$('#tour-body .bracket')?.scrollIntoView({behavior:'smooth'}));
   $('#tour-body [data-act="abandon"]')?.addEventListener('click',()=>{
