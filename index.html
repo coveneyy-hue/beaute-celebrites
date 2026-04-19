@@ -348,7 +348,10 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .duel-photo .photo-tool-btn.is-default{background:rgba(251,191,36,.9);color:#1A1200;border-color:rgba(251,191,36,1)}
 .duel-photo .photo-tool-btn svg{width:13px;height:13px}
 .duel-photo .photo-tools-row{display:flex;gap:4px}
-.duel-stats{padding:10px;background:var(--bg-2);text-align:center;border-top:1px solid var(--border)}
+.duel-stats{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;background:var(--bg-2);border-top:1px solid var(--border)}
+.duel-vote-btn{display:inline-flex;align-items:center;justify-content:center;min-width:82px;height:36px;padding:0 14px;border-radius:12px;background:linear-gradient(180deg,var(--amber-hi),var(--amber));color:#fff;font-size:14px;font-weight:800;letter-spacing:-.01em;box-shadow:0 6px 14px rgba(245,158,11,.25),inset 0 1px 0 rgba(255,255,255,.18);touch-action:manipulation}
+.duel-vote-btn:active{transform:scale(.96)}
+.duel-score{text-align:center;min-width:72px;margin-left:auto}
 .duel-stats .wins{font-size:30px;font-weight:800;color:var(--amber);line-height:1}
 .duel-stats .wins-l{font-size:10px;font-weight:700;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;margin-top:4px}
 .duel-card .d-name{padding:0 12px 2px;font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -2315,7 +2318,7 @@ function renderDuel(){
   const card=(p,wins)=>{
     const photoSrc = cardCurrentPhoto(p, ui.duel.photoIdx) || p.mainPhoto;
     const currentIdx = cardEffectiveIdx(p, ui.duel.photoIdx);
-    return `<div class="duel-card" data-card-pid="${p.id}" data-pick="${p.id}" role="button" tabindex="0">
+    return `<div class="duel-card" data-card-pid="${p.id}">
       <div class="duel-photo">
         ${photoSrc?`<img src="${esc(photoSrc)}" alt="${esc(p.name)}" onerror="this.style.display='none'">`:`<div style="height:100%;display:grid;place-items:center;color:var(--text-4);font-size:40px">?</div>`}
         <div class="fav-mini ${state.favorites[u]?.[p.id]?'is-on':''}"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.6-9.5-9.4C1 8.3 2.7 5 6 5c2 0 3.3 1 4 2.2C10.7 6 12 5 14 5c3.3 0 5 3.3 3.5 6.6C19 16.4 12 21 12 21Z"/></svg></div>
@@ -2323,7 +2326,7 @@ function renderDuel(){
         ${cardPhotoControlsHtml(p, 'duel', currentIdx)}
       </div>
       <div>
-        <div class="duel-stats"><div class="wins">${wins}</div><div class="wins-l">Victoires</div></div>
+        <div class="duel-stats"><button class="duel-vote-btn" data-pick="${p.id}" type="button">Vote</button><div class="duel-score"><div class="wins">${wins}</div><div class="wins-l">Victoires</div></div></div>
         <div class="d-name">${esc(p.name)}</div>
         <div class="d-sub">ELO ${getElo(u,p.id)}</div>
       </div>
@@ -2332,7 +2335,7 @@ function renderDuel(){
   body.innerHTML=filterBar+`
     <div class="duel-hero-card">
       <div class="hico">⚔</div>
-      <div><h3>Duel libre</h3><p>Touche la personne la plus attirante. L'ELO est mis à jour automatiquement.</p></div>
+      <div><h3>Duel libre</h3><p>Utilise le bouton Vote sous la photo. L'ELO est mis à jour automatiquement.</p></div>
     </div>
     <div class="duel-actions">
       <button class="btn btn-small" data-act="skip">Passer</button>
@@ -2523,7 +2526,7 @@ function renderTourPlay(){
   const card=(p,n)=>{
     const photoSrc = cardCurrentPhoto(p, ui.tour.photoIdx) || p.mainPhoto;
     const currentIdx = cardEffectiveIdx(p, ui.tour.photoIdx);
-    return `<div class="duel-card" data-card-pid="${p.id}" data-pick="${p.id}" role="button" tabindex="0">
+    return `<div class="duel-card" data-card-pid="${p.id}">
       <div class="duel-photo">
         ${photoSrc?`<img src="${esc(photoSrc)}" onerror="this.style.display='none'">`:`<div style="height:100%;display:grid;place-items:center;color:var(--text-4);font-size:40px">?</div>`}
         <div class="fav-mini ${state.favorites[u]?.[p.id]?'is-on':''}"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.6-9.5-9.4C1 8.3 2.7 5 6 5c2 0 3.3 1 4 2.2C10.7 6 12 5 14 5c3.3 0 5 3.3 3.5 6.6C19 16.4 12 21 12 21Z"/></svg></div>
@@ -2531,7 +2534,7 @@ function renderTourPlay(){
         ${cardPhotoControlsHtml(p, 'tour', currentIdx)}
       </div>
       <div>
-        <div class="duel-stats"><div class="wins">${n==null?'?':fmt(n)}</div><div class="wins-l">${blind?'Note masquée':'Ta note'}</div></div>
+        <div class="duel-stats"><button class="duel-vote-btn" data-pick="${p.id}" type="button">Vote</button><div class="duel-score"><div class="wins">${n==null?'?':fmt(n)}</div><div class="wins-l">${blind?'Note masquée':'Ta note'}</div></div></div>
         <div class="d-name">${esc(p.name)}</div>
         <div class="d-sub">${p.birthday||''}${p.profession?(p.birthday?' · ':'')+esc(p.profession):''}</div>
       </div>
@@ -2541,7 +2544,7 @@ function renderTourPlay(){
   $('#tour-body').innerHTML=`
     <div class="tour-hero">
       <div class="tico">🏆</div>
-      <div><h3>Tournoi ${label} ${t.config.size}</h3><p>${blind?"Mode aveugle : choisis à l'instinct, les notes sont masquées.":'Touche le visage préféré pour faire avancer le bracket.'}</p></div>
+      <div><h3>Tournoi ${label} ${t.config.size}</h3><p>${blind?"Mode aveugle : utilise le bouton Vote, les notes sont masquées.":'Utilise le bouton Vote pour faire avancer le bracket.'}</p></div>
     </div>
     <div class="duel-actions">
       ${blind?'<button class="btn btn-small" data-act="reveal">Révéler les notes</button>':''}
