@@ -2758,9 +2758,11 @@ function renderSettings(){
         <button class="btn" id="import-data">📥 Importer</button>
         <button class="btn btn-danger" id="clear-all">🗑️ Tout effacer</button>
       </div>
-      <div style="display:grid;grid-template-columns:1fr;gap:8px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
         <button class="btn" id="clear-uploaded-photos">🧹 Vider photos</button>
+        <button class="btn" id="compress-uploads">🗜️ Compresser photos</button>
       </div>
+      <input id="import-file" type="file" accept="application/json,.json" hidden>
     </div>`;
   const st=computeStorageStats();
   const storageColor = st.pct >= 90 ? 'var(--coral)' : st.pct >= 70 ? 'var(--amber)' : 'var(--victor-hi)';
@@ -2850,7 +2852,8 @@ function renderSettings(){
     toast(removed?`Export léger (${removed} photo${removed>1?'s':''} uploadée${removed>1?'s':''} retirée${removed>1?'s':''})`:'Export léger téléchargé','ok');
   });
   // ==== Vider toutes les photos uploadées ====
-  $('#clear-uploads').addEventListener('click',()=>{
+  const clearUploadsBtn = $('#clear-uploaded-photos');
+  if(clearUploadsBtn) clearUploadsBtn.addEventListener('click',()=>{
     const n = countUploadedPhotos();
     if(!n){ toast('Aucune photo uploadée à supprimer'); return; }
     if(!confirm(`Supprimer les ${n} photo${n>1?'s':''} uploadée${n>1?'s':''} depuis ce téléphone ?\nLes photos TMDb/Wikidata sont conservées.`)) return;
@@ -2865,7 +2868,8 @@ function renderSettings(){
     toast(`${n} photo${n>1?'s':''} supprimée${n>1?'s':''}`,'ok');
   });
   // ==== Compresser toutes les photos uploadées existantes ====
-  $('#compress-uploads').addEventListener('click', async ()=>{
+  const compressUploadsBtn = $('#compress-uploads');
+  if(compressUploadsBtn) compressUploadsBtn.addEventListener('click', async ()=>{
     const n = countUploadedPhotos();
     if(!n){ toast('Aucune photo uploadée à compresser'); return; }
     if(!confirm(`Recompresser les ${n} photo${n>1?'s':''} uploadée${n>1?'s':''} ?\nCible : environ 40 Ko par photo.\nLa qualité peut baisser légèrement mais libère de l'espace.`)) return;
@@ -2934,8 +2938,9 @@ function renderSettings(){
     }
   });
   // ==== Import intelligent ====
-  $('#import-data').addEventListener('click',()=>$('#import-file').click());
-  $('#import-file').addEventListener('change',e=>{
+  $('#import-data').addEventListener('click',()=>{ const input = $('#import-file'); if(input) input.click(); else toast("Champ d'import introuvable",'err'); });
+  const importFileInput = $('#import-file');
+  if(importFileInput) importFileInput.addEventListener('change',e=>{
     const f=e.target.files?.[0]; if(!f) return;
     const r=new FileReader();
     r.onload=()=>{
@@ -2948,7 +2953,8 @@ function renderSettings(){
     };
     r.readAsText(f);
   });
-  $('#reset-data').addEventListener('click',()=>{
+  const clearAllBtn = $('#clear-all');
+  if(clearAllBtn) clearAllBtn.addEventListener('click',()=>{
     if(!confirm('Effacer TOUTES les données (personnes, notes, duels, tournois) ?\nCette action est irréversible.')) return;
     if(!confirm('Vraiment tout effacer ?')) return;
     localStorage.removeItem(STORAGE_KEY);
@@ -2960,7 +2966,8 @@ function renderSettings(){
     saveState(); renderHeader(); renderList(); renderSettings();
     toast('Données effacées','ok');
   });
-  $('#find-dupes').addEventListener('click', openDupesDialog);
+  const findDupesBtn = $('#find-dupes');
+  if(findDupesBtn) findDupesBtn.addEventListener('click', openDupesDialog);
 }
 
 /* ============ SMART IMPORT ============ */
