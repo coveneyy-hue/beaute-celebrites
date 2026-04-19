@@ -235,6 +235,34 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .seg button{padding:9px;border-radius:7px;font-size:13px;font-weight:700;color:var(--text-3);transition:all .15s}
 .seg button.on[data-g="M"]{background:rgba(6,182,212,.2);color:var(--yannick-hi)}
 .seg button.on[data-g="F"]{background:rgba(236,72,153,.2);color:var(--lily-hi)}
+.seg button.on[data-pg]{background:rgba(251,191,36,.15);color:var(--amber)}
+.bulk-progress{padding:12px;background:var(--bg-2);border:1px solid var(--border);border-radius:10px;font-size:12.5px;color:var(--text-2);line-height:1.5}
+.bulk-progress .bp-bar{height:6px;background:var(--bg-3);border-radius:3px;overflow:hidden;margin-top:8px}
+.bulk-progress .bp-fill{height:100%;background:linear-gradient(90deg,var(--amber-hi),var(--amber));transition:width .2s}
+.bulk-progress .bp-stat{display:flex;justify-content:space-between;font-size:11.5px;color:var(--text-4);margin-top:4px}
+.bulk-preview{margin-top:12px}
+.bulk-preview .bp-title{font-size:11px;font-weight:800;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.bulk-preview .bp-title .bp-count{color:var(--amber);letter-spacing:-.01em;text-transform:none;font-size:12px}
+.bulk-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;max-height:240px;overflow-y:auto;padding:4px;background:var(--bg-2);border:1px solid var(--border);border-radius:10px}
+.bulk-grid .bg-cell{position:relative;aspect-ratio:2/3;border-radius:6px;overflow:hidden;background:var(--bg-3)}
+.bulk-grid .bg-cell img{width:100%;height:100%;object-fit:cover;display:block}
+.bulk-grid .bg-cell .bg-name{position:absolute;left:0;right:0;bottom:0;padding:3px 4px;background:linear-gradient(transparent,rgba(0,0,0,.85));font-size:9px;font-weight:700;color:#fff;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bulk-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.import-summary{padding:12px 14px;background:var(--bg-2);border:1px solid var(--border);border-radius:10px;margin-bottom:14px;font-size:13px;line-height:1.5;color:var(--text-2)}
+.import-summary strong{color:var(--amber)}
+.import-section-title{font-size:11px;font-weight:800;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin:16px 0 8px}
+.import-user-row{display:grid;grid-template-columns:90px 1fr;gap:10px;align-items:center;padding:10px 12px;background:var(--bg-2);border:1px solid var(--border);border-radius:10px;margin-bottom:8px}
+.import-user-label{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700}
+.import-user-label .dot{width:10px;height:10px;border-radius:50%;flex:none}
+.import-user-meta{font-size:11px;color:var(--text-4);font-weight:500;margin-top:2px}
+.import-user-row select{background:var(--bg-3);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--text);width:100%}
+.import-user-row select:focus{border-color:var(--amber);outline:none}
+.import-checkbox{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--bg-2);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:pointer;transition:border-color .15s}
+.import-checkbox.is-on{border-color:var(--amber);background:rgba(251,191,36,.06)}
+.import-checkbox input{margin-top:2px;flex:none;width:18px;height:18px;accent-color:var(--amber)}
+.import-checkbox .ic-text{flex:1;font-size:13px;line-height:1.4}
+.import-checkbox .ic-text strong{color:var(--text)}
+.import-checkbox .ic-text .ic-sub{font-size:11.5px;color:var(--text-4);margin-top:2px}
 
 .duel-arena{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
 .duel-card{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;transition:transform .15s,border-color .15s;text-align:left;width:100%}
@@ -466,6 +494,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
     <div class="modal-body">
       <div class="tabs">
         <button class="tab is-active" data-tab="tmdb">TMDb</button>
+        <button class="tab" data-tab="popular">Populaires</button>
         <button class="tab" data-tab="wiki">Wikidata</button>
         <button class="tab" data-tab="manual">Manuel</button>
       </div>
@@ -476,6 +505,29 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
         </div>
         <div class="search-hint" id="tmdb-hint"></div>
         <div class="search-results" id="tmdb-results"></div>
+      </div>
+      <div data-panel="popular" hidden>
+        <div class="search-hint" id="popular-hint">Importe en lot les personnes les plus populaires sur TMDb en ce moment.</div>
+        <div class="form-grid" style="margin-top:8px">
+          <div class="field full">
+            <label>Nombre à charger</label>
+            <select id="pop-count">
+              <option value="50">Top 50</option>
+              <option value="100">Top 100</option>
+              <option value="200" selected>Top 200</option>
+            </select>
+          </div>
+          <div class="field full">
+            <label>Filtrer par genre</label>
+            <div class="seg" id="pop-gender" style="grid-template-columns:1fr 1fr 1fr">
+              <button type="button" data-pg="all" class="on">Tout</button>
+              <button type="button" data-pg="F">Femmes</button>
+              <button type="button" data-pg="M">Hommes</button>
+            </div>
+          </div>
+        </div>
+        <div id="pop-progress" style="margin-top:10px"></div>
+        <button class="btn btn-primary btn-block" id="pop-start" style="margin-top:12px">🔍 Prévisualiser</button>
       </div>
       <div data-panel="wiki" hidden>
         <div class="search-people">
@@ -594,6 +646,20 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
   </div>
 </div>
 
+<div class="modal" id="modal-import">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div><div class="modal-title">Importer un fichier</div><div class="modal-sub">Choisis quelles données fusionner</div></div>
+      <button class="modal-close" data-close><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="modal-body" id="import-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" data-close>Annuler</button>
+      <button class="btn btn-primary" id="import-confirm">Importer</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -705,6 +771,7 @@ const state = {
   },
 };
 const ui = { currentPersonId:null, draft:null, duel:null, tour:null, photoIdx:0 };
+let pendingImport = null;
 
 /* ============ UTILITIES ============ */
 const $ = (s,r=document)=>r.querySelector(s);
@@ -715,6 +782,37 @@ function esc(s){ if(s==null) return ''; return String(s).replace(/[&<>"']/g,c=>(
 function fmt(n){ return (n==null||Number.isNaN(n))?'-':Number(n).toFixed(2); }
 function icon(n){ return ICONS[n]||''; }
 function toast(msg,kind=''){ const t=$('#toast'); t.textContent=msg; t.className='show '+kind; clearTimeout(toast._tm); toast._tm=setTimeout(()=>{t.className='';},2400); }
+
+/* ====== Data management helpers ====== */
+function downloadJson(obj, filename){
+  const blob = new Blob([JSON.stringify(obj,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+function countUploadedPhotos(){
+  let n = 0;
+  (state.people||[]).forEach(p=>{
+    if(p.mainPhoto && p.mainPhoto.startsWith('data:')) n++;
+    if(Array.isArray(p.photos)){
+      p.photos.forEach(u => { if(typeof u==='string' && u.startsWith('data:') && u!==p.mainPhoto) n++; });
+    }
+  });
+  return n;
+}
+function computeStorageStats(){
+  let bytes = 0;
+  try { bytes = (localStorage.getItem(STORAGE_KEY)||'').length; } catch(_){}
+  const kb = Math.round(bytes/1024);
+  const mb = (bytes/1024/1024).toFixed(2);
+  // Most browsers: ~5 MB localStorage quota per origin
+  const quotaMB = 5;
+  const pct = Math.min(100, Math.round(bytes / (quotaMB*1024*1024) * 100));
+  const uploaded = countUploadedPhotos();
+  return { bytes, kb, mb, pct, uploaded, quotaMB };
+}
 function ensureBuckets(u){
   if(!state.ratings[u]) state.ratings[u]={};
   if(!state.favorites[u]) state.favorites[u]={};
@@ -796,6 +894,209 @@ async function tmdbSearchPerson(q){
   return (d.results||[]).slice(0,12);
 }
 async function tmdbPerson(id){ return tmdbFetch('/person/'+id,{append_to_response:'images'}); }
+async function tmdbPopularPage(page){ return tmdbFetch('/person/popular',{page:String(page)}); }
+
+// Holds cancellation flag + the previewed list between "Prévisualiser" and "Importer"
+let bulkCancel = false;
+let bulkPreview = null; // { list:[...], genderFilter, target }
+
+// Reset preview when user changes filters
+function resetBulkPreview(){
+  bulkPreview = null;
+  const progEl = $('#pop-progress');
+  if(progEl) progEl.innerHTML = '';
+  const btn = $('#pop-start');
+  if(btn){ btn.disabled = false; btn.textContent = '🔍 Prévisualiser'; }
+}
+
+async function runBulkPopularImport(){
+  if(!state.settings.tmdbKey){
+    toast("Ajoute d'abord une clé TMDb dans Réglages",'err');
+    return;
+  }
+  // If we have a preview already, this click means "Confirmer"
+  if(bulkPreview){
+    return executeBulkImport();
+  }
+  // Otherwise: fetch & show preview
+  return previewBulkPopular();
+}
+
+async function previewBulkPopular(){
+  const target = parseInt($('#pop-count').value) || 200;
+  const genderFilter = $$('#pop-gender button.on')[0]?.getAttribute('data-pg') || 'all';
+  const btn = $('#pop-start');
+  const progEl = $('#pop-progress');
+  bulkCancel = false;
+  btn.disabled = true;
+  btn.textContent = '⏳ Récupération de la liste…';
+
+  try {
+    const needPages = Math.max(1, Math.ceil(target / 20) + (genderFilter!=='all' ? 5 : 2));
+    const collected = [];
+    const existingTmdbIds = new Set(state.people.map(p=>p.tmdbId).filter(Boolean));
+    let duplicates = 0;
+
+    for(let page=1; page<=needPages; page++){
+      if(bulkCancel) throw new Error('Annulé');
+      progEl.innerHTML = `
+        <div class="bulk-progress">
+          <div>Récupération de la liste populaire…</div>
+          <div class="bp-bar"><div class="bp-fill" style="width:${Math.round((page-1)/needPages*100)}%"></div></div>
+          <div class="bp-stat"><span>Page ${page} / ${needPages}</span><span>${collected.length} trouvées</span></div>
+        </div>`;
+      let d;
+      try { d = await tmdbPopularPage(page); }
+      catch(e){ if(page===1) throw e; else break; }
+      for(const r of (d.results||[])){
+        const g = r.gender===1?'F':r.gender===2?'M':null;
+        if(genderFilter!=='all' && g!==genderFilter) continue;
+        if(existingTmdbIds.has(r.id)){ duplicates++; continue; }
+        collected.push(r);
+        if(collected.length >= target) break;
+      }
+      if(collected.length >= target) break;
+      await new Promise(r=>setTimeout(r,120));
+    }
+
+    if(!collected.length){
+      toast(duplicates?`Tous déjà en banque (${duplicates} doublons)`:'Aucun résultat','err');
+      progEl.innerHTML = '';
+      btn.disabled = false;
+      btn.textContent = '🔍 Prévisualiser';
+      return;
+    }
+
+    bulkPreview = { list: collected, genderFilter, target };
+
+    // Render preview grid (show up to 24 thumbnails for speed)
+    const shown = collected.slice(0, 24);
+    const gridHtml = shown.map(r=>{
+      const img = r.profile_path ? (TMDB_IMG + r.profile_path) : '';
+      return `<div class="bg-cell">
+        ${img?`<img loading="lazy" src="${esc(img)}" onerror="this.style.display='none'">`:''}
+        <div class="bg-name">${esc(r.name||'?')}</div>
+      </div>`;
+    }).join('');
+
+    progEl.innerHTML = `
+      <div class="bulk-preview">
+        <div class="bp-title">
+          <span>Aperçu</span>
+          <span class="bp-count">${collected.length} nouvelle${collected.length>1?'s':''} personne${collected.length>1?'s':''}${duplicates?` · ${duplicates} doublon${duplicates>1?'s':''} ignoré${duplicates>1?'s':''}`:''}</span>
+        </div>
+        <div class="bulk-grid">${gridHtml}</div>
+        <div style="font-size:11.5px;color:var(--text-4);margin-top:8px;line-height:1.4">
+          ${collected.length>24?`Aperçu des 24 premières. Les ${collected.length-24} autres suivront.`:''}
+          ${collected.length>50?' Le chargement prendra environ '+Math.ceil(collected.length*0.18)+'s.':''}
+        </div>
+        <div class="bulk-actions">
+          <button type="button" class="btn btn-ghost" id="pop-cancel-preview">Annuler</button>
+          <button type="button" class="btn btn-primary" id="pop-confirm">🚀 Importer ${collected.length}</button>
+        </div>
+      </div>`;
+
+    // Hide the main start button while preview is active (confirmed from the preview buttons)
+    btn.style.display = 'none';
+
+    $('#pop-cancel-preview')?.addEventListener('click', ()=>{
+      resetBulkPreview();
+      btn.style.display = '';
+    });
+    $('#pop-confirm')?.addEventListener('click', executeBulkImport);
+
+  } catch(err){
+    toast('Erreur : '+err.message,'err');
+    btn.disabled = false;
+    btn.textContent = '🔍 Prévisualiser';
+  }
+}
+
+async function executeBulkImport(){
+  if(!bulkPreview){ return; }
+  const { list } = bulkPreview;
+  const progEl = $('#pop-progress');
+  const btn = $('#pop-start');
+  bulkCancel = false;
+
+  const setProgress = (msg, done, total, currentName='') => {
+    const pct = total ? Math.min(100, Math.round(done/total*100)) : 0;
+    progEl.innerHTML = `
+      <div class="bulk-progress">
+        <div>${esc(msg)}</div>
+        <div class="bp-bar"><div class="bp-fill" style="width:${pct}%"></div></div>
+        <div class="bp-stat"><span>${esc(currentName)}</span><span>${done} / ${total}</span></div>
+      </div>
+      <div class="bulk-actions" style="grid-template-columns:1fr">
+        <button type="button" class="btn btn-ghost" id="pop-cancel-run">✋ Arrêter</button>
+      </div>`;
+    $('#pop-cancel-run')?.addEventListener('click',()=>{
+      bulkCancel = true;
+      toast("Arrêt demandé…");
+    });
+  };
+
+  let added = 0, failed = 0;
+  try {
+    for(let i=0; i<list.length; i++){
+      if(bulkCancel) break;
+      const r = list[i];
+      setProgress('Import en cours…', i, list.length, r.name||'');
+      try {
+        const f = await tmdbPerson(r.id);
+        const g = f.gender===1?'F':f.gender===2?'M':(r.gender===1?'F':r.gender===2?'M':'F');
+        const ph = (f.images?.profiles||[]).map(x=>TMDB_IMG+x.file_path);
+        const main = f.profile_path ? (TMDB_IMG+f.profile_path) : (ph[0]||null);
+        const yr = f.birthday ? parseInt(f.birthday.slice(0,4)) : null;
+        state.people.push({
+          id: uid(), tmdbId: r.id, name: f.name, gender: g,
+          mainPhoto: main, photos: ph.length?ph:(main?[main]:[]),
+          birthday: yr, nationality: f.place_of_birth||null,
+          profession: f.known_for_department||null, bio: f.biography||null,
+          addedAt: Date.now()
+        });
+        added++;
+        // Save every 20 people so a crash or quota hit doesn't lose everything
+        if(added % 20 === 0){
+          const ok = saveState();
+          if(!ok){
+            toast('Stockage saturé après '+added+' personnes','err');
+            break;
+          }
+        }
+      } catch(err){
+        failed++;
+      }
+      await new Promise(r=>setTimeout(r,80));
+    }
+
+    const finalOk = saveState();
+    progEl.innerHTML = `
+      <div class="bulk-progress">
+        <div>${bulkCancel?'Arrêté':'Terminé'} · <strong>${added}</strong> ajoutée${added>1?'s':''}${failed?` · ${failed} échec${failed>1?'s':''}`:''}</div>
+        <div class="bp-bar"><div class="bp-fill" style="width:100%"></div></div>
+      </div>`;
+    renderList();
+    if(!finalOk){
+      toast(`Import partiel : ${added} ajoutée${added>1?'s':''} (stockage plein)`,'err');
+    } else if(bulkCancel){
+      toast(`Arrêté · ${added} ajoutée${added>1?'s':''}`,'ok');
+    } else {
+      toast(`${added} personne${added>1?'s':''} ajoutée${added>1?'s':''}${failed?' · '+failed+' échec'+(failed>1?'s':''):''}`,'ok');
+      setTimeout(()=>closeAllModals(), 1200);
+    }
+  } catch(err){
+    toast('Erreur : '+err.message,'err');
+  } finally {
+    bulkPreview = null;
+    bulkCancel = false;
+    if(btn){
+      btn.style.display = '';
+      btn.disabled = false;
+      btn.textContent = '🔍 Prévisualiser';
+    }
+  }
+}
 
 /* ============ WIKIDATA ============ */
 async function wikiSearch(q){
@@ -903,7 +1204,7 @@ function renderList(){
 
 /* ============ MODALS ============ */
 function openModal(id){ document.getElementById(id)?.classList.add('is-open'); }
-function closeAllModals(){ $$('.modal.is-open').forEach(m=>m.classList.remove('is-open')); }
+function closeAllModals(){ $$('.modal.is-open').forEach(m=>m.classList.remove('is-open')); pendingImport=null; }
 
 /* User switch */
 function renderUserSwitch(){
@@ -938,6 +1239,14 @@ function initAddOnce(){
     $('#add-manual-save').hidden=k!=='manual';
   }));
   let tT,wT;
+  // ==== Popular tab: bulk import ====
+  $$('#pop-gender button').forEach(b=>b.addEventListener('click',()=>{
+    $$('#pop-gender button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    resetBulkPreview();
+  }));
+  $('#pop-count')?.addEventListener('change', resetBulkPreview);
+  $('#pop-start')?.addEventListener('click', runBulkPopularImport);
   $('#tmdb-q').addEventListener('input',e=>{
     clearTimeout(tT);
     const q=e.target.value.trim();
@@ -1021,9 +1330,19 @@ function initAddOnce(){
 }
 function renderTmdbHint(){
   const h=$('#tmdb-hint');
-  if(state.settings.tmdbKey){ h.textContent='Clé TMDb active. Tape un nom pour chercher.'; return; }
-  h.innerHTML=`Aucune clé TMDb enregistrée. Ouvre les <a href="#" id="go-settings">Réglages</a> pour la coller (clé v3 ou token v4). L'onglet Wikidata fonctionne sans clé.`;
-  $('#go-settings')?.addEventListener('click',e=>{ e.preventDefault(); closeAllModals(); setTimeout(openSettings,180); });
+  const ph=$('#popular-hint');
+  const popBtn=$('#pop-start');
+  if(state.settings.tmdbKey){
+    h.textContent='Clé TMDb active. Tape un nom pour chercher.';
+    if(ph) ph.textContent = 'Importe en lot les personnes les plus populaires sur TMDb en ce moment. Les doublons (déjà en banque) sont ignorés.';
+    if(popBtn) popBtn.disabled = false;
+  } else {
+    h.innerHTML=`Aucune clé TMDb enregistrée. Ouvre les <a href="#" id="go-settings">Réglages</a> pour la coller (clé v3 ou token v4). L'onglet Wikidata fonctionne sans clé.`;
+    $('#go-settings')?.addEventListener('click',e=>{ e.preventDefault(); closeAllModals(); setTimeout(openSettings,180); });
+    if(ph) ph.innerHTML = `Clé TMDb requise. Ouvre les <a href="#" id="go-settings-pop">Réglages</a> pour la coller.`;
+    $('#go-settings-pop')?.addEventListener('click',e=>{ e.preventDefault(); closeAllModals(); setTimeout(openSettings,180); });
+    if(popBtn) popBtn.disabled = true;
+  }
 }
 function renderTmdbResults(results){
   const box=$('#tmdb-results');
@@ -1975,12 +2294,24 @@ function renderSettings(){
 
     <div class="setting-section">
       <h3>Données</h3>
+      <div id="storage-info" style="font-size:12.5px;color:var(--text-3);line-height:1.5;margin-bottom:10px;padding:10px 12px;background:var(--bg-2);border-radius:10px;border:1px solid var(--border)"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-        <button class="btn" id="export-data">Exporter JSON</button>
-        <button class="btn" id="import-data">Importer JSON</button>
+        <button class="btn" id="export-data">📦 Export complet</button>
+        <button class="btn" id="export-light">🪶 Export léger</button>
+      </div>
+      <div style="font-size:11px;color:var(--text-4);margin-bottom:10px;line-height:1.4">
+        <strong>Complet</strong> inclut les photos uploadées (gros fichier).<br>
+        <strong>Léger</strong> ne garde que les URLs web — idéal pour transférer entre téléphones.
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <button class="btn" id="import-data">📥 Importer JSON</button>
+        <button class="btn" id="clear-uploads">🧹 Vider photos</button>
+      </div>
+      <div style="font-size:11px;color:var(--text-4);margin-bottom:10px;line-height:1.4">
+        <strong>Vider photos</strong> supprime toutes les photos uploadées depuis ce téléphone (garde les URLs TMDb/Wikidata).
       </div>
       <input type="file" id="import-file" accept=".json" style="display:none">
-      <button class="btn btn-danger btn-block" id="reset-data">Tout effacer</button>
+      <button class="btn btn-danger btn-block" id="reset-data">⚠️ Tout effacer</button>
     </div>
 
     <div class="setting-section">
@@ -1994,6 +2325,24 @@ function renderSettings(){
       </div>
     </div>
   `;
+  // Populate storage info
+  const st = computeStorageStats();
+  const storageColor = st.pct >= 80 ? '#F87171' : st.pct >= 60 ? 'var(--amber)' : 'var(--victor-hi)';
+  const infoEl = $('#storage-info');
+  if(infoEl){
+    infoEl.innerHTML = `
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-weight:700;color:var(--text-2)">
+        <span>Stockage utilisé</span>
+        <span style="color:${storageColor}">${st.mb} Mo / ~${st.quotaMB} Mo (${st.pct}%)</span>
+      </div>
+      <div style="height:6px;background:var(--bg-3);border-radius:3px;overflow:hidden;margin-bottom:8px">
+        <div style="height:100%;width:${st.pct}%;background:${storageColor};transition:width .3s"></div>
+      </div>
+      <div style="font-size:11.5px;color:var(--text-4)">
+        ${st.uploaded} photo${st.uploaded>1?'s':''} uploadée${st.uploaded>1?'s':''} depuis ce téléphone
+      </div>
+    `;
+  }
   $$('#settings-body .slider[data-wk]').forEach(s=>s.addEventListener('input',e=>{
     const k=e.target.getAttribute('data-wk');
     state.settings.weights[k]=parseFloat(e.target.value);
@@ -2031,19 +2380,55 @@ function renderSettings(){
     state.settings.sortBy=e.target.value;
     saveState(); renderList();
   });
+  // ==== Export complet (avec photos uploadées) ====
   $('#export-data').addEventListener('click',()=>{
-    const blob=new Blob([JSON.stringify({
+    const payload = {
       people:state.people, ratings:state.ratings, favorites:state.favorites,
       elo:state.elo, duels:state.duels, duelHistory:state.duelHistory,
-      tournaments:state.tournaments, settings:state.settings, exportedAt:Date.now(), v:1
-    },null,2)],{type:'application/json'});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');
-    a.href=url; a.download='classeur-beaute-'+new Date().toISOString().slice(0,10)+'.json';
-    document.body.appendChild(a); a.click(); a.remove();
-    URL.revokeObjectURL(url);
-    toast('Export téléchargé','ok');
+      tournaments:state.tournaments, settings:state.settings,
+      exportedAt:Date.now(), v:2, kind:'full'
+    };
+    downloadJson(payload, 'classeur-beaute-complet-'+new Date().toISOString().slice(0,10)+'.json');
+    toast('Export complet téléchargé','ok');
   });
+  // ==== Export léger (sans photos uploadées) ====
+  $('#export-light').addEventListener('click',()=>{
+    const lightPeople = state.people.map(p=>{
+      const clone = {...p};
+      // Strip data URLs (uploaded photos). Keep http(s) URLs.
+      if(clone.mainPhoto && clone.mainPhoto.startsWith('data:')) clone.mainPhoto = null;
+      if(Array.isArray(clone.photos)){
+        clone.photos = clone.photos.filter(u => typeof u==='string' && !u.startsWith('data:'));
+        if(!clone.mainPhoto && clone.photos.length) clone.mainPhoto = clone.photos[0];
+      }
+      return clone;
+    });
+    const removed = countUploadedPhotos();
+    const payload = {
+      people:lightPeople, ratings:state.ratings, favorites:state.favorites,
+      elo:state.elo, duels:state.duels, duelHistory:state.duelHistory,
+      tournaments:state.tournaments, settings:state.settings,
+      exportedAt:Date.now(), v:2, kind:'light'
+    };
+    downloadJson(payload, 'classeur-beaute-leger-'+new Date().toISOString().slice(0,10)+'.json');
+    toast(removed?`Export léger (${removed} photo${removed>1?'s':''} uploadée${removed>1?'s':''} retirée${removed>1?'s':''})`:'Export léger téléchargé','ok');
+  });
+  // ==== Vider toutes les photos uploadées ====
+  $('#clear-uploads').addEventListener('click',()=>{
+    const n = countUploadedPhotos();
+    if(!n){ toast('Aucune photo uploadée à supprimer'); return; }
+    if(!confirm(`Supprimer les ${n} photo${n>1?'s':''} uploadée${n>1?'s':''} depuis ce téléphone ?\nLes photos TMDb/Wikidata sont conservées.`)) return;
+    state.people.forEach(p=>{
+      if(p.mainPhoto && p.mainPhoto.startsWith('data:')) p.mainPhoto = null;
+      if(Array.isArray(p.photos)){
+        p.photos = p.photos.filter(u => typeof u==='string' && !u.startsWith('data:'));
+        if(!p.mainPhoto && p.photos.length) p.mainPhoto = p.photos[0];
+      }
+    });
+    saveState(); renderList(); renderSettings();
+    toast(`${n} photo${n>1?'s':''} supprimée${n>1?'s':''}`,'ok');
+  });
+  // ==== Import intelligent ====
   $('#import-data').addEventListener('click',()=>$('#import-file').click());
   $('#import-file').addEventListener('change',e=>{
     const f=e.target.files?.[0]; if(!f) return;
@@ -2051,17 +2436,10 @@ function renderSettings(){
     r.onload=()=>{
       try{
         const d=JSON.parse(r.result);
-        if(!d.people) throw new Error('Fichier invalide');
-        if(!confirm('Remplacer toutes les données par celles du fichier ?')) return;
-        Object.assign(state,{
-          people:d.people||[], ratings:d.ratings||{}, favorites:d.favorites||{},
-          elo:d.elo||{}, duels:d.duels||{}, duelHistory:d.duelHistory||{},
-          tournaments:d.tournaments||{}, settings:Object.assign({currentUser:'lily',weights:{...DEFAULT_WEIGHTS},tmdbKey:'',sortBy:'note',filter:'all',query:'',consultSort:'note',compareA:'lily',compareB:'victor'},d.settings||{})
-        });
-        USERS.forEach(u=>ensureBuckets(u.id));
-        saveState(); renderHeader(); renderList(); renderSettings();
-        toast('Import terminé ('+state.people.length+' personnes)','ok');
+        if(!d.people && !d.ratings) throw new Error('Fichier invalide');
+        openImportDialog(d, f.name);
       }catch(err){ toast('Erreur import : '+err.message,'err'); }
+      e.target.value='';
     };
     r.readAsText(f);
   });
@@ -2077,6 +2455,249 @@ function renderSettings(){
     saveState(); renderHeader(); renderList(); renderSettings();
     toast('Données effacées','ok');
   });
+}
+
+/* ============ SMART IMPORT ============ */
+// Holds the pending import data while the dialog is open
+// (Declared with let at module top-level; safe because no function body runs
+// before module initialization completes.)
+
+function openImportDialog(d, filename){
+  pendingImport = d;
+  const body = $('#import-body');
+  const incomingPeople = Array.isArray(d.people) ? d.people : [];
+  const isFull = d.kind === 'full' || incomingPeople.some(p =>
+    (p.mainPhoto && p.mainPhoto.startsWith('data:')) ||
+    (Array.isArray(p.photos) && p.photos.some(u => typeof u==='string' && u.startsWith('data:')))
+  );
+
+  // Detect which source users have data in the file
+  const srcUsers = USERS.filter(u => {
+    const r = d.ratings?.[u.id];
+    const f = d.favorites?.[u.id];
+    const el = d.elo?.[u.id];
+    const du = d.duels?.[u.id];
+    return (r && Object.keys(r).length) || (f && Object.values(f||{}).some(Boolean)) || (el && Object.keys(el).length) || du;
+  });
+
+  // Count local existing people by tmdbId/wikiId/name so we can show how many are new
+  const localKeys = new Set(state.people.map(p => p.tmdbId?'t:'+p.tmdbId : p.wikiId?'w:'+p.wikiId : 'n:'+(p.name||'').toLowerCase()));
+  let newPeople = 0;
+  incomingPeople.forEach(p => {
+    const k = p.tmdbId?'t:'+p.tmdbId : p.wikiId?'w:'+p.wikiId : 'n:'+(p.name||'').toLowerCase();
+    if(!localKeys.has(k)) newPeople++;
+  });
+
+  // Build the dialog HTML
+  const exportDate = d.exportedAt ? new Date(d.exportedAt).toLocaleDateString('fr-FR') : '?';
+  body.innerHTML = `
+    <div class="import-summary">
+      <div style="margin-bottom:6px"><strong>${esc(filename||'Fichier importé')}</strong></div>
+      Contenu : <strong>${incomingPeople.length}</strong> personne${incomingPeople.length>1?'s':''}
+      (${newPeople} nouvelle${newPeople>1?'s':''} chez toi) ·
+      ${srcUsers.length} utilisateur${srcUsers.length>1?'s':''} avec données
+      ${isFull?' · inclut photos uploadées':''}
+      <br>
+      <span style="font-size:11.5px;color:var(--text-4)">Export du ${exportDate}${d.kind?' · '+d.kind:''}</span>
+    </div>
+
+    <div class="import-section-title">Personnes</div>
+    <label class="import-checkbox is-on" id="imp-ppl-lbl">
+      <input type="checkbox" id="imp-people" checked>
+      <span class="ic-text">
+        <strong>Fusionner les personnes du fichier</strong>
+        <div class="ic-sub">Ajoute les nouvelles (${newPeople}) et met à jour les photos/métadonnées des existantes. Aucune personne de ta banque n'est supprimée.</div>
+      </span>
+    </label>
+
+    <div class="import-section-title">Données par utilisateur</div>
+    <div style="font-size:11.5px;color:var(--text-4);margin-bottom:10px;line-height:1.4">
+      Pour chaque utilisateur trouvé dans le fichier, choisis à quel utilisateur local assigner ses notes, favoris, ELO, duels et tournois. Choisis "Ignorer" pour ne rien importer.
+    </div>
+    ${srcUsers.length?srcUsers.map(src=>{
+      const nR = Object.keys(d.ratings?.[src.id]||{}).length;
+      const nF = Object.values(d.favorites?.[src.id]||{}).filter(Boolean).length;
+      const nD = d.duels?.[src.id]||0;
+      return `<div class="import-user-row">
+        <div>
+          <div class="import-user-label">
+            <span class="dot" style="background:${src.color}"></span>
+            ${esc(src.name)}
+          </div>
+          <div class="import-user-meta">${nR}n · ${nF}♥ · ${nD}d</div>
+        </div>
+        <select data-src-user="${src.id}">
+          <option value="__skip__">— Ignorer —</option>
+          ${USERS.map(dst=>`<option value="${dst.id}" ${dst.id===src.id?'selected':''}>Vers ${esc(dst.name)}${dst.id===src.id?' (même)':''}</option>`).join('')}
+        </select>
+      </div>`;
+    }).join(''):'<div style="font-size:12.5px;color:var(--text-4);padding:10px">Aucune donnée utilisateur dans ce fichier (banque de personnes seulement).</div>'}
+
+    <div class="import-section-title">Mode de fusion</div>
+    <label class="import-checkbox ${'is-on'}" id="imp-mode-lbl">
+      <input type="radio" name="imp-mode" value="merge" checked>
+      <span class="ic-text">
+        <strong>Fusionner (recommandé)</strong>
+        <div class="ic-sub">Les notes/favoris/duels du fichier remplacent ceux de l'utilisateur cible pour les mêmes personnes. Les autres utilisateurs de ce téléphone ne sont pas touchés.</div>
+      </span>
+    </label>
+    <label class="import-checkbox">
+      <input type="radio" name="imp-mode" value="replace-user">
+      <span class="ic-text">
+        <strong>Remplacer l'utilisateur cible</strong>
+        <div class="ic-sub">Efface toutes les données existantes de l'utilisateur cible avant d'importer. Utile si tu veux une copie conforme d'un autre téléphone pour cet utilisateur.</div>
+      </span>
+    </label>
+  `;
+
+  // Attach checkbox highlight & radio sync
+  const pplCb = $('#imp-people');
+  pplCb.addEventListener('change',()=>{
+    $('#imp-ppl-lbl').classList.toggle('is-on', pplCb.checked);
+  });
+  $$('#import-body input[name="imp-mode"]').forEach(r=>{
+    r.addEventListener('change',()=>{
+      $$('#import-body .import-checkbox').forEach(lbl=>{
+        const radio = lbl.querySelector('input[type="radio"]');
+        if(radio) lbl.classList.toggle('is-on', radio.checked);
+      });
+    });
+  });
+
+  openModal('modal-import');
+}
+
+function applyImport(){
+  const d = pendingImport;
+  if(!d){ closeAllModals(); return; }
+
+  const importPeople = $('#imp-people')?.checked;
+  const mode = $('#import-body input[name="imp-mode"]:checked')?.value || 'merge';
+
+  // Build mapping: source user id -> dest user id (or null to skip)
+  const map = {};
+  $$('#import-body select[data-src-user]').forEach(sel=>{
+    const src = sel.getAttribute('data-src-user');
+    const dst = sel.value;
+    if(dst && dst!=='__skip__') map[src] = dst;
+  });
+
+  // ---- 1) Merge people ----
+  if(importPeople && Array.isArray(d.people)){
+    // Build lookup of local people by stable keys
+    const byTmdb = new Map(), byWiki = new Map(), byName = new Map();
+    state.people.forEach(p=>{
+      if(p.tmdbId) byTmdb.set(String(p.tmdbId), p);
+      if(p.wikiId) byWiki.set(p.wikiId, p);
+      byName.set((p.name||'').toLowerCase().trim(), p);
+    });
+    // Build old-id -> new-id remap table so we can redirect ratings keys
+    const idRemap = {};
+    d.people.forEach(src=>{
+      let local = null;
+      if(src.tmdbId && byTmdb.has(String(src.tmdbId))) local = byTmdb.get(String(src.tmdbId));
+      else if(src.wikiId && byWiki.has(src.wikiId)) local = byWiki.get(src.wikiId);
+      else if(src.name && byName.has((src.name||'').toLowerCase().trim())) local = byName.get((src.name||'').toLowerCase().trim());
+
+      if(local){
+        // Merge photos (dedup) and metadata; prefer local non-null values, but fill blanks from source
+        const mergedPhotos = Array.from(new Set([...(local.photos||[]), ...(src.photos||[])]));
+        local.photos = mergedPhotos.length ? mergedPhotos : local.photos;
+        if(!local.mainPhoto && src.mainPhoto) local.mainPhoto = src.mainPhoto;
+        ['birthday','nationality','profession','bio','gender'].forEach(k=>{
+          if(local[k]==null && src[k]!=null) local[k] = src[k];
+        });
+        if(!local.tmdbId && src.tmdbId) local.tmdbId = src.tmdbId;
+        if(!local.wikiId && src.wikiId) local.wikiId = src.wikiId;
+        idRemap[src.id] = local.id;
+      } else {
+        // New person: keep source id if it doesn't clash, else generate new
+        let newId = src.id;
+        if(!newId || state.people.some(p=>p.id===newId)) newId = uid();
+        const cloned = {...src, id:newId, addedAt: src.addedAt || Date.now()};
+        state.people.push(cloned);
+        idRemap[src.id] = newId;
+        // Update lookups so later duplicates in the file point to this new entry
+        if(cloned.tmdbId) byTmdb.set(String(cloned.tmdbId), cloned);
+        if(cloned.wikiId) byWiki.set(cloned.wikiId, cloned);
+        byName.set((cloned.name||'').toLowerCase().trim(), cloned);
+      }
+    });
+
+    // Helper to remap person-id keys in a {pid:value} map
+    const remapKeys = obj => {
+      if(!obj) return {};
+      const out = {};
+      Object.keys(obj).forEach(pid => {
+        const nk = idRemap[pid] || pid; // keep pid if we don't have a mapping
+        out[nk] = obj[pid];
+      });
+      return out;
+    };
+
+    // ---- 2) Merge user-scoped data based on mapping ----
+    Object.keys(map).forEach(srcU=>{
+      const dstU = map[srcU];
+      ensureBuckets(dstU);
+
+      const srcRatings = remapKeys(d.ratings?.[srcU] || {});
+      const srcFavs    = remapKeys(d.favorites?.[srcU] || {});
+      const srcElo     = remapKeys(d.elo?.[srcU] || {});
+      const srcDuels   = d.duels?.[srcU] || 0;
+      const srcHist    = d.duelHistory?.[srcU] || [];
+      const srcTours   = d.tournaments?.[srcU] || [];
+
+      if(mode === 'replace-user'){
+        state.ratings[dstU]   = srcRatings;
+        state.favorites[dstU] = srcFavs;
+        state.elo[dstU]       = srcElo;
+        state.duels[dstU]     = srcDuels;
+        state.duelHistory[dstU] = srcHist;
+        state.tournaments[dstU] = srcTours;
+      } else {
+        // merge (source wins per-person for ratings/favorites/elo)
+        Object.assign(state.ratings[dstU],   srcRatings);
+        Object.assign(state.favorites[dstU], srcFavs);
+        Object.assign(state.elo[dstU],       srcElo);
+        state.duels[dstU] = (state.duels[dstU]||0) + srcDuels;
+        state.duelHistory[dstU] = [...(state.duelHistory[dstU]||[]), ...srcHist];
+        state.tournaments[dstU] = [...(state.tournaments[dstU]||[]), ...srcTours];
+      }
+    });
+  } else if(Object.keys(map).length){
+    // People not imported, but user data was requested -> we can still try mapping
+    // using any overlap of ids that may already exist (best-effort, no remap table)
+    Object.keys(map).forEach(srcU=>{
+      const dstU = map[srcU];
+      ensureBuckets(dstU);
+      const srcRatings = d.ratings?.[srcU] || {};
+      const srcFavs    = d.favorites?.[srcU] || {};
+      const srcElo     = d.elo?.[srcU] || {};
+      if(mode === 'replace-user'){
+        state.ratings[dstU]   = {...srcRatings};
+        state.favorites[dstU] = {...srcFavs};
+        state.elo[dstU]       = {...srcElo};
+        state.duels[dstU]     = d.duels?.[srcU] || 0;
+      } else {
+        Object.assign(state.ratings[dstU],   srcRatings);
+        Object.assign(state.favorites[dstU], srcFavs);
+        Object.assign(state.elo[dstU],       srcElo);
+        state.duels[dstU] = (state.duels[dstU]||0) + (d.duels?.[srcU]||0);
+      }
+    });
+  }
+
+  USERS.forEach(u=>ensureBuckets(u.id));
+  const ok = saveState();
+  if(!ok){
+    toast('Stockage plein : réessaie avec un export léger','err');
+    return;
+  }
+
+  pendingImport = null;
+  closeAllModals();
+  renderHeader(); renderList(); renderSettings();
+  toast('Import terminé ✓','ok');
 }
 
 /* ============ INIT ============ */
@@ -2120,6 +2741,8 @@ function attachEvents(){
   // details actions
   $('#detail-save').addEventListener('click',saveDetails);
   $('#detail-delete').addEventListener('click',deletePerson);
+  // import confirm
+  $('#import-confirm')?.addEventListener('click', applyImport);
   // escape closes modals
   document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeAllModals(); });
 }
