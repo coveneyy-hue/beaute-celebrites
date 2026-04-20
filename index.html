@@ -76,11 +76,13 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .chip[data-gender="F"].is-active{background:rgba(236,72,153,.15);color:var(--lily-hi);border-color:rgba(236,72,153,.35)}
 
 .list-wrap{margin-top:14px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow-x:auto;overflow-y:visible;box-shadow:var(--shadow-sm)}
-.list-head{display:grid;grid-template-columns:52px 1fr 58px 150px;align-items:center;gap:8px;padding:12px 12px;background:linear-gradient(180deg,rgba(255,255,255,.02),transparent);border-bottom:1px solid var(--border);font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--text-3);text-transform:uppercase;min-width:420px}
+.list-head{display:grid;align-items:center;gap:8px;padding:12px 12px;background:linear-gradient(180deg,rgba(255,255,255,.02),transparent);border-bottom:1px solid var(--border);font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--text-3);text-transform:uppercase}
+body.show-date .list-head{min-width:420px}
 .list-head .sort-btn{display:inline-flex;align-items:center;gap:4px;color:var(--amber)}
 .list-head .sort-btn svg{width:10px;height:10px}
 
-.row{display:grid;grid-template-columns:52px 1fr 58px 150px;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border-soft);transition:background .12s;min-width:420px}
+.row{display:grid;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border-soft);transition:background .12s}
+body.show-date .row{min-width:420px}
 .row:last-child{border-bottom:none}
 .row:active{background:var(--card-hover)}
 .row-rank{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:15px;font-weight:700;color:var(--text);position:relative}
@@ -431,6 +433,21 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .tour-opts button.on.f{background:rgba(236,72,153,.2);color:var(--lily-hi)}
 .tour-opts button:disabled{opacity:.35;pointer-events:none}
 
+/* ---- Date column visibility ---- */
+.col-date{ display:none }
+body.show-date .col-date{ display:block }
+.list-head .col-date{ display:none }
+body.show-date .list-head .col-date{ display:flex }
+/* Grid columns: 3-col default, 4-col when date visible */
+.list-head, .row{ grid-template-columns:52px 1fr 58px }
+body.show-date .list-head, body.show-date .row{ grid-template-columns:52px 1fr 58px 150px }
+/* In bulk mode the rank col shrinks to fit checkbox */
+body.bulk-mode .list-head, body.bulk-mode .row{ grid-template-columns:36px 1fr 58px }
+body.bulk-mode.show-date .list-head, body.bulk-mode.show-date .row{ grid-template-columns:36px 1fr 58px 150px }
+/* Sort arrow indicator */
+.sort-btn .sort-arrow{ font-size:10px; margin-left:3px; opacity:.7; display:inline-block }
+.tb-btn.is-active-eye{ background:rgba(245,158,11,.15); color:var(--amber-hi); border-color:rgba(245,158,11,.4) }
+
 /* ---- Bulk delete mode ---- */
 .tb-btn.is-active-danger{background:rgba(239,68,68,.18);color:var(--coral);border-color:rgba(239,68,68,.45)}
 .row-check{display:none;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;border:2px solid var(--border);background:var(--bg-2);flex:none;transition:all .15s}
@@ -440,19 +457,25 @@ body.bulk-mode .row.is-selected .row-check svg{opacity:1}
 .row-check svg{width:13px;height:13px;color:#fff;opacity:0;transition:opacity .12s}
 body.bulk-mode .row{cursor:pointer;user-select:none}
 body.bulk-mode .row:active{background:rgba(239,68,68,.07)}
-#bulk-bar{display:none;position:sticky;bottom:0;z-index:10;margin-top:0;padding:10px 14px;background:var(--card);border-top:1px solid var(--border);border-radius:0 0 var(--radius-lg) var(--radius-lg);align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -4px 16px rgba(0,0,0,.3)}
+body.bulk-mode .row.is-selected{background:rgba(239,68,68,.06)}
+/* bulk bar — fixed to bottom of screen so overflow-x:auto on list-wrap doesn't block sticky */
+#bulk-bar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:50;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));background:var(--card);border-top:1px solid rgba(239,68,68,.35);align-items:center;justify-content:space-between;gap:10px;box-shadow:0 -6px 24px rgba(0,0,0,.4);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 body.bulk-mode #bulk-bar{display:flex}
+/* add bottom padding to app so fixed bar doesn't hide last row */
+body.bulk-mode #app{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 80px)}
 #bulk-bar .bulk-info{font-size:13px;font-weight:700;color:var(--text-2)}
-#bulk-bar .bulk-info span{color:var(--coral)}
+#bulk-bar .bulk-info .bulk-n{color:var(--coral)}
 #bulk-bar .bulk-actions{display:flex;gap:8px;align-items:center}
-#bulk-select-all{font-size:12px;font-weight:700;color:var(--amber);padding:6px 10px;border-radius:8px;background:var(--amber-soft);border:1px solid rgba(245,158,11,.25)}
-#bulk-delete-btn{padding:8px 14px;border-radius:10px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.35);color:var(--coral);font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px;transition:background .15s}
+#bulk-select-all{font-size:12px;font-weight:700;color:var(--amber);padding:7px 11px;border-radius:9px;background:var(--amber-soft);border:1px solid rgba(245,158,11,.3);white-space:nowrap}
+#bulk-delete-btn{padding:8px 14px;border-radius:10px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.35);color:var(--coral);font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px;transition:background .15s;white-space:nowrap}
 #bulk-delete-btn:active{background:rgba(239,68,68,.3)}
 #bulk-delete-btn:disabled{opacity:.4;pointer-events:none}
-#bulk-delete-btn svg{width:15px;height:15px}
-/* In bulk mode, hide the rank number column — replaced by checkbox */
-body.bulk-mode .row .row-rank-num{display:none}
-body.bulk-mode .list-wrap{border-radius:var(--radius-lg)}
+#bulk-delete-btn svg{width:15px;height:15px;flex:none}
+/* in bulk mode: hide rank number, show checkbox */
+body.bulk-mode .row-rank-num{display:none}
+/* in bulk mode: list-head # column shows a select-all checkbox hint */
+body.bulk-mode .list-head-hash{display:none}
+body.bulk-mode .list-head-check{display:flex}
 
 #toast{position:fixed;top:calc(var(--safe-top) + 16px);left:50%;transform:translate(-50%,-80px);z-index:999;padding:11px 16px;background:var(--card);border:1px solid var(--border);border-radius:999px;font-size:13px;font-weight:600;color:var(--text);box-shadow:var(--shadow-md);opacity:0;transition:all .25s;pointer-events:none;max-width:90vw}
 #toast.show{opacity:1;transform:translate(-50%,0)}
@@ -488,8 +511,8 @@ body.bulk-mode .list-wrap{border-radius:var(--radius-lg)}
 @media (max-width:380px){
   .toolbar{gap:7px}
   .tb-btn{width:42px;height:42px}
-  .row{grid-template-columns:44px 1fr 50px 150px;gap:6px;padding:9px 10px;min-width:380px}
-  .list-head{grid-template-columns:44px 1fr 50px 150px;gap:6px;padding:10px 10px;min-width:380px}
+  .row{gap:6px;padding:9px 10px}
+  .list-head{gap:6px;padding:10px 10px}
   .thumb{width:36px;height:50px}
   .row-badge .badge{padding:2px 6px;font-size:10px}
   .row-badge .badge svg{width:9px;height:9px}
@@ -543,6 +566,9 @@ body.bulk-mode .list-wrap{border-radius:var(--radius-lg)}
     <button class="tb-btn" data-act="settings" aria-label="Réglages">
       <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z" stroke="currentColor" stroke-width="1.5"/></svg>
     </button>
+    <button class="tb-btn" id="tb-toggle-date" data-act="toggle-date" aria-label="Afficher/masquer colonne date">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M2.5 12s3-7 9.5-7 9.5 7 9.5 7-3 7-9.5 7S2.5 12 2.5 12Z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M3 3l18 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" id="eye-slash"/></svg>
+    </button>
     <button class="tb-btn is-danger" id="tb-bulk-delete" data-act="bulk-delete" aria-label="Suppression en lot">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
     </button>
@@ -566,23 +592,29 @@ body.bulk-mode .list-wrap{border-radius:var(--radius-lg)}
 
   <div class="list-wrap">
     <div class="list-head">
-      <div style="text-align:center">#</div>
-      <button class="sort-btn" id="sort-name" style="justify-self:start">PERSONNE</button>
-      <button class="sort-btn" id="sort-elo" style="justify-self:center">ELO</button>
-      <button class="sort-btn" id="sort-added" style="justify-self:center">AJOUTÉ</button>
-    </div>
-    <div id="list-body"></div>
-    <div id="bulk-bar">
-      <div class="bulk-info">
-        <span id="bulk-count">0</span> sélectionné<span id="bulk-plural"></span>
-      </div>
-      <div class="bulk-actions">
-        <button id="bulk-select-all">Tout sélectionner</button>
-        <button id="bulk-delete-btn" disabled>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-          Supprimer
+      <div style="text-align:center;display:flex;align-items:center;justify-content:center">
+        <span class="list-head-hash" style="font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--text-3)">#</span>
+        <button class="list-head-check" id="bulk-head-check" aria-label="Tout sélectionner" style="display:none;width:22px;height:22px;border-radius:6px;border:2px solid var(--border);background:var(--bg-2);align-items:center;justify-content:center;transition:all .15s">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg>
         </button>
       </div>
+      <button class="sort-btn" id="sort-name" style="justify-self:start">PERSONNE</button>
+      <button class="sort-btn" id="sort-elo" style="justify-self:center">ELO</button>
+      <button class="sort-btn col-date" id="sort-added" style="justify-self:center">AJOUTÉ</button>
+    </div>
+    <div id="list-body"></div>
+  </div>
+
+  <div id="bulk-bar">
+    <div class="bulk-info">
+      <span class="bulk-n" id="bulk-count">0</span> sélectionné<span id="bulk-plural"></span>
+    </div>
+    <div class="bulk-actions">
+      <button id="bulk-select-all">Tout sélectionner</button>
+      <button id="bulk-delete-btn" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        Supprimer
+      </button>
     </div>
   </div>
 </div>
@@ -1312,7 +1344,7 @@ function loadState(){
     const d=JSON.parse(r);
     Object.assign(state,d);
     USERS.forEach(u=>ensureBuckets(u.id));
-    state.settings=Object.assign({currentUser:'lily',tmdbKey:'',sortBy:'elo',filter:'all',query:'',consultSort:'elo',compareA:'lily',compareB:'victor'},state.settings||{});
+    state.settings=Object.assign({currentUser:'lily',tmdbKey:'',sortBy:'elo',sortDir:'desc',showDateCol:false,filter:'all',query:'',consultSort:'elo',compareA:'lily',compareB:'victor'},state.settings||{});
   }catch(e){ console.warn(e); }
 }
 
@@ -1746,10 +1778,12 @@ function filterPeople(){
 function sortPeople(list){
   const u=state.settings.currentUser;
   const by=state.settings.sortBy||'elo';
+  const dir=state.settings.sortDir||'desc';
+  const asc=dir==='asc';
   const c=list.slice();
-  if(by==='name') c.sort((a,b)=>a.name.localeCompare(b.name,'fr'));
-  else if(by==='added') c.sort((a,b)=>(b.addedAt||0)-(a.addedAt||0));
-  else c.sort((a,b)=>getElo(u,b.id)-getElo(u,a.id));
+  if(by==='name') c.sort((a,b)=>{ const r=a.name.localeCompare(b.name,'fr'); return asc?r:-r; });
+  else if(by==='added') c.sort((a,b)=>{ const r=(a.addedAt||0)-(b.addedAt||0); return asc?r:-r; });
+  else c.sort((a,b)=>{ const r=getElo(u,a.id)-getElo(u,b.id); return asc?r:-r; });
   return c;
 }
 function renderList(){
@@ -1760,11 +1794,20 @@ function renderList(){
   if(searchEl && searchEl.value!==(state.settings.query||'')) searchEl.value=state.settings.query||'';
   // Sync chips with persisted filter
   $$('#chips .chip').forEach(c=>c.classList.toggle('is-active',c.getAttribute('data-filter')===(state.settings.filter||'all')));
-  // Highlight active sort button
+  // Highlight active sort button with directional arrow
   const sortBy=state.settings.sortBy||'elo';
-  ['sort-name','sort-elo','sort-added'].forEach(id=>{
+  const sortDir=state.settings.sortDir||'desc';
+  const arrowUp='↑', arrowDown='↓';
+  [['sort-name','name'],['sort-elo','elo'],['sort-added','added']].forEach(([id,key])=>{
     const btn=$('#'+id);
-    if(btn){ const key=id.replace('sort-',''); btn.style.color=sortBy===key?'var(--amber-hi)':''; }
+    if(!btn) return;
+    const isActive=sortBy===key;
+    btn.style.color=isActive?'var(--amber-hi)':'';
+    // inject or update arrow span
+    let arrowEl=btn.querySelector('.sort-arrow');
+    if(!arrowEl){ arrowEl=document.createElement('span'); arrowEl.className='sort-arrow'; btn.appendChild(arrowEl); }
+    arrowEl.textContent=isActive?(sortDir==='asc'?arrowUp:arrowDown):'';
+    arrowEl.style.opacity=isActive?'1':'0';
   });
   // Show/hide clear button
   const clearBtn=$('#search-clear');
@@ -1786,13 +1829,13 @@ function renderList(){
   body.innerHTML=sorted.map((p,i)=>{
     const el=state.elo[u]?.[p.id]??1500;
     const th=p.mainPhoto?`<img class="thumb" loading="lazy" src="${esc(p.mainPhoto)}" onerror="this.outerHTML='&lt;div class=&quot;thumb placeholder&quot;&gt;?&lt;/div&gt;'">`:`<div class="thumb placeholder">?</div>`;
-    let tsHtml='<div style="font-size:10px;color:var(--text-4);text-align:center;line-height:1.5">—</div>';
+    let tsHtml='<div class="col-date" style="font-size:10px;color:var(--text-4);text-align:center;line-height:1.5">—</div>';
     if(p.addedAt){
       const d=new Date(p.addedAt);
       const pad=n=>String(n).padStart(2,'0');
       const date=`${d.getFullYear()}/${pad(d.getMonth()+1)}/${pad(d.getDate())}`;
       const time=`${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-      tsHtml=`<div style="font-size:10px;color:var(--text-3);text-align:center;line-height:1.5;font-variant-numeric:tabular-nums">${date}<br>${time}</div>`;
+      tsHtml=`<div class="col-date" style="font-size:10px;color:var(--text-3);text-align:center;line-height:1.5;font-variant-numeric:tabular-nums">${date}<br>${time}</div>`;
     }
     const isSelected=bulkSelected.has(p.id);
     return `<div class="row${isSelected?' is-selected':''}" data-open="${p.id}" data-pid="${p.id}">
@@ -3925,18 +3968,28 @@ function exitBulkMode(){
   const btn = $('#tb-bulk-delete');
   if(btn) btn.classList.remove('is-active-danger');
   renderList();
+  updateBulkBar();
 }
 function updateBulkBar(){
   const n = bulkSelected.size;
-  const total = filterPeople().length;
+  const visible = filterPeople();
+  const total = visible.length;
+  const allSel = total > 0 && visible.every(p=>bulkSelected.has(p.id));
   const countEl = $('#bulk-count');
   const pluralEl = $('#bulk-plural');
   const deleteBtn = $('#bulk-delete-btn');
   const selectAllBtn = $('#bulk-select-all');
+  const headCheck = $('#bulk-head-check');
   if(countEl) countEl.textContent = n;
   if(pluralEl) pluralEl.textContent = n > 1 ? 's' : '';
   if(deleteBtn) deleteBtn.disabled = n === 0;
-  if(selectAllBtn) selectAllBtn.textContent = n === total && total > 0 ? 'Tout désélectionner' : 'Tout sélectionner';
+  if(selectAllBtn) selectAllBtn.textContent = allSel ? 'Tout désélectionner' : 'Tout sélectionner';
+  if(headCheck){
+    headCheck.style.background = allSel ? 'var(--coral)' : 'var(--bg-2)';
+    headCheck.style.borderColor = allSel ? 'var(--coral)' : 'var(--border)';
+    const svg = headCheck.querySelector('svg');
+    if(svg) svg.style.color = allSel ? '#fff' : 'transparent';
+  }
 }
 function toggleBulkRow(pid){
   if(bulkSelected.has(pid)) bulkSelected.delete(pid); else bulkSelected.add(pid);
@@ -3977,6 +4030,15 @@ function attachEvents(){
     else if(a==='duel') openDuel();
     else if(a==='tournament') openTournament();
     else if(a==='settings') openSettings();
+    else if(a==='toggle-date'){
+      state.settings.showDateCol=!state.settings.showDateCol;
+      document.body.classList.toggle('show-date', state.settings.showDateCol);
+      const eyeBtn=$('#tb-toggle-date');
+      if(eyeBtn) eyeBtn.classList.toggle('is-active-eye', state.settings.showDateCol);
+      const slash=$('#eye-slash');
+      if(slash) slash.style.display=state.settings.showDateCol?'none':'inline';
+      saveState();
+    }
     else if(a==='bulk-delete'){ if(bulkMode) exitBulkMode(); else enterBulkMode(); }
   }));
   // user switch
@@ -4000,10 +4062,20 @@ function attachEvents(){
     state.settings.filter=c.getAttribute('data-filter');
     renderList();
   }));
-  // sort
-  $('#sort-name').addEventListener('click',()=>{ state.settings.sortBy='name'; saveState(); renderList(); toast('Tri : nom A-Z'); });
-  $('#sort-elo').addEventListener('click',()=>{ state.settings.sortBy='elo'; saveState(); renderList(); toast('Tri : ELO'); });
-  $('#sort-added').addEventListener('click',()=>{ state.settings.sortBy='added'; saveState(); renderList(); toast('Tri : date ajout'); });
+  // Sort buttons — same key again → flip direction; new key → default dir
+  const defaultDir={name:'asc', elo:'desc', added:'desc'};
+  function handleSort(key){
+    if(state.settings.sortBy===key){
+      state.settings.sortDir=state.settings.sortDir==='asc'?'desc':'asc';
+    } else {
+      state.settings.sortBy=key;
+      state.settings.sortDir=defaultDir[key]||'desc';
+    }
+    saveState(); renderList();
+  }
+  $('#sort-name').addEventListener('click',()=>handleSort('name'));
+  $('#sort-elo').addEventListener('click',()=>handleSort('elo'));
+  $('#sort-added').addEventListener('click',()=>handleSort('added'));
   // list row — delegate clicks; in bulk mode toggle selection, otherwise open detail
   document.addEventListener('click',e=>{
     const open=e.target.closest('[data-open]');
@@ -4025,8 +4097,22 @@ function attachEvents(){
     renderList(); updateBulkBar();
   });
   $('#bulk-delete-btn').addEventListener('click', confirmBulkDelete);
-  // Exit bulk mode when a modal opens (escape hatch)
-  document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(bulkMode){ exitBulkMode(); return; } closeAllModals(); } });
+  // header checkbox = select/deselect all
+  document.addEventListener('click', e=>{
+    if(e.target.closest('#bulk-head-check')){
+      const visible = filterPeople().map(p=>p.id);
+      const allSel = visible.every(id=>bulkSelected.has(id));
+      if(allSel){ visible.forEach(id=>bulkSelected.delete(id)); } else { visible.forEach(id=>bulkSelected.add(id)); }
+      renderList(); updateBulkBar();
+    }
+  });
+  // Escape: exit bulk mode first, then close modals
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){
+      if(bulkMode){ exitBulkMode(); return; }
+      closeAllModals();
+    }
+  });
   // details actions
   $('#detail-save').addEventListener('click',saveDetails);
   $('#detail-delete').addEventListener('click',deletePerson);
@@ -4043,6 +4129,14 @@ function registerSW(){
 function init(){
   try{ loadState(); }catch(e){}
   USERS.forEach(u=>ensureBuckets(u.id));
+  // Restore date column visibility from saved state
+  if(state.settings.showDateCol){
+    document.body.classList.add('show-date');
+    const eyeBtn=$('#tb-toggle-date');
+    if(eyeBtn) eyeBtn.classList.add('is-active-eye');
+    const slash=$('#eye-slash');
+    if(slash) slash.style.display='none';
+  }
   renderHeader();
   renderList();
   attachEvents();
