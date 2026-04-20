@@ -76,11 +76,11 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .chip[data-gender="F"].is-active{background:rgba(236,72,153,.15);color:var(--lily-hi);border-color:rgba(236,72,153,.35)}
 
 .list-wrap{margin-top:14px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-sm)}
-.list-head{display:grid;grid-template-columns:52px 1fr 58px 148px;align-items:center;gap:8px;padding:12px 12px;background:linear-gradient(180deg,rgba(255,255,255,.02),transparent);border-bottom:1px solid var(--border);font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--text-3);text-transform:uppercase}
+.list-head{display:grid;grid-template-columns:52px 1fr 58px;align-items:center;gap:8px;padding:12px 12px;background:linear-gradient(180deg,rgba(255,255,255,.02),transparent);border-bottom:1px solid var(--border);font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--text-3);text-transform:uppercase}
 .list-head .sort-btn{display:inline-flex;align-items:center;gap:4px;color:var(--amber)}
 .list-head .sort-btn svg{width:10px;height:10px}
 
-.row{display:grid;grid-template-columns:52px 1fr 58px 148px;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border-soft);transition:background .12s}
+.row{display:grid;grid-template-columns:52px 1fr 58px;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border-soft);transition:background .12s}
 .row:last-child{border-bottom:none}
 .row:active{background:var(--card-hover)}
 .row-rank{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:15px;font-weight:700;color:var(--text);position:relative}
@@ -543,7 +543,6 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
       <div style="text-align:center">#</div>
       <button class="sort-btn" id="sort-name" style="justify-self:start">PERSONNE</button>
       <button class="sort-btn" id="sort-elo" style="justify-self:center">ELO</button>
-      <div style="text-align:center">AJOUTÉ</div>
     </div>
     <div id="list-body"></div>
   </div>
@@ -796,110 +795,110 @@ const TMDB_IMG = 'https://image.tmdb.org/t/p/w500';
 /* ============ PREDEFINED LISTS ============ */
 const PRESET_LISTS = [
   {
-    id: "top98-plastique",
-    label: "Top 98 · Belle plastique",
-    desc: "Sélection orientée sex-symbols, glamour, photogénie et impact visuel, sans angle 'belle âme'. 49 femmes et 49 hommes.",
+    id: "top100-beauty",
+    label: "Top 100 · Beauté de tous les temps",
+    desc: "50 femmes et 50 hommes universellement reconnus pour leur beauté iconique, des golden ages d'Hollywood à aujourd'hui.",
     entries: [
       // ── FEMMES (49) ──
-      { tmdbId:  61696, name:"Brigitte Bardot", gender:"F" },
+      { tmdbId:1373737, name:"Audrey Hepburn", gender:"F" },
       { tmdbId:   3122, name:"Marilyn Monroe", gender:"F" },
-      { tmdbId:   3072, name:"Raquel Welch", gender:"F" },
-      { tmdbId:  54812, name:"Sophia Loren", gender:"F" },
-      { tmdbId:  19537, name:"Monica Bellucci", gender:"F" },
-      { tmdbId:   1551, name:"Angelina Jolie", gender:"F" },
-      { tmdbId:  21462, name:"Salma Hayek", gender:"F" },
-      { tmdbId:  49533, name:"Megan Fox", gender:"F" },
-      { tmdbId:   1245, name:"Scarlett Johansson", gender:"F" },
-      { tmdbId:  58726, name:"Margot Robbie", gender:"F" },
-      { tmdbId:  67647, name:"Ana de Armas", gender:"F" },
-      { tmdbId:  18897, name:"Jessica Alba", gender:"F" },
-      { tmdbId:  57165, name:"Adriana Lima", gender:"F" },
-      { tmdbId:  75232, name:"Bella Hadid", gender:"F" },
-      { tmdbId:  62064, name:"Cindy Crawford", gender:"F" },
-      { tmdbId:  12052, name:"Naomi Campbell", gender:"F" },
-      { tmdbId:   7399, name:"Claudia Schiffer", gender:"F" },
-      { tmdbId:   2109, name:"Halle Berry", gender:"F" },
-      { tmdbId:  68203, name:"Gal Gadot", gender:"F" },
-      { tmdbId: 885531, name:"Sydney Sweeney", gender:"F" },
-      { tmdbId: 224513, name:"Zendaya", gender:"F" },
-      { tmdbId:  17483, name:"Catherine Zeta-Jones", gender:"F" },
-      { tmdbId:   1816, name:"Sharon Stone", gender:"F" },
-      { tmdbId:  19543, name:"Penélope Cruz", gender:"F" },
-      { tmdbId:   5081, name:"Nicole Kidman", gender:"F" },
-      { tmdbId:   5064, name:"Charlize Theron", gender:"F" },
-      { tmdbId:  15461, name:"Eva Mendes", gender:"F" },
-      { tmdbId:   1480, name:"Jennifer Lopez", gender:"F" },
-      { tmdbId:  56325, name:"Aishwarya Rai", gender:"F" },
-      { tmdbId:  57755, name:"Priyanka Chopra", gender:"F" },
-      { tmdbId:   8171, name:"Hedy Lamarr", gender:"F" },
-      { tmdbId:   8140, name:"Rita Hayworth", gender:"F" },
       { tmdbId:  10990, name:"Grace Kelly", gender:"F" },
       { tmdbId:   3093, name:"Elizabeth Taylor", gender:"F" },
-      { tmdbId:   4293, name:"Catherine Deneuve", gender:"F" },
-      { tmdbId:  14536, name:"Demi Moore", gender:"F" },
-      { tmdbId:  17208, name:"Eva Green", gender:"F" },
-      { tmdbId:   2231, name:"Beyoncé", gender:"F" },
-      { tmdbId:  51329, name:"Rihanna", gender:"F" },
-      { tmdbId:  72129, name:"Lupita Nyong'o", gender:"F" },
-      { tmdbId:  24045, name:"Kate Winslet", gender:"F" },
-      { tmdbId:   1461, name:"Jennifer Aniston", gender:"F" },
-      { tmdbId: 1373737, name:"Audrey Hepburn", gender:"F" },
-      { tmdbId:   3087, name:"Vivien Leigh", gender:"F" },
-      { tmdbId:  26472, name:"Rosario Dawson", gender:"F" },
+      { tmdbId:  54812, name:"Sophia Loren", gender:"F" },
+      { tmdbId:  61696, name:"Brigitte Bardot", gender:"F" },
       { tmdbId:  11701, name:"Ingrid Bergman", gender:"F" },
+      { tmdbId:   8171, name:"Hedy Lamarr", gender:"F" },
+      { tmdbId:   8140, name:"Rita Hayworth", gender:"F" },
+      { tmdbId:   3087, name:"Vivien Leigh", gender:"F" },
+      { tmdbId:   3072, name:"Raquel Welch", gender:"F" },
+      { tmdbId:   1245, name:"Scarlett Johansson", gender:"F" },
       { tmdbId:   3230, name:"Natalie Portman", gender:"F" },
+      { tmdbId:   5064, name:"Charlize Theron", gender:"F" },
+      { tmdbId:   1551, name:"Angelina Jolie", gender:"F" },
+      { tmdbId:   2109, name:"Halle Berry", gender:"F" },
+      { tmdbId:  19537, name:"Monica Bellucci", gender:"F" },
+      { tmdbId:  19543, name:"Penélope Cruz", gender:"F" },
+      { tmdbId: 224513, name:"Zendaya", gender:"F" },
+      { tmdbId:  49533, name:"Megan Fox", gender:"F" },
+      { tmdbId:  58726, name:"Margot Robbie", gender:"F" },
+      { tmdbId:  21462, name:"Salma Hayek", gender:"F" },
+      { tmdbId:  17483, name:"Catherine Zeta-Jones", gender:"F" },
+      { tmdbId:   5081, name:"Nicole Kidman", gender:"F" },
       { tmdbId:   1907, name:"Cate Blanchett", gender:"F" },
+      { tmdbId:  68203, name:"Gal Gadot", gender:"F" },
+      { tmdbId:   1480, name:"Jennifer Lopez", gender:"F" },
+      { tmdbId:   2231, name:"Beyoncé", gender:"F" },
+      { tmdbId:  72129, name:"Lupita Nyong'o", gender:"F" },
+      { tmdbId:  57755, name:"Priyanka Chopra", gender:"F" },
+      { tmdbId:  56325, name:"Aishwarya Rai", gender:"F" },
+      { tmdbId:  51329, name:"Rihanna", gender:"F" },
+      { tmdbId:  15461, name:"Eva Mendes", gender:"F" },
+      { tmdbId:  18897, name:"Jessica Alba", gender:"F" },
+      { tmdbId:  67647, name:"Ana de Armas", gender:"F" },
+      { tmdbId:   1461, name:"Jennifer Aniston", gender:"F" },
+      { tmdbId:  57165, name:"Adriana Lima", gender:"F" },
+      { tmdbId: 885531, name:"Sydney Sweeney", gender:"F" },
       { tmdbId: 115440, name:"Taylor Swift", gender:"F" },
+      { tmdbId:  24045, name:"Kate Winslet", gender:"F" },
+      { tmdbId:  14536, name:"Demi Moore", gender:"F" },
+      { tmdbId:  75232, name:"Bella Hadid", gender:"F" },
+      { tmdbId:   7399, name:"Claudia Schiffer", gender:"F" },
+      { tmdbId:  62064, name:"Cindy Crawford", gender:"F" },
+      { tmdbId:  12052, name:"Naomi Campbell", gender:"F" },
+      { tmdbId:  17208, name:"Eva Green", gender:"F" },
+      { tmdbId:   1816, name:"Sharon Stone", gender:"F" },
+      { tmdbId:   4293, name:"Catherine Deneuve", gender:"F" },
+      { tmdbId:  26472, name:"Rosario Dawson", gender:"F" },
       // ── HOMMES (49) ──
-      { tmdbId:   1333, name:"Alain Delon", gender:"M" },
-      { tmdbId:  74568, name:"Henry Cavill", gender:"M" },
-      { tmdbId:   9780, name:"Jude Law", gender:"M" },
-      { tmdbId:   2232, name:"Brad Pitt", gender:"M" },
-      { tmdbId:   1100, name:"Paul Newman", gender:"M" },
       { tmdbId:   3899, name:"Cary Grant", gender:"M" },
-      { tmdbId:  16483, name:"Sean Connery", gender:"M" },
-      { tmdbId:   9993, name:"Omar Sharif", gender:"M" },
-      { tmdbId:   2037, name:"Robert Redford", gender:"M" },
-      { tmdbId:   3895, name:"Clark Gable", gender:"M" },
-      { tmdbId:  17419, name:"Antonio Banderas", gender:"M" },
-      { tmdbId:   6968, name:"Pierce Brosnan", gender:"M" },
-      { tmdbId:    976, name:"Jason Momoa", gender:"M" },
-      { tmdbId:  71580, name:"Chris Hemsworth", gender:"M" },
-      { tmdbId:  53638, name:"Ryan Gosling", gender:"M" },
-      { tmdbId: 468944, name:"Michael B. Jordan", gender:"M" },
-      { tmdbId:  17605, name:"Idris Elba", gender:"M" },
-      { tmdbId: 1136406, name:"Jacob Elordi", gender:"M" },
-      { tmdbId: 1625558, name:"Timothée Chalamet", gender:"M" },
-      { tmdbId:  10297, name:"Rodrigo Santoro", gender:"M" },
-      { tmdbId:  15170, name:"Orlando Bloom", gender:"M" },
-      { tmdbId:  35742, name:"Liam Hemsworth", gender:"M" },
-      { tmdbId:  16828, name:"Chris Evans", gender:"M" },
-      { tmdbId:   6384, name:"Keanu Reeves", gender:"M" },
-      { tmdbId:   6193, name:"Leonardo DiCaprio", gender:"M" },
-      { tmdbId:   3143, name:"Hugh Jackman", gender:"M" },
-      { tmdbId:  45332, name:"Jake Gyllenhaal", gender:"M" },
-      { tmdbId:  30614, name:"Ryan Reynolds", gender:"M" },
-      { tmdbId:   2524, name:"Michael Fassbender", gender:"M" },
-      { tmdbId:   2888, name:"Johnny Depp", gender:"M" },
-      { tmdbId:   9273, name:"Tyrone Power", gender:"M" },
-      { tmdbId:   9342, name:"Rock Hudson", gender:"M" },
-      { tmdbId:   7605, name:"Steve McQueen", gender:"M" },
-      { tmdbId:  17468, name:"Viggo Mortensen", gender:"M" },
-      { tmdbId:   2090, name:"George Clooney", gender:"M" },
-      { tmdbId:   8613, name:"Cary Grant", gender:"M" },
-      { tmdbId:   8691, name:"Gregory Peck", gender:"M" },
+      { tmdbId:   1100, name:"Paul Newman", gender:"M" },
       { tmdbId:   4110, name:"Marlon Brando", gender:"M" },
       { tmdbId:  18996, name:"James Dean", gender:"M" },
-      { tmdbId:    500, name:"Tom Cruise", gender:"M" },
-      { tmdbId:   3223, name:"Robert Downey Jr.", gender:"M" },
-      { tmdbId:  33276, name:"Rami Malek", gender:"M" },
-      { tmdbId:  19293, name:"Jared Leto", gender:"M" },
-      { tmdbId:   5064, name:"Javier Bardem", gender:"M" },
+      { tmdbId:   2232, name:"Brad Pitt", gender:"M" },
+      { tmdbId:   2090, name:"George Clooney", gender:"M" },
+      { tmdbId:   6384, name:"Keanu Reeves", gender:"M" },
+      { tmdbId:   3895, name:"Clark Gable", gender:"M" },
+      { tmdbId:   1333, name:"Alain Delon", gender:"M" },
+      { tmdbId:   9993, name:"Omar Sharif", gender:"M" },
+      { tmdbId:   2037, name:"Robert Redford", gender:"M" },
+      { tmdbId:  16483, name:"Sean Connery", gender:"M" },
+      { tmdbId:   9273, name:"Tyrone Power", gender:"M" },
+      { tmdbId:   7605, name:"Steve McQueen", gender:"M" },
+      { tmdbId:  17419, name:"Antonio Banderas", gender:"M" },
+      { tmdbId:   6968, name:"Pierce Brosnan", gender:"M" },
+      { tmdbId:   9780, name:"Jude Law", gender:"M" },
+      { tmdbId:  74568, name:"Henry Cavill", gender:"M" },
+      { tmdbId:1136406, name:"Jacob Elordi", gender:"M" },
+      { tmdbId:1625558, name:"Timothée Chalamet", gender:"M" },
       { tmdbId:   8784, name:"Denzel Washington", gender:"M" },
+      { tmdbId: 468944, name:"Michael B. Jordan", gender:"M" },
       { tmdbId:   1813, name:"Will Smith", gender:"M" },
-      { tmdbId:  37625, name:"Paul Mescal", gender:"M" },
-      { tmdbId:   5292, name:"Warren Beatty", gender:"M" },
+      { tmdbId:  17605, name:"Idris Elba", gender:"M" },
+      { tmdbId:  16828, name:"Chris Evans", gender:"M" },
       { tmdbId:   3784, name:"Harrison Ford", gender:"M" },
+      { tmdbId:   6193, name:"Leonardo DiCaprio", gender:"M" },
+      { tmdbId:   3143, name:"Hugh Jackman", gender:"M" },
+      { tmdbId:   2888, name:"Johnny Depp", gender:"M" },
+      { tmdbId:  53638, name:"Ryan Gosling", gender:"M" },
+      { tmdbId:  71580, name:"Chris Hemsworth", gender:"M" },
+      { tmdbId:   5292, name:"Warren Beatty", gender:"M" },
+      { tmdbId:   3223, name:"Robert Downey Jr.", gender:"M" },
+      { tmdbId:    500, name:"Tom Cruise", gender:"M" },
+      { tmdbId:  17468, name:"Viggo Mortensen", gender:"M" },
+      { tmdbId:   9342, name:"Rock Hudson", gender:"M" },
+      { tmdbId:   2524, name:"Michael Fassbender", gender:"M" },
+      { tmdbId:   5064, name:"Javier Bardem", gender:"M" },
+      { tmdbId:  10297, name:"Rodrigo Santoro", gender:"M" },
+      { tmdbId:    976, name:"Jason Momoa", gender:"M" },
+      { tmdbId:  33276, name:"Rami Malek", gender:"M" },
+      { tmdbId:  15170, name:"Orlando Bloom", gender:"M" },
+      { tmdbId:  30614, name:"Ryan Reynolds", gender:"M" },
+      { tmdbId:  45332, name:"Jake Gyllenhaal", gender:"M" },
+      { tmdbId:  35742, name:"Liam Hemsworth", gender:"M" },
+      { tmdbId:  19293, name:"Jared Leto", gender:"M" },
+      { tmdbId:   8691, name:"Gregory Peck", gender:"M" },
+      { tmdbId:   8613, name:"Cary Grant", gender:"M" },
+      { tmdbId:  37625, name:"Paul Mescal", gender:"M" },
     ]
   }
 ];
@@ -1558,11 +1557,9 @@ function initListsOnce(){
   const grid=$('#lists-grid');
   if(!grid){ console.warn('[Lists] #lists-grid introuvable'); return; }
   if(!PRESET_LISTS || !PRESET_LISTS.length){ grid.innerHTML='<div class="empty-state"><p>Aucune liste disponible</p></div>'; return; }
-  // Dedup by name (lowercased) rather than by tmdbId — the hardcoded tmdbIds
-  // in PRESET_LISTS are unreliable and get resolved by name at import time.
-  const existingNames=new Set(state.people.map(p=>(p.name||'').trim().toLowerCase()).filter(Boolean));
+  const existingTmdbIds=new Set(state.people.map(p=>p.tmdbId).filter(Boolean));
   grid.innerHTML=PRESET_LISTS.map(lst=>{
-    const newCount=lst.entries.filter(e=>!existingNames.has((e.name||'').trim().toLowerCase())).length;
+    const newCount=lst.entries.filter(e=>!existingTmdbIds.has(e.tmdbId)).length;
     const total=lst.entries.length;
     return `<div style="padding:14px;background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius)">
       <div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:4px">${esc(lst.label)}</div>
@@ -1583,32 +1580,9 @@ function initListsOnce(){
   }));
 }
 
-/* Resolve a preset entry to a real TMDb person ID by searching by name.
-   The hardcoded tmdbId in PRESET_LISTS is unreliable (many are wrong), so we
-   ignore it and trust the name instead. TMDb /search/person returns results
-   sorted by popularity, so the first match for a famous name is almost always
-   the right person. If a gender hint is provided, we prefer the first result
-   whose gender matches (TMDb: 1=F, 2=M). */
-async function resolveTmdbIdByName(entry){
-  const d=await tmdbFetch('/search/person',{query:entry.name,include_adult:'false'});
-  const results=(d&&d.results)||[];
-  if(!results.length) return null;
-  if(entry.gender){
-    const wantCode=entry.gender==='F'?1:entry.gender==='M'?2:null;
-    if(wantCode){
-      const match=results.find(r=>r.gender===wantCode);
-      if(match) return match.id;
-    }
-  }
-  return results[0].id;
-}
-
 async function importPresetList(lst, triggerBtn){
   const existingTmdbIds=new Set(state.people.map(p=>p.tmdbId).filter(Boolean));
-  const existingNames=new Set(state.people.map(p=>(p.name||'').trim().toLowerCase()).filter(Boolean));
-  // Skip entries whose name is already in the bank (name-based dedup since
-  // the hardcoded tmdbIds can't be trusted for dedup).
-  const toImport=lst.entries.filter(e=>!existingNames.has((e.name||'').trim().toLowerCase()));
+  const toImport=lst.entries.filter(e=>!existingTmdbIds.has(e.tmdbId));
   if(!toImport.length){ toast('Toutes ces personnes sont déjà dans ta banque','ok'); return; }
 
   const progEl=$('#lists-progress');
@@ -1628,28 +1602,21 @@ async function importPresetList(lst, triggerBtn){
   for(let i=0;i<toImport.length;i++){
     const entry=toImport[i];
     setProgress(i,toImport.length,entry.name);
+    // Skip if already added during this batch
+    if(state.people.some(p=>p.tmdbId===entry.tmdbId)){ continue; }
     try{
-      // Step 1: resolve the real TMDb ID from the name (the hardcoded
-      // entry.tmdbId is unreliable and deliberately ignored).
-      const resolvedId=await resolveTmdbIdByName(entry);
-      if(!resolvedId){ failed++; continue; }
-      // Skip if this resolved person is already in the bank or was just added
-      // in this batch (protects against name duplicates like "Cary Grant" x2).
-      if(existingTmdbIds.has(resolvedId) || state.people.some(p=>p.tmdbId===resolvedId)){ continue; }
-      // Step 2: fetch the full person record using the resolved ID.
-      const f=await tmdbFetch('/person/'+resolvedId,{append_to_response:'images'});
+      const f=await tmdbFetch('/person/'+entry.tmdbId,{append_to_response:'images'});
       const g=f.gender===1?'F':f.gender===2?'M':(entry.gender||'F');
       const ph=(f.images?.profiles||[]).map(x=>TMDB_IMG+x.file_path);
       const main=f.profile_path?(TMDB_IMG+f.profile_path):(ph[0]||null);
       const yr=f.birthday?parseInt(f.birthday.slice(0,4)):null;
       state.people.push({
-        id:uid(), tmdbId:resolvedId, name:f.name, gender:g,
+        id:uid(), tmdbId:entry.tmdbId, name:f.name, gender:g,
         mainPhoto:main, photos:ph.length?ph:(main?[main]:[]),
         birthday:yr, nationality:f.place_of_birth||null,
         profession:f.known_for_department||null, bio:f.biography||null,
         addedAt:Date.now()
       });
-      existingTmdbIds.add(resolvedId);
       added++;
       if(added%20===0){ const ok=saveState(); if(!ok){ toast('Stockage saturé après '+added+' personnes','err'); break; } }
     }catch(err){ failed++; }
@@ -1684,15 +1651,7 @@ function filterPeople(){
     if(f==='F'&&p.gender!=='F') return false;
     if(f==='fav'&&!state.favorites[u]?.[p.id]) return false;
     if(q){
-      const elo=getElo(u,p.id);
-      const eloRounded=Math.round(elo);
-      const h=(
-        (p.name||'')+' '+
-        (p.profession||'')+' '+
-        (p.nationality||'')+' '+
-        String(elo)+' '+
-        String(eloRounded)
-      ).toLowerCase();
+      const h=(p.name+' '+(p.profession||'')+' '+(p.nationality||'')).toLowerCase();
       if(!h.includes(q)) return false;
     }
     return true;
@@ -1735,19 +1694,10 @@ function renderList(){
   body.innerHTML=sorted.map((p,i)=>{
     const el=state.elo[u]?.[p.id]??1500;
     const th=p.mainPhoto?`<img class="thumb" loading="lazy" src="${esc(p.mainPhoto)}" onerror="this.outerHTML='&lt;div class=&quot;thumb placeholder&quot;&gt;?&lt;/div&gt;'">`:`<div class="thumb placeholder">?</div>`;
-    let tsHtml='<div style="font-size:10px;color:var(--text-4);text-align:center;line-height:1.5">—</div>';
-    if(p.addedAt){
-      const d=new Date(p.addedAt);
-      const pad=n=>String(n).padStart(2,'0');
-      const date=`${d.getFullYear()}/${pad(d.getMonth()+1)}/${pad(d.getDate())}`;
-      const time=`${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-      tsHtml=`<div style="font-size:10px;color:var(--text-3);text-align:center;line-height:1.5;font-variant-numeric:tabular-nums">${date}<br>${time}</div>`;
-    }
     return `<div class="row" data-open="${p.id}">
       <div style="text-align:center;font-weight:700;font-size:14px">${i+1}</div>
       <div class="row-main">${th}<div class="row-info"><div class="row-name">${esc(p.name)}</div></div></div>
       <div class="row-elo">${el}<small>ELO</small></div>
-      ${tsHtml}
     </div>`;
   }).join('');
 }
@@ -2712,16 +2662,9 @@ function renderBracketHtml(t){
         const p=state.people.find(x=>x.id===id);
         if(!p) return '<div class="bracket-slot is-tbd"><span class="bs-name">?</span></div>';
         const win=m.winner===id;
-        let eloBadge='';
-        if(m.winner && m.eloDeltas && m.eloDeltas[id]!==undefined){
-          const delta=m.eloDeltas[id];
-          const sign=delta>=0?'+':'';
-          const color=delta>=0?'var(--green)':'var(--coral)';
-          eloBadge=`<span style="color:${color};font-size:10px;font-weight:700;margin-left:4px;white-space:nowrap">(${sign}${delta})</span>`;
-        }
         return `<div class="bracket-slot ${win?'is-winner':''}">
           ${p.mainPhoto?`<img src="${esc(p.mainPhoto)}" onerror="this.style.display='none'">`:''}
-          <span class="bs-name">${esc(p.name)}</span>${eloBadge}
+          <span class="bs-name">${esc(p.name)}</span>
         </div>`;
       };
       return `<div class="bracket-match ${cur?'is-current':''}">${slot(m.a)}${slot(m.b)}</div>`;
@@ -2737,13 +2680,7 @@ function tourAdvance(winId){
   const m=r.matches[t.currentMatch];
   m.winner=winId;
   const loseId=m.a===winId?m.b:m.a;
-  // Capture ELO before update to compute delta
-  const eloWBefore=getElo(u,winId);
-  const eloLBefore=getElo(u,loseId);
   updateElo(u,winId,loseId);
-  const eloWAfter=getElo(u,winId);
-  const eloLAfter=getElo(u,loseId);
-  m.eloDeltas={ [winId]: eloWAfter-eloWBefore, [loseId]: eloLAfter-eloLBefore };
   state.duels[u]=(state.duels[u]||0)+1;
   state.duelHistory[u]=state.duelHistory[u]||[];
   state.duelHistory[u].push({ winnerId:winId, loserId:loseId, t:Date.now(), source:'tournament' });
@@ -2774,24 +2711,6 @@ function renderTourPodium(){
     const loser=sm.winner===sm.a?sm.b:sm.a;
     return state.people.find(p=>p.id===loser);
   }).filter(Boolean);
-
-  // Compute total ELO delta per participant across all tournament matches
-  const totalDeltas={};
-  t.rounds.forEach(r=>r.matches.forEach(m=>{
-    if(m.winner && m.eloDeltas){
-      Object.entries(m.eloDeltas).forEach(([pid,delta])=>{
-        totalDeltas[pid]=(totalDeltas[pid]||0)+delta;
-      });
-    }
-  }));
-  const eloBadge=(pid)=>{
-    if(totalDeltas[pid]===undefined) return '';
-    const d=totalDeltas[pid];
-    const sign=d>=0?'+':'';
-    const color=d>=0?'var(--green)':'var(--coral)';
-    return `<span style="color:${color};font-size:12px;font-weight:700;margin-left:6px">(${sign}${d})</span>`;
-  };
-
   $('#tour-title').textContent='Podium';
   $('#tour-sub').textContent='Tournoi terminé';
   $('#tour-body').innerHTML=`
@@ -2803,16 +2722,16 @@ function renderTourPodium(){
       <div class="note-card" style="--user-color:#FBBF24">
         <div class="nc-label">🥇 Or</div>
         ${champ?.mainPhoto?`<img src="${esc(champ.mainPhoto)}" style="width:80px;height:110px;margin:8px auto;border-radius:10px;object-fit:cover" onerror="this.style.display='none'">`:''}
-        <div style="font-size:14px;font-weight:800">${esc(champ?.name||'?')}${champ?eloBadge(champ.id):''}</div>
+        <div style="font-size:14px;font-weight:800">${esc(champ?.name||'?')}</div>
       </div>
       <div class="note-card" style="--user-color:#C0C4D1">
         <div class="nc-label">🥈 Argent</div>
         ${finalLoser?.mainPhoto?`<img src="${esc(finalLoser.mainPhoto)}" style="width:80px;height:110px;margin:8px auto;border-radius:10px;object-fit:cover" onerror="this.style.display='none'">`:''}
-        <div style="font-size:14px;font-weight:800">${esc(finalLoser?.name||'?')}${finalLoser?eloBadge(finalLoser.id):''}</div>
+        <div style="font-size:14px;font-weight:800">${esc(finalLoser?.name||'?')}</div>
       </div>
     </div>
     ${thirds.length?`<div style="margin-bottom:14px"><h3 style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);margin-bottom:8px">🥉 Demi-finalistes</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${thirds.map(p=>`
-      <div class="top-item">${p.mainPhoto?`<img src="${esc(p.mainPhoto)}" onerror="this.style.display='none'">`:`<div style="width:30px;height:42px;background:var(--bg-3);border-radius:6px"></div>`}<div class="nm">${esc(p.name)}${eloBadge(p.id)}</div></div>
+      <div class="top-item">${p.mainPhoto?`<img src="${esc(p.mainPhoto)}" onerror="this.style.display='none'">`:`<div style="width:30px;height:42px;background:var(--bg-3);border-radius:6px"></div>`}<div class="nm">${esc(p.name)}</div></div>
     `).join('')}</div></div>`:''}
     <div style="margin-top:14px"><h3 style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);margin-bottom:8px">Bracket complet</h3>${renderBracketHtml(t)}</div>
     <div style="margin-top:14px"><button class="btn btn-primary btn-block" data-close>Terminer</button></div>
