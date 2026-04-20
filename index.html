@@ -623,6 +623,11 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
           <div class="field full"><label>Bio courte</label><textarea id="m-bio" placeholder="Univers, parcours..."></textarea></div>
         </div>
       </div>
+      <div data-panel="lists" hidden>
+        <p class="search-hint" style="margin-bottom:12px">Importe une liste prédéfinie de personnes via TMDb. Les personnes déjà dans ta banque (même TMDb ID) sont automatiquement ignorées.</p>
+        <div id="lists-grid" style="display:flex;flex-direction:column;gap:8px;min-height:40px"></div>
+        <div id="lists-progress" style="margin-top:12px"></div>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" data-close>Annuler</button>
@@ -1133,15 +1138,33 @@ function toast(msg,kind=''){ const t=$('#toast'); t.textContent=msg; t.className
 
 /* ====== Data management helpers ====== */
 function downloadJson(obj, filename){
-  const blob = new Blob([JSON.stringify(obj,null,2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = filename;
-  a.style.display = 'none';
-  document.body.appendChild(a);
-  a.click();
-  // Delay revoke so Android has time to initiate the download
-  setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 2000);
+  // Use data URI instead of blob URL — more reliable on Android Chrome
+  // (blob URLs can be truncated before the download completes on mobile)
+  try {
+    const json = JSON.stringify(obj, null, 2);
+    // btoa only handles latin1; use TextEncoder + base64 for full Unicode support
+    const bytes = new TextEncoder().encode(json);
+    const binary = Array.from(bytes).reduce((s,b)=>s+String.fromCharCode(b),'');
+    const b64 = btoa(binary);
+    const dataUri = 'data:application/json;base64,' + b64;
+    const a = document.createElement('a');
+    a.href = dataUri;
+    a.download = filename;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>a.remove(), 500);
+  } catch(e) {
+    // Fallback to blob if data URI fails (e.g. file too large for data URI)
+    const blob = new Blob([JSON.stringify(obj,null,2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 3000);
+  }
 }
 function countUploadedPhotos(){
   let n = 0;
@@ -1493,7 +1516,8 @@ async function wikiHydrate(qid){
 function initListsOnce(){
   // Appelé à chaque affichage de l'onglet — re-rend toujours (le compteur change après import)
   const grid=$('#lists-grid');
-  if(!grid) return;
+  if(!grid){ console.warn('[Lists] #lists-grid introuvable'); return; }
+  if(!PRESET_LISTS || !PRESET_LISTS.length){ grid.innerHTML='<div class="empty-state"><p>Aucune liste disponible</p></div>'; return; }
   const existingTmdbIds=new Set(state.people.map(p=>p.tmdbId).filter(Boolean));
   grid.innerHTML=PRESET_LISTS.map(lst=>{
     const newCount=lst.entries.filter(e=>!existingTmdbIds.has(e.tmdbId)).length;
@@ -2082,6 +2106,8 @@ function openAdd(){
   $$('#modal-add [data-panel]').forEach(p=>p.hidden=p.getAttribute('data-panel')!=='tmdb');
   const saveBtn = $('#add-manual-save');
   if(saveBtn) saveBtn.hidden = true;
+  // Pre-render lists panel so it's ready when the tab is clicked
+  initListsOnce();
   openModal('modal-add');
 }
 
@@ -3633,10 +3659,3 @@ if(document.readyState==='loading'){
 </script>
 </body>
 </html>
-      <div data-panel="lists" hidden>
-        <div class="search-hint" style="margin-bottom:12px">
-          Importe une liste prédéfinie de personnes depuis TMDb. Les personnes déjà présentes dans ta banque (même TMDb ID) sont ignorées automatiquement — aucun doublon ne sera créé.
-        </div>
-        <div id="lists-grid" style="display:flex;flex-direction:column;gap:8px"></div>
-        <div id="lists-progress" style="margin-top:12px"></div>
-      </div>
