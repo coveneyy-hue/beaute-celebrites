@@ -1557,9 +1557,11 @@ function initListsOnce(){
   const grid=$('#lists-grid');
   if(!grid){ console.warn('[Lists] #lists-grid introuvable'); return; }
   if(!PRESET_LISTS || !PRESET_LISTS.length){ grid.innerHTML='<div class="empty-state"><p>Aucune liste disponible</p></div>'; return; }
-  const existingTmdbIds=new Set(state.people.map(p=>p.tmdbId).filter(Boolean));
+  // Dedup by name (lowercased) rather than by tmdbId — the hardcoded tmdbIds
+  // in PRESET_LISTS are unreliable and get resolved by name at import time.
+  const existingNames=new Set(state.people.map(p=>(p.name||'').trim().toLowerCase()).filter(Boolean));
   grid.innerHTML=PRESET_LISTS.map(lst=>{
-    const newCount=lst.entries.filter(e=>!existingTmdbIds.has(e.tmdbId)).length;
+    const newCount=lst.entries.filter(e=>!existingNames.has((e.name||'').trim().toLowerCase())).length;
     const total=lst.entries.length;
     return `<div style="padding:14px;background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius)">
       <div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:4px">${esc(lst.label)}</div>
@@ -1580,9 +1582,32 @@ function initListsOnce(){
   }));
 }
 
+/* Resolve a preset entry to a real TMDb person ID by searching by name.
+   The hardcoded tmdbId in PRESET_LISTS is unreliable (many are wrong), so we
+   ignore it and trust the name instead. TMDb /search/person returns results
+   sorted by popularity, so the first match for a famous name is almost always
+   the right person. If a gender hint is provided, we prefer the first result
+   whose gender matches (TMDb: 1=F, 2=M). */
+async function resolveTmdbIdByName(entry){
+  const d=await tmdbFetch('/search/person',{query:entry.name,include_adult:'false'});
+  const results=(d&&d.results)||[];
+  if(!results.length) return null;
+  if(entry.gender){
+    const wantCode=entry.gender==='F'?1:entry.gender==='M'?2:null;
+    if(wantCode){
+      const match=results.find(r=>r.gender===wantCode);
+      if(match) return match.id;
+    }
+  }
+  return results[0].id;
+}
+
 async function importPresetList(lst, triggerBtn){
   const existingTmdbIds=new Set(state.people.map(p=>p.tmdbId).filter(Boolean));
-  const toImport=lst.entries.filter(e=>!existingTmdbIds.has(e.tmdbId));
+  const existingNames=new Set(state.people.map(p=>(p.name||'').trim().toLowerCase()).filter(Boolean));
+  // Skip entries whose name is already in the bank (name-based dedup since
+  // the hardcoded tmdbIds can't be trusted for dedup).
+  const toImport=lst.entries.filter(e=>!existingNames.has((e.name||'').trim().toLowerCase()));
   if(!toImport.length){ toast('Toutes ces personnes sont déjà dans ta banque','ok'); return; }
 
   const progEl=$('#lists-progress');
@@ -1602,21 +1627,28 @@ async function importPresetList(lst, triggerBtn){
   for(let i=0;i<toImport.length;i++){
     const entry=toImport[i];
     setProgress(i,toImport.length,entry.name);
-    // Skip if already added during this batch
-    if(state.people.some(p=>p.tmdbId===entry.tmdbId)){ continue; }
     try{
-      const f=await tmdbFetch('/person/'+entry.tmdbId,{append_to_response:'images'});
+      // Step 1: resolve the real TMDb ID from the name (the hardcoded
+      // entry.tmdbId is unreliable and deliberately ignored).
+      const resolvedId=await resolveTmdbIdByName(entry);
+      if(!resolvedId){ failed++; continue; }
+      // Skip if this resolved person is already in the bank or was just added
+      // in this batch (protects against name duplicates like "Cary Grant" x2).
+      if(existingTmdbIds.has(resolvedId) || state.people.some(p=>p.tmdbId===resolvedId)){ continue; }
+      // Step 2: fetch the full person record using the resolved ID.
+      const f=await tmdbFetch('/person/'+resolvedId,{append_to_response:'images'});
       const g=f.gender===1?'F':f.gender===2?'M':(entry.gender||'F');
       const ph=(f.images?.profiles||[]).map(x=>TMDB_IMG+x.file_path);
       const main=f.profile_path?(TMDB_IMG+f.profile_path):(ph[0]||null);
       const yr=f.birthday?parseInt(f.birthday.slice(0,4)):null;
       state.people.push({
-        id:uid(), tmdbId:entry.tmdbId, name:f.name, gender:g,
+        id:uid(), tmdbId:resolvedId, name:f.name, gender:g,
         mainPhoto:main, photos:ph.length?ph:(main?[main]:[]),
         birthday:yr, nationality:f.place_of_birth||null,
         profession:f.known_for_department||null, bio:f.biography||null,
         addedAt:Date.now()
       });
+      existingTmdbIds.add(resolvedId);
       added++;
       if(added%20===0){ const ok=saveState(); if(!ok){ toast('Stockage saturé après '+added+' personnes','err'); break; } }
     }catch(err){ failed++; }
