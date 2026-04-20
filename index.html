@@ -440,6 +440,28 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--bg-3);border-radius:4px}
 
+/* ---- Local photos modal ---- */
+.lp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media(min-width:480px){.lp-grid{grid-template-columns:repeat(4,1fr)}}
+.lp-item{position:relative;border-radius:10px;overflow:hidden;background:var(--bg-3);border:2px solid transparent;cursor:pointer;transition:border-color .15s,transform .12s;aspect-ratio:2/3}
+.lp-item.selected{border-color:var(--amber);transform:scale(.97)}
+.lp-item img{width:100%;height:100%;object-fit:cover;display:block}
+.lp-item .lp-check{position:absolute;top:5px;right:5px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.55);border:1.5px solid rgba(255,255,255,.3);display:grid;place-items:center;transition:all .15s}
+.lp-item.selected .lp-check{background:var(--amber);border-color:var(--amber)}
+.lp-item .lp-check svg{width:12px;height:12px;color:#fff;opacity:0;transition:opacity .15s}
+.lp-item.selected .lp-check svg{opacity:1}
+.lp-item .lp-badge{position:absolute;top:5px;left:5px;padding:2px 7px;border-radius:999px;font-size:9.5px;font-weight:800;background:rgba(251,191,36,.9);color:#0B0F1E;letter-spacing:.02em}
+.lp-item .lp-meta{position:absolute;bottom:0;left:0;right:0;padding:20px 6px 6px;background:linear-gradient(transparent,rgba(0,0,0,.8));font-size:10px;color:rgba(255,255,255,.85);line-height:1.3}
+.lp-item .lp-name{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lp-item .lp-size{color:rgba(255,255,255,.55);font-size:9.5px}
+.lp-empty{padding:40px 20px;text-align:center;color:var(--text-3)}
+.lp-empty .big{font-size:32px;margin-bottom:8px;opacity:.6}
+.lp-empty h3{font-size:14px;font-weight:700;color:var(--text-2);margin-bottom:4px}
+.lp-empty p{font-size:12px}
+.lp-select-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:10px}
+.lp-select-bar .lp-sel-count{font-size:12.5px;font-weight:700;color:var(--text-2)}
+.lp-select-bar button{font-size:12px;font-weight:700;color:var(--amber);padding:6px 10px;border-radius:8px;background:var(--amber-soft);border:1px solid rgba(245,158,11,.25)}
+
 @media (max-width:380px){
   .toolbar{gap:7px}
   .tb-btn{width:42px;height:42px}
@@ -734,6 +756,20 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
     <div class="modal-footer">
       <button class="btn btn-ghost" data-close>Fermer</button>
       <button class="btn btn-primary" id="dupes-apply">Appliquer les choix</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modal-local-photos">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div><div class="modal-title">Photos locales</div><div class="modal-sub" id="lp-subtitle">Photos stockées sur cet appareil</div></div>
+      <button class="modal-close" data-close><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="modal-body" id="lp-body" style="padding:14px"></div>
+    <div class="modal-footer" id="lp-footer" style="display:flex;gap:10px;padding:12px 16px;border-top:1px solid var(--border);background:linear-gradient(180deg,transparent,rgba(0,0,0,.15))">
+      <button class="btn btn-ghost" data-close style="flex:1">Fermer</button>
+      <button class="btn btn-danger" id="lp-delete-btn" disabled style="flex:1.4">🗑️ Supprimer la sélection</button>
     </div>
   </div>
 </div>
@@ -2882,8 +2918,9 @@ function renderSettings(){
         <button class="btn" id="clear-uploaded-photos">🧹 Vider photos</button>
         <button class="btn" id="compress-uploads">🗜️ Compresser photos</button>
       </div>
-      <div style="display:grid;grid-template-columns:1fr;gap:8px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
         <button class="btn" id="find-dupes">🔍 Détecter les doublons</button>
+        <button class="btn" id="view-local-photos">🖼️ Photos locales</button>
       </div>
       <input id="import-file" type="file" accept="application/json,.json" hidden>
     </div>`;
@@ -3080,6 +3117,8 @@ function renderSettings(){
   });
   const findDupesBtn = $('#find-dupes');
   if(findDupesBtn) findDupesBtn.addEventListener('click', openDupesDialog);
+  const viewLocalPhotosBtn = $('#view-local-photos');
+  if(viewLocalPhotosBtn) viewLocalPhotosBtn.addEventListener('click', openLocalPhotosModal);
 }
 
 /* ============ SMART IMPORT ============ */
@@ -3587,6 +3626,134 @@ function applyDupesDecisions(){
     toast(`${deletedCount} supprimé${deletedCount>1?'s':''} mais sauvegarde échouée`,'err');
   } else {
     toast(`${deletedCount} doublon${deletedCount>1?'s':''} fusionné${deletedCount>1?'s':''} dans ${mergedCount} personne${mergedCount>1?'s':''}`,'ok');
+  }
+}
+
+/* ============ LOCAL PHOTOS MODAL ============ */
+function openLocalPhotosModal(){
+  renderLocalPhotos();
+  openModal('modal-local-photos');
+}
+
+function renderLocalPhotos(){
+  // Collect all data: photos with person info
+  const items = []; // { url, personId, personName, isMain }
+  state.people.forEach(p => {
+    const photos = Array.isArray(p.photos) ? p.photos : (p.mainPhoto ? [p.mainPhoto] : []);
+    const seen = new Set();
+    photos.forEach(url => {
+      if(typeof url === 'string' && url.startsWith('data:') && !seen.has(url)){
+        seen.add(url);
+        items.push({ url, personId: p.id, personName: p.name || '?', isMain: url === p.mainPhoto });
+      }
+    });
+    // mainPhoto may not be in photos array
+    if(p.mainPhoto && p.mainPhoto.startsWith('data:') && !seen.has(p.mainPhoto)){
+      items.push({ url: p.mainPhoto, personId: p.id, personName: p.name || '?', isMain: true });
+    }
+  });
+
+  const body = $('#lp-body');
+  const subtitle = $('#lp-subtitle');
+  if(subtitle) subtitle.textContent = items.length
+    ? `${items.length} photo${items.length>1?'s':''} stockée${items.length>1?'s':''} sur cet appareil`
+    : 'Photos stockées sur cet appareil';
+
+  let selected = new Set();
+
+  function approxKb(url){
+    // base64 is ~4/3 of raw bytes; subtract header (~20 chars)
+    const b64 = url.indexOf(',') >= 0 ? url.length - url.indexOf(',') - 1 : url.length;
+    const bytes = Math.floor(b64 * 0.75);
+    return bytes < 1024 ? bytes + ' o' : Math.round(bytes/1024) + ' Ko';
+  }
+
+  function refreshDeleteBtn(){
+    const btn = $('#lp-delete-btn');
+    if(!btn) return;
+    const n = selected.size;
+    btn.disabled = n === 0;
+    btn.textContent = n > 0
+      ? `🗑️ Supprimer ${n} photo${n>1?'s':''}`
+      : '🗑️ Supprimer la sélection';
+  }
+
+  function render(){
+    if(!items.length){
+      body.innerHTML = `<div class="lp-empty"><div class="big">📭</div><h3>Aucune photo locale</h3><p>Les photos uploadées depuis cet appareil apparaîtront ici.</p></div>`;
+      refreshDeleteBtn();
+      return;
+    }
+    const allSelected = selected.size === items.length;
+    body.innerHTML = `
+      <div class="lp-select-bar">
+        <span class="lp-sel-count">${selected.size > 0 ? selected.size + ' sélectionnée' + (selected.size>1?'s':'') : items.length + ' photo' + (items.length>1?'s':'')}</span>
+        <button id="lp-toggle-all">${allSelected ? 'Tout désélectionner' : 'Tout sélectionner'}</button>
+      </div>
+      <div class="lp-grid">
+        ${items.map((item,i) => {
+          const sel = selected.has(i);
+          return `<div class="lp-item ${sel?'selected':''}" data-idx="${i}">
+            <img src="${esc(item.url)}" loading="lazy" decoding="async">
+            ${item.isMain ? `<div class="lp-badge">⭐ Principale</div>` : ''}
+            <div class="lp-check"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="lp-meta">
+              <div class="lp-name">${esc(item.personName)}</div>
+              <div class="lp-size">${approxKb(item.url)}</div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`;
+
+    // Toggle all
+    $('#lp-toggle-all').addEventListener('click', () => {
+      if(allSelected){ selected.clear(); } else { items.forEach((_,i)=>selected.add(i)); }
+      render(); refreshDeleteBtn();
+    });
+
+    // Item click
+    $$('#lp-body .lp-item').forEach(el => {
+      el.addEventListener('click', () => {
+        const idx = parseInt(el.getAttribute('data-idx'));
+        if(selected.has(idx)) selected.delete(idx); else selected.add(idx);
+        el.classList.toggle('selected', selected.has(idx));
+        el.querySelector('.lp-check svg').style.opacity = selected.has(idx) ? '1' : '0';
+        const topBar = body.querySelector('.lp-sel-count');
+        if(topBar) topBar.textContent = selected.size > 0
+          ? selected.size + ' sélectionnée' + (selected.size>1?'s':'')
+          : items.length + ' photo' + (items.length>1?'s':'');
+        const toggleBtn = $('#lp-toggle-all');
+        if(toggleBtn) toggleBtn.textContent = selected.size === items.length ? 'Tout désélectionner' : 'Tout sélectionner';
+        refreshDeleteBtn();
+      });
+    });
+    refreshDeleteBtn();
+  }
+
+  render();
+
+  // Delete button
+  const deleteBtn = $('#lp-delete-btn');
+  if(deleteBtn){
+    // Remove old listener by replacing element
+    const newBtn = deleteBtn.cloneNode(true);
+    deleteBtn.parentNode.replaceChild(newBtn, deleteBtn);
+    newBtn.addEventListener('click', () => {
+      const n = selected.size;
+      if(!n) return;
+      if(!confirm(`Supprimer ${n} photo${n>1?'s':''} sélectionnée${n>1?'s':''} ?`)) return;
+      const toDelete = new Set([...selected].map(i => items[i].url));
+      state.people.forEach(p => {
+        if(p.mainPhoto && toDelete.has(p.mainPhoto)) p.mainPhoto = null;
+        if(Array.isArray(p.photos)){
+          p.photos = p.photos.filter(u => !toDelete.has(u));
+          if(!p.mainPhoto && p.photos.length) p.mainPhoto = p.photos[0];
+        }
+      });
+      saveState(); renderList(); renderSettings();
+      toast(`${n} photo${n>1?'s':''} supprimée${n>1?'s':''}`, 'ok');
+      openLocalPhotosModal(); // re-render
+    });
   }
 }
 
