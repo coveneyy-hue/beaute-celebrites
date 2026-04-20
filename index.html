@@ -54,9 +54,9 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .user-pill-name{font-size:13px;font-weight:700;letter-spacing:-.01em}
 .user-pill-chev{color:var(--text-3);width:10px;height:10px}
 
-.toolbar{display:flex;justify-content:center;gap:10px;margin:6px 0 16px;flex-wrap:wrap}
-.tb-btn{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:var(--card);border:1px solid var(--border);color:var(--text-2);transition:transform .1s,background .15s,color .15s,border-color .15s;position:relative}
-.tb-btn svg{width:22px;height:22px}
+.toolbar{display:flex;justify-content:center;gap:6px;margin:6px 0 16px;flex-wrap:nowrap;overflow-x:hidden}
+.tb-btn{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:var(--card);border:1px solid var(--border);color:var(--text-2);transition:transform .1s,background .15s,color .15s,border-color .15s;position:relative;flex:0 0 auto}
+.tb-btn svg{width:18px;height:18px}
 .tb-btn:active{transform:scale(.94)}
 .tb-btn.is-primary{background:linear-gradient(180deg,var(--amber-hi),var(--amber));color:#1A1200;border-color:rgba(0,0,0,.2);box-shadow:0 6px 16px rgba(245,158,11,.35),inset 0 1px 0 rgba(255,255,255,.35)}
 .tb-btn.is-danger{color:var(--coral);border-color:rgba(251,113,133,.3)}
@@ -509,8 +509,8 @@ body.bulk-mode .list-head-check{display:flex}
 .lp-select-bar button{font-size:12px;font-weight:700;color:var(--amber);padding:6px 10px;border-radius:8px;background:var(--amber-soft);border:1px solid rgba(245,158,11,.25)}
 
 @media (max-width:380px){
-  .toolbar{gap:7px}
-  .tb-btn{width:42px;height:42px}
+  .toolbar{gap:4px}
+  .tb-btn{width:34px;height:34px}
   .row{gap:6px;padding:9px 10px}
   .list-head{gap:6px;padding:10px 10px}
   .thumb{width:36px;height:50px}
