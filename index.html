@@ -1651,7 +1651,15 @@ function filterPeople(){
     if(f==='F'&&p.gender!=='F') return false;
     if(f==='fav'&&!state.favorites[u]?.[p.id]) return false;
     if(q){
-      const h=(p.name+' '+(p.profession||'')+' '+(p.nationality||'')).toLowerCase();
+      const elo=getElo(u,p.id);
+      const eloRounded=Math.round(elo);
+      const h=(
+        (p.name||'')+' '+
+        (p.profession||'')+' '+
+        (p.nationality||'')+' '+
+        String(elo)+' '+
+        String(eloRounded)
+      ).toLowerCase();
       if(!h.includes(q)) return false;
     }
     return true;
