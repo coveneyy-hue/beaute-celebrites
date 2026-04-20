@@ -1412,6 +1412,11 @@ function sortPeople(list){
 function renderList(){
   const body=$('#list-body');
   const u=state.settings.currentUser;
+  // Sync search field with persisted state
+  const searchEl=$('#search');
+  if(searchEl && searchEl.value!==(state.settings.query||'')) searchEl.value=state.settings.query||'';
+  // Sync chips with persisted filter
+  $$('#chips .chip').forEach(c=>c.classList.toggle('is-active',c.getAttribute('data-filter')===(state.settings.filter||'all')));
   const filt=filterPeople();
   const sorted=sortPeople(filt);
   $('#count').textContent=filt.length+' / '+state.people.length;
@@ -1565,9 +1570,11 @@ function initAddOnce(){
     const nt=$('#m-nat').value.trim();
     const pr=$('#m-prof').value.trim();
     const bo=$('#m-bio').value.trim();
-    state.people.push({ id:uid(), name, gender:g.getAttribute('data-g'), mainPhoto:ph||null, photos:ph?[ph]:[], birthday:yr, nationality:nt||null, profession:pr||null, bio:bo||null, addedAt:Date.now() });
+    const newIdM=uid();
+    state.people.push({ id:newIdM, name, gender:g.getAttribute('data-g'), mainPhoto:ph||null, photos:ph?[ph]:[], birthday:yr, nationality:nt||null, profession:pr||null, bio:bo||null, addedAt:Date.now() });
     saveState(); renderList(); closeAllModals();
     toast('Ajouté : '+name,'ok');
+    setTimeout(()=>openDetails(newIdM),120);
     ['m-name','m-photo','m-year','m-nat','m-prof','m-bio'].forEach(id=>$('#'+id).value='');
     if(mFileInput) mFileInput.value='';
     renderManualPreview();
@@ -1619,9 +1626,11 @@ function renderTmdbResults(results){
       const ph=(f.images?.profiles||[]).map(x=>TMDB_IMG+x.file_path);
       const main=f.profile_path?(TMDB_IMG+f.profile_path):(ph[0]||null);
       const yr=f.birthday?parseInt(f.birthday.slice(0,4)):null;
-      state.people.push({ id:uid(), tmdbId:tid, name:f.name, gender:g==='?'?'F':g, mainPhoto:main, photos:ph.length?ph:(main?[main]:[]), birthday:yr, nationality:f.place_of_birth||null, profession:f.known_for_department||null, bio:f.biography||null, addedAt:Date.now() });
+      const newId1=uid();
+      state.people.push({ id:newId1, tmdbId:tid, name:f.name, gender:g==='?'?'F':g, mainPhoto:main, photos:ph.length?ph:(main?[main]:[]), birthday:yr, nationality:f.place_of_birth||null, profession:f.known_for_department||null, bio:f.biography||null, addedAt:Date.now() });
       saveState(); renderList(); closeAllModals();
       toast('Ajouté : '+f.name,'ok');
+      setTimeout(()=>openDetails(newId1),120);
     }catch(err){ toast('Erreur TMDb : '+err.message,'err'); btn.style.opacity=''; }
   }));
 }
@@ -1861,9 +1870,11 @@ function renderWikiResults(results){
       const h=await wikiHydrate(qid);
       if(!h?.name){ toast('Entité incomplète','err'); btn.style.opacity=''; return; }
       if(!h.gender){ toast('Genre manquant, utilise l\'ajout manuel','err'); btn.style.opacity=''; return; }
-      state.people.push({ id:uid(), wikiId:qid, name:h.name, gender:h.gender, mainPhoto:h.mainPhoto, photos:h.photos||[], birthday:h.birthday||null, bio:h.bio||null, addedAt:Date.now() });
+      const newIdW=uid();
+      state.people.push({ id:newIdW, wikiId:qid, name:h.name, gender:h.gender, mainPhoto:h.mainPhoto, photos:h.photos||[], birthday:h.birthday||null, bio:h.bio||null, addedAt:Date.now() });
       saveState(); renderList(); closeAllModals();
       toast('Ajouté : '+h.name,'ok');
+      setTimeout(()=>openDetails(newIdW),120);
     }catch(err){ toast('Erreur Wikidata : '+err.message,'err'); btn.style.opacity=''; }
   }));
 }
