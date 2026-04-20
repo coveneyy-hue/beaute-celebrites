@@ -546,6 +546,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
         <button class="tab" data-tab="cast">Film/Série</button>
         <button class="tab" data-tab="wiki">Wikidata</button>
         <button class="tab" data-tab="manual">Manuel</button>
+        <button class="tab" data-tab="lists">Listes</button>
       </div>
       <div data-panel="tmdb">
         <div class="search-people">
@@ -746,6 +747,117 @@ const USERS = [
 ];
 const STORAGE_KEY = 'classeur-beaute-v1';
 const TMDB_IMG = 'https://image.tmdb.org/t/p/w500';
+
+/* ============ PREDEFINED LISTS ============ */
+const PRESET_LISTS = [
+  {
+    id: "top100-beauty",
+    label: "Top 100 · Beauté de tous les temps",
+    desc: "50 femmes et 50 hommes universellement reconnus pour leur beauté iconique, des golden ages d'Hollywood à aujourd'hui.",
+    entries: [
+      // ── FEMMES (49) ──
+      { tmdbId:1373737, name:"Audrey Hepburn", gender:"F" },
+      { tmdbId:   3122, name:"Marilyn Monroe", gender:"F" },
+      { tmdbId:  10990, name:"Grace Kelly", gender:"F" },
+      { tmdbId:   3093, name:"Elizabeth Taylor", gender:"F" },
+      { tmdbId:  54812, name:"Sophia Loren", gender:"F" },
+      { tmdbId:  61696, name:"Brigitte Bardot", gender:"F" },
+      { tmdbId:  11701, name:"Ingrid Bergman", gender:"F" },
+      { tmdbId:   8171, name:"Hedy Lamarr", gender:"F" },
+      { tmdbId:   8140, name:"Rita Hayworth", gender:"F" },
+      { tmdbId:   3087, name:"Vivien Leigh", gender:"F" },
+      { tmdbId:   3072, name:"Raquel Welch", gender:"F" },
+      { tmdbId:   1245, name:"Scarlett Johansson", gender:"F" },
+      { tmdbId:   3230, name:"Natalie Portman", gender:"F" },
+      { tmdbId:   5064, name:"Charlize Theron", gender:"F" },
+      { tmdbId:   1551, name:"Angelina Jolie", gender:"F" },
+      { tmdbId:   2109, name:"Halle Berry", gender:"F" },
+      { tmdbId:  19537, name:"Monica Bellucci", gender:"F" },
+      { tmdbId:  19543, name:"Penélope Cruz", gender:"F" },
+      { tmdbId: 224513, name:"Zendaya", gender:"F" },
+      { tmdbId:  49533, name:"Megan Fox", gender:"F" },
+      { tmdbId:  58726, name:"Margot Robbie", gender:"F" },
+      { tmdbId:  21462, name:"Salma Hayek", gender:"F" },
+      { tmdbId:  17483, name:"Catherine Zeta-Jones", gender:"F" },
+      { tmdbId:   5081, name:"Nicole Kidman", gender:"F" },
+      { tmdbId:   1907, name:"Cate Blanchett", gender:"F" },
+      { tmdbId:  68203, name:"Gal Gadot", gender:"F" },
+      { tmdbId:   1480, name:"Jennifer Lopez", gender:"F" },
+      { tmdbId:   2231, name:"Beyoncé", gender:"F" },
+      { tmdbId:  72129, name:"Lupita Nyong'o", gender:"F" },
+      { tmdbId:  57755, name:"Priyanka Chopra", gender:"F" },
+      { tmdbId:  56325, name:"Aishwarya Rai", gender:"F" },
+      { tmdbId:  51329, name:"Rihanna", gender:"F" },
+      { tmdbId:  15461, name:"Eva Mendes", gender:"F" },
+      { tmdbId:  18897, name:"Jessica Alba", gender:"F" },
+      { tmdbId:  67647, name:"Ana de Armas", gender:"F" },
+      { tmdbId:   1461, name:"Jennifer Aniston", gender:"F" },
+      { tmdbId:  57165, name:"Adriana Lima", gender:"F" },
+      { tmdbId: 885531, name:"Sydney Sweeney", gender:"F" },
+      { tmdbId: 115440, name:"Taylor Swift", gender:"F" },
+      { tmdbId:  24045, name:"Kate Winslet", gender:"F" },
+      { tmdbId:  14536, name:"Demi Moore", gender:"F" },
+      { tmdbId:  75232, name:"Bella Hadid", gender:"F" },
+      { tmdbId:   7399, name:"Claudia Schiffer", gender:"F" },
+      { tmdbId:  62064, name:"Cindy Crawford", gender:"F" },
+      { tmdbId:  12052, name:"Naomi Campbell", gender:"F" },
+      { tmdbId:  17208, name:"Eva Green", gender:"F" },
+      { tmdbId:   1816, name:"Sharon Stone", gender:"F" },
+      { tmdbId:   4293, name:"Catherine Deneuve", gender:"F" },
+      { tmdbId:  26472, name:"Rosario Dawson", gender:"F" },
+      // ── HOMMES (49) ──
+      { tmdbId:   3899, name:"Cary Grant", gender:"M" },
+      { tmdbId:   1100, name:"Paul Newman", gender:"M" },
+      { tmdbId:   4110, name:"Marlon Brando", gender:"M" },
+      { tmdbId:  18996, name:"James Dean", gender:"M" },
+      { tmdbId:   2232, name:"Brad Pitt", gender:"M" },
+      { tmdbId:   2090, name:"George Clooney", gender:"M" },
+      { tmdbId:   6384, name:"Keanu Reeves", gender:"M" },
+      { tmdbId:   3895, name:"Clark Gable", gender:"M" },
+      { tmdbId:   1333, name:"Alain Delon", gender:"M" },
+      { tmdbId:   9993, name:"Omar Sharif", gender:"M" },
+      { tmdbId:   2037, name:"Robert Redford", gender:"M" },
+      { tmdbId:  16483, name:"Sean Connery", gender:"M" },
+      { tmdbId:   9273, name:"Tyrone Power", gender:"M" },
+      { tmdbId:   7605, name:"Steve McQueen", gender:"M" },
+      { tmdbId:  17419, name:"Antonio Banderas", gender:"M" },
+      { tmdbId:   6968, name:"Pierce Brosnan", gender:"M" },
+      { tmdbId:   9780, name:"Jude Law", gender:"M" },
+      { tmdbId:  74568, name:"Henry Cavill", gender:"M" },
+      { tmdbId:1136406, name:"Jacob Elordi", gender:"M" },
+      { tmdbId:1625558, name:"Timothée Chalamet", gender:"M" },
+      { tmdbId:   8784, name:"Denzel Washington", gender:"M" },
+      { tmdbId: 468944, name:"Michael B. Jordan", gender:"M" },
+      { tmdbId:   1813, name:"Will Smith", gender:"M" },
+      { tmdbId:  17605, name:"Idris Elba", gender:"M" },
+      { tmdbId:  16828, name:"Chris Evans", gender:"M" },
+      { tmdbId:   3784, name:"Harrison Ford", gender:"M" },
+      { tmdbId:   6193, name:"Leonardo DiCaprio", gender:"M" },
+      { tmdbId:   3143, name:"Hugh Jackman", gender:"M" },
+      { tmdbId:   2888, name:"Johnny Depp", gender:"M" },
+      { tmdbId:  53638, name:"Ryan Gosling", gender:"M" },
+      { tmdbId:  71580, name:"Chris Hemsworth", gender:"M" },
+      { tmdbId:   5292, name:"Warren Beatty", gender:"M" },
+      { tmdbId:   3223, name:"Robert Downey Jr.", gender:"M" },
+      { tmdbId:    500, name:"Tom Cruise", gender:"M" },
+      { tmdbId:  17468, name:"Viggo Mortensen", gender:"M" },
+      { tmdbId:   9342, name:"Rock Hudson", gender:"M" },
+      { tmdbId:   2524, name:"Michael Fassbender", gender:"M" },
+      { tmdbId:   5064, name:"Javier Bardem", gender:"M" },
+      { tmdbId:  10297, name:"Rodrigo Santoro", gender:"M" },
+      { tmdbId:    976, name:"Jason Momoa", gender:"M" },
+      { tmdbId:  33276, name:"Rami Malek", gender:"M" },
+      { tmdbId:  15170, name:"Orlando Bloom", gender:"M" },
+      { tmdbId:  30614, name:"Ryan Reynolds", gender:"M" },
+      { tmdbId:  45332, name:"Jake Gyllenhaal", gender:"M" },
+      { tmdbId:  35742, name:"Liam Hemsworth", gender:"M" },
+      { tmdbId:  19293, name:"Jared Leto", gender:"M" },
+      { tmdbId:   8691, name:"Gregory Peck", gender:"M" },
+      { tmdbId:   8613, name:"Cary Grant", gender:"M" },
+      { tmdbId:  37625, name:"Paul Mescal", gender:"M" },
+    ]
+  }
+];
 
 /* Reads an image File and returns a resized JPEG data URL.
    Progressively reduces dimensions and quality until target size is met.
@@ -1376,6 +1488,88 @@ async function wikiHydrate(qid){
   return { wikiId:qid, name, gender, bio:desc, birthday:year, mainPhoto:wikiImg(imgF,500), photos:imgF?[wikiImg(imgF,800)]:[] };
 }
 
+
+/* ============ PRESET LISTS IMPORT ============ */
+function initListsOnce(){
+  if(initListsOnce.done) return; initListsOnce.done=true;
+  const grid=$('#lists-grid');
+  if(!grid) return;
+  grid.innerHTML=PRESET_LISTS.map(lst=>{
+    const existingTmdbIds=new Set(state.people.map(p=>p.tmdbId).filter(Boolean));
+    const newCount=lst.entries.filter(e=>!existingTmdbIds.has(e.tmdbId)).length;
+    const total=lst.entries.length;
+    return `<div style="padding:14px;background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius)">
+      <div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:4px">${esc(lst.label)}</div>
+      <div style="font-size:12px;color:var(--text-3);margin-bottom:10px;line-height:1.4">${esc(lst.desc)}</div>
+      <div style="font-size:12px;color:var(--text-4);margin-bottom:10px">${total} personnes · <strong style="color:var(--amber)">${newCount} nouvelles</strong> à importer${newCount<total?' · '+(total-newCount)+' déjà en banque':''}</div>
+      <button class="btn btn-primary btn-block" data-list-id="${esc(lst.id)}">
+        ${newCount===0?'✅ Déjà importée':'🚀 Importer les '+newCount+' nouvelles'}
+      </button>
+    </div>`;
+  }).join('');
+
+  $$('#lists-grid [data-list-id]').forEach(btn=>btn.addEventListener('click',()=>{
+    const listId=btn.getAttribute('data-list-id');
+    const lst=PRESET_LISTS.find(l=>l.id===listId);
+    if(!lst) return;
+    if(!state.settings.tmdbKey){ toast("Clé TMDb requise — ouvre les Réglages",'err'); return; }
+    importPresetList(lst, btn);
+  }));
+}
+
+async function importPresetList(lst, triggerBtn){
+  const existingTmdbIds=new Set(state.people.map(p=>p.tmdbId).filter(Boolean));
+  const toImport=lst.entries.filter(e=>!existingTmdbIds.has(e.tmdbId));
+  if(!toImport.length){ toast('Toutes ces personnes sont déjà dans ta banque','ok'); return; }
+
+  const progEl=$('#lists-progress');
+  let added=0, failed=0;
+  if(triggerBtn) triggerBtn.disabled=true;
+
+  const setProgress=(done,total,name='')=>{
+    const pct=total?Math.round(done/total*100):0;
+    if(progEl) progEl.innerHTML=`
+      <div class="bulk-progress">
+        <div>Import en cours… ${esc(name)}</div>
+        <div class="bp-bar"><div class="bp-fill" style="width:${pct}%"></div></div>
+        <div class="bp-stat"><span>${done} / ${total}</span><span>${added} ajoutée${added>1?'s':''}</span></div>
+      </div>`;
+  };
+
+  for(let i=0;i<toImport.length;i++){
+    const entry=toImport[i];
+    setProgress(i,toImport.length,entry.name);
+    // Skip if already added during this batch
+    if(state.people.some(p=>p.tmdbId===entry.tmdbId)){ continue; }
+    try{
+      const f=await tmdbFetch('/person/'+entry.tmdbId,{append_to_response:'images'});
+      const g=f.gender===1?'F':f.gender===2?'M':(entry.gender||'F');
+      const ph=(f.images?.profiles||[]).map(x=>TMDB_IMG+x.file_path);
+      const main=f.profile_path?(TMDB_IMG+f.profile_path):(ph[0]||null);
+      const yr=f.birthday?parseInt(f.birthday.slice(0,4)):null;
+      state.people.push({
+        id:uid(), tmdbId:entry.tmdbId, name:f.name, gender:g,
+        mainPhoto:main, photos:ph.length?ph:(main?[main]:[]),
+        birthday:yr, nationality:f.place_of_birth||null,
+        profession:f.known_for_department||null, bio:f.biography||null,
+        addedAt:Date.now()
+      });
+      added++;
+      if(added%20===0){ const ok=saveState(); if(!ok){ toast('Stockage saturé après '+added+' personnes','err'); break; } }
+    }catch(err){ failed++; }
+    await new Promise(r=>setTimeout(r,80));
+  }
+
+  saveState(); renderList();
+  if(progEl) progEl.innerHTML=`
+    <div class="bulk-progress">
+      <div>✅ Terminé · <strong>${added}</strong> ajoutée${added>1?'s':''}${failed?' · '+failed+' échec'+(failed>1?'s':''):''}</div>
+      <div class="bp-bar"><div class="bp-fill" style="width:100%"></div></div>
+    </div>`;
+  if(triggerBtn){ triggerBtn.disabled=false; triggerBtn.textContent='✅ Importé'; }
+  toast(`${added} personne${added>1?'s':''} ajoutée${added>1?'s':''}${failed?' · '+failed+' échec'+(failed>1?'s':''):''}`,'ok');
+}
+
 /* ============ RENDER: HEADER ============ */
 function renderHeader(){
   const u=getUser(state.settings.currentUser);
@@ -1474,6 +1668,7 @@ function initAddOnce(){
     const k=t.getAttribute('data-tab');
     $$('#modal-add [data-panel]').forEach(p=>p.hidden=p.getAttribute('data-panel')!==k);
     $('#add-manual-save').hidden=k!=='manual';
+    if(k==='lists') initListsOnce();
   }));
   let tT,wT;
   // ==== Popular tab: bulk import ====
@@ -2894,6 +3089,20 @@ function openImportDialog(d, filename){
   // Build the dialog HTML
   const exportDate = d.exportedAt ? new Date(d.exportedAt).toLocaleDateString('fr-FR') : '?';
   body.innerHTML = `
+    <div style="margin-bottom:16px;padding:12px 14px;background:rgba(6,182,212,.06);border:1px solid rgba(6,182,212,.2);border-radius:10px;font-size:12px;color:var(--text-3);line-height:1.6">
+      <div style="font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--yannick-hi);margin-bottom:8px">📋 Comment bâtir une nouvelle liste prédéfinie</div>
+      <p style="margin-bottom:6px">Pour ajouter une liste dans l'onglet <strong style="color:var(--text)">Listes</strong> du modal d'ajout, éditer la constante <code style="background:var(--bg-3);padding:1px 5px;border-radius:4px">PRESET_LISTS</code> dans le code JS et y ajouter un objet avec la structure suivante :</p>
+      <pre style="background:var(--bg-3);padding:8px 10px;border-radius:8px;font-size:10.5px;overflow-x:auto;color:var(--amber);margin-bottom:6px">{
+  id: "mon-id-unique",
+  label: "Nom affiché",
+  desc: "Description courte",
+  entries: [
+    { tmdbId: 1245, name: "Scarlett Johansson", gender: "F" },
+    { tmdbId: 6193, name: "Leonardo DiCaprio",  gender: "M" },
+  ]
+}</pre>
+      <p>Chaque entrée doit contenir un <strong style="color:var(--text)">tmdbId</strong> (entier, visible dans l'URL TMDb : themoviedb.org/person/<strong>1245</strong>-…), un <strong style="color:var(--text)">name</strong> (pour l'affichage avant import), et un <strong style="color:var(--text)">gender</strong> ("F" ou "M"). Les doublons (même tmdbId déjà en banque) sont automatiquement ignorés à l'import.</p>
+    </div>
     <div class="import-summary">
       <div style="margin-bottom:6px"><strong>${esc(filename||'Fichier importé')}</strong></div>
       Contenu : <strong>${incomingPeople.length}</strong> personne${incomingPeople.length>1?'s':''}
@@ -3424,3 +3633,10 @@ if(document.readyState==='loading'){
 </script>
 </body>
 </html>
+      <div data-panel="lists" hidden>
+        <div class="search-hint" style="margin-bottom:12px">
+          Importe une liste prédéfinie de personnes depuis TMDb. Les personnes déjà présentes dans ta banque (même TMDb ID) sont ignorées automatiquement — aucun doublon ne sera créé.
+        </div>
+        <div id="lists-grid" style="display:flex;flex-direction:column;gap:8px"></div>
+        <div id="lists-progress" style="margin-top:12px"></div>
+      </div>
