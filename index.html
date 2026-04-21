@@ -184,6 +184,9 @@ body.show-date .row{min-width:420px}
 .note-card{padding:14px 12px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg-2);text-align:center;position:relative;border-left:3px solid var(--user-color,var(--amber));transition:background .15s,border-color .15s,transform .1s}
 .note-card:active{transform:scale(.97)}
 .note-card.is-current{background:var(--card-hover)}
+.note-card.is-editable{cursor:pointer}
+.note-card.is-editable .nc-value{color:var(--amber-hi)}
+.note-card.is-editable::after{content:'✎';position:absolute;top:10px;right:10px;font-size:12px;color:var(--amber);opacity:.9}
 .note-card .nc-label{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--user-color,var(--text-3));margin-bottom:6px}
 .note-card .nc-value{font-size:24px;font-weight:800;letter-spacing:-.02em;color:var(--text)}
 .note-card .nc-value.dim{color:var(--text-4)}
@@ -2396,7 +2399,11 @@ function renderDetails(){
       ${(tmdbLink||wikiLink)?`<div class="detail-links">${tmdbLink} ${wikiLink}</div>`:''}
     </div>
     <div class="notes-grid">
-      <div class="note-card is-current"><div class="nc-label">ELO</div><div class="nc-value">${elo}</div><div class="nc-tiny">Classement de ${esc(getUser(u).name)}</div></div>
+      <button class="note-card is-current is-editable" id="detail-edit-elo" type="button" aria-label="Modifier la cote ELO">
+        <div class="nc-label">ELO</div>
+        <div class="nc-value">${elo}</div>
+        <div class="nc-tiny">Classement de ${esc(getUser(u).name)} · Appuyer pour modifier</div>
+      </button>
       <div class="note-card"><div class="nc-label">Victoires</div><div class="nc-value">${wins}</div><div class="nc-tiny">Tous combats confondus</div></div>
       <div class="note-card"><div class="nc-label">Défaites</div><div class="nc-value">${losses}</div><div class="nc-tiny">Tous combats confondus</div></div>
       <div class="note-card"><div class="nc-label">Combats</div><div class="nc-value">${duels.length}</div><div class="nc-tiny">Duels + tournois journalisés</div></div>
@@ -2453,6 +2460,22 @@ Tenter l'ajout quand même ?`;
     if(p.mainPhoto === removed) p.mainPhoto = p.photos[0] || null;
     if(ui.photoIdx >= p.photos.length) ui.photoIdx = Math.max(0, p.photos.length-1);
     saveState(); renderList(); renderDetails(); toast('Photo supprimée','ok');
+  });
+  $('#detail-edit-elo')?.addEventListener('click',()=>{
+    const current = getElo(u,p.id);
+    const raw = prompt(`Modifier la cote ELO de ${p.name}`, String(current));
+    if(raw===null) return;
+    const value = Number(String(raw).replace(',', '.').trim());
+    if(!Number.isFinite(value) || value < 0){
+      toast('Veuillez entrer un nombre valide','err');
+      return;
+    }
+    if(!state.elo[u]) state.elo[u] = {};
+    state.elo[u][p.id] = Math.round(value);
+    saveState();
+    renderList();
+    renderDetails();
+    toast(`ELO mis à jour : ${Math.round(value)}`,'ok');
   });
 }
 function saveDetails(){
