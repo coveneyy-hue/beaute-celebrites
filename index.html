@@ -181,6 +181,12 @@ body.show-date .row{min-width:420px}
 .detail-links a{color:var(--amber);font-weight:600}
 
 .notes-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
+.duel-history{margin:8px 0 4px}
+.duel-history-title{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);margin-bottom:8px}
+.duel-history-list{display:flex;flex-direction:column;gap:8px}
+.duel-history-item{padding:10px 12px;border-radius:12px;background:var(--bg-2);border:1px solid var(--border);font-size:13px;line-height:1.45;color:var(--text-2)}
+.duel-history-item strong{color:var(--text)}
+.duel-history-date{color:var(--amber);font-weight:700}
 .note-card{padding:14px 12px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg-2);text-align:center;position:relative;border-left:3px solid var(--user-color,var(--amber));transition:background .15s,border-color .15s,transform .1s}
 .note-card:active{transform:scale(.97)}
 .note-card.is-current{background:var(--card-hover)}
@@ -2362,6 +2368,25 @@ function renderDetails(){
   const duels=(state.duelHistory[u]||[]).filter(d=>d.winnerId===p.id || d.loserId===p.id);
   const wins=duels.filter(d=>d.winnerId===p.id).length;
   const losses=duels.filter(d=>d.loserId===p.id).length;
+  const duelHistoryHtml = duels.length ? `
+    <div class="duel-history">
+      <div class="duel-history-title">Historique des duels</div>
+      <div class="duel-history-list">
+        ${duels
+          .slice()
+          .sort((a,b)=>(b.t||0)-(a.t||0))
+          .map(d=>{
+            const winner = state.people.find(x=>x.id===d.winnerId)?.name || 'Personne inconnue';
+            const loser = state.people.find(x=>x.id===d.loserId)?.name || 'Personne inconnue';
+            const date = d.t ? new Date(d.t).toLocaleDateString('fr-FR') : 'Date inconnue';
+            const text = d.winnerId===p.id
+              ? `${esc(p.name)} a vaincu ${esc(loser)}`
+              : `${esc(p.name)} a perdu contre ${esc(winner)}`;
+            return `<div class="duel-history-item"><span class="duel-history-date">${esc(date)}</span> · <strong>${text}</strong></div>`;
+          })
+          .join('')}
+      </div>
+    </div>` : '';
   $('#detail-body').innerHTML=`
     <div class="detail-photo">
       ${main?`<img src="${esc(main)}" alt="${esc(p.name)}" onerror="this.style.display='none'">`:`<div style="height:100%;display:grid;place-items:center;color:var(--text-4);font-size:60px">?</div>`}
@@ -2407,7 +2432,8 @@ function renderDetails(){
       <div class="note-card"><div class="nc-label">Victoires</div><div class="nc-value">${wins}</div><div class="nc-tiny">Tous combats confondus</div></div>
       <div class="note-card"><div class="nc-label">Défaites</div><div class="nc-value">${losses}</div><div class="nc-tiny">Tous combats confondus</div></div>
       <div class="note-card"><div class="nc-label">Combats</div><div class="nc-value">${duels.length}</div><div class="nc-tiny">Duels + tournois journalisés</div></div>
-    </div>`;
+    </div>
+    ${duelHistoryHtml}`;
   $('#fav-toggle')?.addEventListener('click',()=>{
     if(!state.favorites[u]) state.favorites[u]={};
     state.favorites[u][p.id]=!state.favorites[u][p.id];
