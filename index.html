@@ -557,11 +557,8 @@ body.bulk-mode .list-head-check{display:flex}
     <button class="tb-btn" data-act="compare" aria-label="Comparer">
       <svg viewBox="0 0 24 24" fill="none"><path d="M7 3v18M17 3v18M3 7h8M13 17h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
     </button>
-    <button class="tb-btn" data-act="duel" aria-label="Duels">
-      <svg viewBox="0 0 24 24" fill="none"><path d="M14 5 L19 10 M14 10 L19 5 M5 14 L10 19 M5 19 L10 14 M9 15 L15 9 M3 21 L6 18 M18 6 L21 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-    </button>
-    <button class="tb-btn" data-act="tournament" aria-label="Tournoi">
-      <svg viewBox="0 0 24 24" fill="none"><path d="M6 9h12M6 4h12v4a6 6 0 0 1-12 0V4ZM4 4h2v2a2 2 0 0 0 2 2M20 4h-2v2a2 2 0 0 1-2 2M9 19h6M12 13v6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <button class="tb-btn" data-act="modes" aria-label="Duels, tournoi et Last man standing">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M6 7h12M8 12h8M10 17h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="6" cy="7" r="1.5" fill="currentColor"/><circle cx="18" cy="12" r="1.5" fill="currentColor"/><circle cx="10" cy="17" r="1.5" fill="currentColor"/></svg>
     </button>
     <button class="tb-btn" data-act="settings" aria-label="Réglages">
       <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z" stroke="currentColor" stroke-width="1.5"/></svg>
@@ -753,6 +750,26 @@ body.bulk-mode .list-head-check{display:flex}
       <button class="modal-close" data-close><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
     </div>
     <div class="modal-body" id="duel-body"></div>
+  </div>
+</div>
+
+<div class="modal" id="modal-modes">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div><div class="modal-title">Modes de confrontation</div><div class="modal-sub">Duel, tournoi ou Last man standing</div></div>
+      <button class="modal-close" data-close><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="modal-body" id="modes-body"></div>
+  </div>
+</div>
+
+<div class="modal" id="modal-lms">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div><div class="modal-title" id="lms-title">Last man standing</div><div class="modal-sub" id="lms-sub">Fais monter la difficulté jusqu'à la défaite</div></div>
+      <button class="modal-close" data-close><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="modal-body" id="lms-body"></div>
   </div>
 </div>
 
@@ -1235,7 +1252,7 @@ const state = {
     compareB: 'victor',
   },
 };
-const ui = { currentPersonId:null, draft:null, duel:null, tour:null, photoIdx:0 };
+const ui = { currentPersonId:null, draft:null, duel:null, tour:null, lms:null, photoIdx:0 };
 let pendingImport = null;
 
 /* ============ UTILITIES ============ */
@@ -2456,6 +2473,202 @@ function deletePerson(){
   toast('Supprimé : '+p.name);
 }
 
+
+
+/* ============ MODES MENU ============ */
+function openModes(){
+  renderModesMenu();
+  openModal('modal-modes');
+}
+function renderModesMenu(){
+  const u=state.settings.currentUser;
+  const user=getUser(u);
+  $('#modes-body').innerHTML=`
+    <div class="tour-hero" style="margin-bottom:12px">
+      <div class="tico">⚡</div>
+      <div><h3>Choisis un mode</h3><p>Joueur : ${esc(user.name)}. Les trois modes utilisent le même classement ELO.</p></div>
+    </div>
+    <div style="display:grid;gap:10px">
+      <button class="search-result" data-mode-open="duel">
+        <div class="sr-info"><div class="sr-name">Duel libre</div><div class="sr-meta">Deux profils, filtre par genre, vote rapide en continu.</div></div>
+        <div class="sr-badge">⚔</div>
+      </button>
+      <button class="search-result" data-mode-open="tournament">
+        <div class="sr-info"><div class="sr-name">Tournoi</div><div class="sr-meta">Bracket 32 avec filtre Femmes, Hommes ou Mixte.</div></div>
+        <div class="sr-badge">🏆</div>
+      </button>
+      <button class="search-result" data-mode-open="lms">
+        <div class="sr-info"><div class="sr-name">Last man standing</div><div class="sr-meta">Préselectionne un profil et fais-le affronter des ELO de plus en plus élevés jusqu'à sa défaite.</div></div>
+        <div class="sr-badge">📈</div>
+      </button>
+    </div>`;
+  $$('[data-mode-open]', $('#modes-body')).forEach(b=>b.addEventListener('click',()=>{
+    const mode=b.getAttribute('data-mode-open');
+    if(mode==='duel') openDuel();
+    else if(mode==='tournament') openTournament();
+    else if(mode==='lms') openLms();
+  }));
+}
+
+/* ============ LAST MAN STANDING ============ */
+function openLms(){
+  ui.lms={ stage:'setup', filter:'all', selectedId:'', currentId:'', opponentId:'', streak:0, beaten:[], photoIdx:{} };
+  renderLms();
+  openModal('modal-lms');
+}
+function getLmsPool(){
+  const f=ui.lms.filter;
+  return state.people.filter(p=>f==='all'||p.gender===f);
+}
+function pickLmsOpponent(){
+  const u=state.settings.currentUser;
+  const champId=ui.lms.currentId;
+  const beaten=new Set([champId, ...(ui.lms.beaten||[])]);
+  const champElo=getElo(u, champId);
+  const pool=getLmsPool().filter(p=>!beaten.has(p.id));
+  if(!pool.length) return null;
+  const stronger=pool.filter(p=>getElo(u,p.id)>champElo).sort((a,b)=>getElo(u,a.id)-getElo(u,b.id));
+  if(stronger.length){
+    const idx=Math.min(ui.lms.streak, stronger.length-1);
+    return stronger[idx];
+  }
+  const fallback=pool.slice().sort((a,b)=>getElo(u,b.id)-getElo(u,a.id));
+  return fallback[0]||null;
+}
+function startLms(){
+  if(!ui.lms.selectedId) return;
+  ui.lms.stage='playing';
+  ui.lms.currentId=ui.lms.selectedId;
+  ui.lms.streak=0;
+  ui.lms.beaten=[];
+  ui.lms.opponentId=pickLmsOpponent()?.id || '';
+  renderLms();
+}
+function renderLms(){
+  const u=state.settings.currentUser;
+  const user=getUser(u);
+  const pool=getLmsPool();
+  $('#lms-sub').textContent='Joueur : '+user.name;
+  if(ui.lms.stage==='setup'){
+    const options=pool.slice().sort((a,b)=>a.name.localeCompare(b.name,'fr')).map(p=>`<option value="${p.id}" ${ui.lms.selectedId===p.id?'selected':''}>${esc(p.name)} · ELO ${getElo(u,p.id)}</option>`).join('');
+    $('#lms-body').innerHTML=`
+      <div class="tour-hero">
+        <div class="tico">📈</div>
+        <div><h3>Last man standing</h3><p>Choisis une personne à tester. Elle rencontrera ensuite des adversaires au score ELO de plus en plus élevé jusqu'à sa défaite.</p></div>
+      </div>
+      <div class="field" style="margin-bottom:12px">
+        <label>Catégorie</label>
+        <div class="tour-opts c3">
+          <button class="${ui.lms.filter==='all'?'on':''}" data-lfs="all">Tous (${state.people.length})</button>
+          <button class="${ui.lms.filter==='F'?'on f':''}" data-lfs="F">Femmes (${state.people.filter(p=>p.gender==='F').length})</button>
+          <button class="${ui.lms.filter==='M'?'on m':''}" data-lfs="M">Hommes (${state.people.filter(p=>p.gender==='M').length})</button>
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:12px">
+        <label>Profil de départ</label>
+        <select id="lms-selected">
+          <option value="">Choisir une personne</option>
+          ${options}
+        </select>
+      </div>
+      <button class="btn btn-primary btn-block" id="lms-start" ${pool.length<2||!ui.lms.selectedId?'disabled':''}>Lancer le mode</button>
+      ${pool.length<2?'<div class="search-hint">Il faut au moins 2 profils dans ce filtre.</div>':''}`;
+    $$('#lms-body [data-lfs]').forEach(b=>b.addEventListener('click',()=>{ ui.lms.filter=b.getAttribute('data-lfs'); ui.lms.selectedId=''; renderLms(); }));
+    $('#lms-selected')?.addEventListener('change',e=>{ ui.lms.selectedId=e.target.value; renderLms(); });
+    $('#lms-start')?.addEventListener('click',startLms);
+    return;
+  }
+
+  const champ=state.people.find(p=>p.id===ui.lms.currentId);
+  if(!champ){
+    ui.lms.stage='setup';
+    renderLms();
+    return;
+  }
+  if(!ui.lms.opponentId) ui.lms.opponentId=pickLmsOpponent()?.id || '';
+  const opp=state.people.find(p=>p.id===ui.lms.opponentId);
+  if(!opp){
+    $('#lms-body').innerHTML=`
+      <div class="tour-hero">
+        <div class="tico">👑</div>
+        <div><h3>Parcours terminé</h3><p>${esc(champ.name)} a survécu à tous les adversaires disponibles dans ce filtre.</p></div>
+      </div>
+      <div class="stat-hero"><div class="box"><div class="v">${ui.lms.streak}</div><div class="l">Victoires</div></div><div class="box"><div class="v">${getElo(u,champ.id)}</div><div class="l">ELO final</div></div></div>
+      <button class="btn btn-primary btn-block" id="lms-restart">Recommencer</button>`;
+    $('#lms-restart')?.addEventListener('click',()=>openLms());
+    return;
+  }
+  const h2h=getHeadToHeadWins(u,champ.id,opp.id);
+  const card=(p,wins,isChamp)=>{
+    const photoSrc = cardCurrentPhoto(p, ui.lms.photoIdx) || p.mainPhoto;
+    const currentIdx = cardEffectiveIdx(p, ui.lms.photoIdx);
+    return `<div class="duel-card" data-card-pid="${p.id}">
+      <div class="duel-h2h"><div class="h2h-num">${wins}</div></div><div class="duel-photo">
+        ${photoSrc?`<img src="${esc(photoSrc)}" alt="${esc(p.name)}" onerror="this.style.display='none'">`:`<div style="height:100%;display:grid;place-items:center;color:var(--text-4);font-size:40px">?</div>`}
+        ${cardPhotoControlsHtml(p, 'lms', currentIdx)}
+      </div>
+      <div>
+        <div class="duel-stats"><button class="duel-vote-btn" data-lms-pick="${p.id}" type="button">Vote</button></div>
+        <div class="d-name">${esc(p.name)} ${isChamp?'<span style="color:var(--amber)">• cible</span>':''}</div>
+        <div class="d-sub">ELO ${getElo(u,p.id)}</div>
+      </div>
+    </div>`;
+  };
+  $('#lms-body').innerHTML=`
+    <div class="tour-hero">
+      <div class="tico">📈</div>
+      <div><h3>Last man standing</h3><p>${esc(champ.name)} continue jusqu'à sa défaite. Chaque victoire enchaîne un adversaire plus fort.</p></div>
+    </div>
+    <div class="stat-hero">
+      <div class="box"><div class="v">${ui.lms.streak}</div><div class="l">Série</div></div>
+      <div class="box"><div class="v">${getElo(u,champ.id)}</div><div class="l">ELO cible</div></div>
+      <div class="box"><div class="v">${getElo(u,opp.id)}</div><div class="l">ELO adverse</div></div>
+      <div class="box"><div class="v">${ui.lms.beaten.length}</div><div class="l">Battus</div></div>
+    </div>
+    <div class="duel-actions">
+      <button class="btn btn-small" id="lms-skip">Changer l'adversaire</button>
+      <button class="btn btn-small btn-danger" id="lms-stop">Arrêter</button>
+    </div>
+    <div class="duel-arena">${card(champ,h2h.aWins,true)}${card(opp,h2h.bWins,false)}</div>`;
+
+  $$('#lms-body [data-lms-pick]').forEach(btn=>btn.addEventListener('click',()=>lmsVote(btn.getAttribute('data-lms-pick'))));
+  $('#lms-skip')?.addEventListener('click',()=>{ ui.lms.beaten=ui.lms.beaten.filter(id=>id!==ui.lms.opponentId); ui.lms.opponentId=pickLmsOpponent()?.id || ''; renderLms(); });
+  $('#lms-stop')?.addEventListener('click',()=>openLms());
+  wireCardPhotoControls($('#lms-body'), 'lms', ui.lms.photoIdx, ()=>renderLms());
+}
+function lmsVote(winnerId){
+  const u=state.settings.currentUser;
+  const champId=ui.lms.currentId;
+  const oppId=ui.lms.opponentId;
+  if(!champId || !oppId || winnerId!==champId && winnerId!==oppId) return;
+  const loserId=winnerId===champId?oppId:champId;
+  updateElo(u, winnerId, loserId);
+  state.duels[u]=(state.duels[u]||0)+1;
+  state.duelHistory[u]=state.duelHistory[u]||[];
+  state.duelHistory[u].push({ winnerId, loserId, t:Date.now(), source:'lms' });
+  saveState();
+  renderList();
+  if(winnerId===champId){
+    ui.lms.streak += 1;
+    ui.lms.beaten.push(oppId);
+    ui.lms.opponentId = pickLmsOpponent()?.id || '';
+    toast('La cible survit','ok');
+  } else {
+    const champ=state.people.find(p=>p.id===champId);
+    ui.lms.stage='done';
+    $('#lms-body').innerHTML=`
+      <div class="tour-hero">
+        <div class="tico">⛔</div>
+        <div><h3>Défaite de ${esc(champ?.name||'la cible')}</h3><p>Parcours arrêté après ${ui.lms.streak} victoire${ui.lms.streak>1?'s':''}.</p></div>
+      </div>
+      <div class="stat-hero"><div class="box"><div class="v">${ui.lms.streak}</div><div class="l">Victoires</div></div><div class="box"><div class="v">${getElo(u,champId)}</div><div class="l">ELO final</div></div><div class="box"><div class="v">${getElo(u,oppId)}</div><div class="l">Vainqueur</div></div></div>
+      <button class="btn btn-primary btn-block" id="lms-restart">Recommencer</button>`;
+    $('#lms-restart')?.addEventListener('click',()=>openLms());
+    toast('La cible a perdu','err');
+    return;
+  }
+  renderLms();
+}
 
 /* ============ DUEL MODAL ============ */
 function openDuel(){
@@ -4027,6 +4240,7 @@ function attachEvents(){
     else if(a==='consult') openConsult();
     else if(a==='stats') openStats();
     else if(a==='compare') openCompare();
+    else if(a==='modes') openModes();
     else if(a==='duel') openDuel();
     else if(a==='tournament') openTournament();
     else if(a==='settings') openSettings();
