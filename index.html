@@ -2378,11 +2378,14 @@ function renderDetails(){
           .map(d=>{
             const winner = state.people.find(x=>x.id===d.winnerId)?.name || 'Personne inconnue';
             const loser = state.people.find(x=>x.id===d.loserId)?.name || 'Personne inconnue';
-            const date = d.t ? new Date(d.t).toLocaleDateString('fr-FR') : 'Date inconnue';
+            const opponent = d.winnerId===p.id ? loser : winner;
+            const date = d.t
+              ? new Date(d.t).toLocaleString('sv-SE', { year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit' }).replace('-', '/').replace('-', '/')
+              : 'Date inconnue';
             const text = d.winnerId===p.id
-              ? `${esc(p.name)} a vaincu ${esc(loser)}`
-              : `${esc(p.name)} a perdu contre ${esc(winner)}`;
-            return `<div class="duel-history-item"><span class="duel-history-date">${esc(date)}</span> · <strong>${text}</strong></div>`;
+              ? `Victoire contre ${esc(opponent)}`
+              : `Défaite contre ${esc(opponent)}`;
+            return `<div class="duel-history-item"><span class="duel-history-date">${esc(date)}</span> - <strong>${text}</strong></div>`;
           })
           .join('')}
       </div>
