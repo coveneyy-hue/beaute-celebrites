@@ -2529,17 +2529,16 @@ function getLmsPool(){
 function pickLmsOpponent(){
   const u=state.settings.currentUser;
   const champId=ui.lms.currentId;
-  const beaten=new Set([champId, ...(ui.lms.beaten||[])]);
-  const champElo=getElo(u, champId);
-  const pool=getLmsPool().filter(p=>!beaten.has(p.id));
+  const beatenIds=ui.lms.beaten||[];
+  const excluded=new Set([champId, ...beatenIds]);
+  const pool=getLmsPool()
+    .filter(p=>!excluded.has(p.id))
+    .sort((a,b)=>getElo(u,a.id)-getElo(u,b.id) || a.name.localeCompare(b.name,'fr'));
   if(!pool.length) return null;
-  const stronger=pool.filter(p=>getElo(u,p.id)>champElo).sort((a,b)=>getElo(u,a.id)-getElo(u,b.id));
-  if(stronger.length){
-    const idx=Math.min(ui.lms.streak, stronger.length-1);
-    return stronger[idx];
-  }
-  const fallback=pool.slice().sort((a,b)=>getElo(u,b.id)-getElo(u,a.id));
-  return fallback[0]||null;
+
+  const referenceId = beatenIds.length ? beatenIds[beatenIds.length-1] : champId;
+  const referenceElo = getElo(u, referenceId);
+  return pool.find(p=>getElo(u,p.id)>referenceElo) || null;
 }
 function startLms(){
   const pool=getLmsPool();
@@ -2568,7 +2567,7 @@ function renderLms(){
     $('#lms-body').innerHTML=`
       <div class="tour-hero">
         <div class="tico">🏆</div>
-        <div><h3>Last man standing</h3><p>Choisis un profil de départ ou lance un tirage aléatoire. Il rencontrera ensuite des adversaires au score ELO de plus en plus élevé jusqu'à sa défaite.</p></div>
+        <div><h3>Last man standing</h3><p>Choisis un profil de départ ou lance un tirage aléatoire. Il rencontrera ensuite à chaque victoire le prochain adversaire ayant la cote ELO immédiatement au-dessus jusqu'à sa défaite.</p></div>
       </div>
       <div class="field" style="margin-bottom:12px">
         <label>Catégorie</label>
@@ -2592,7 +2591,7 @@ function renderLms(){
           ${options}
         </select>
       </div>
-      <div class="search-hint" style="margin-bottom:12px">${ui.lms.startMode==='random'?'Le profil de départ sera tiré au sort dans le filtre actif.':'Le profil choisi affrontera ensuite des ELO de plus en plus élevés.'}</div>
+      <div class="search-hint" style="margin-bottom:12px">${ui.lms.startMode==='random'?'Le profil de départ sera tiré au sort dans le filtre actif.':'Le profil choisi affrontera ensuite le prochain ELO juste au-dessus à chaque victoire.'}</div>
       <button class="btn btn-primary btn-block" id="lms-start" ${pool.length<2||(ui.lms.startMode==='selected'&&!ui.lms.selectedId)?'disabled':''}>${ui.lms.startMode==='random'?'Lancer en aléatoire':'Lancer le mode'}</button>
       ${pool.length<2?'<div class="search-hint">Il faut au moins 2 profils dans ce filtre.</div>':''}`;
     $$('#lms-body [data-lfs]').forEach(b=>b.addEventListener('click',()=>{ ui.lms.filter=b.getAttribute('data-lfs'); ui.lms.selectedId=''; renderLms(); }));
@@ -2640,7 +2639,7 @@ function renderLms(){
   $('#lms-body').innerHTML=`
     <div class="tour-hero">
       <div class="tico">⚔</div>
-      <div><h3>Last man standing</h3><p>${esc(champ.name)} continue jusqu'à sa défaite. Chaque victoire enchaîne un adversaire plus fort.</p></div>
+      <div><h3>Last man standing</h3><p>${esc(champ.name)} continue jusqu'à sa défaite. Chaque victoire enchaîne le prochain adversaire juste au-dessus en ELO.</p></div>
     </div>
     <div class="stat-hero">
       <div class="box"><div class="v">${ui.lms.streak}</div><div class="l">Série</div></div>
