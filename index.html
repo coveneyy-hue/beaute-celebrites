@@ -557,8 +557,14 @@ body.bulk-mode .list-head-check{display:flex}
     <button class="tb-btn" data-act="compare" aria-label="Comparer">
       <svg viewBox="0 0 24 24" fill="none"><path d="M7 3v18M17 3v18M3 7h8M13 17h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
     </button>
-    <button class="tb-btn" data-act="modes" aria-label="Duels, tournoi et Last man standing">
-      <svg viewBox="0 0 24 24" fill="none"><path d="M6 7h12M8 12h8M10 17h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="6" cy="7" r="1.5" fill="currentColor"/><circle cx="18" cy="12" r="1.5" fill="currentColor"/><circle cx="10" cy="17" r="1.5" fill="currentColor"/></svg>
+    <button class="tb-btn" data-act="modes" aria-label="Modes de compétition : duel, tournoi et Last man standing">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M7 15 L11.5 10.5 M12.5 9.5 L17 5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+        <path d="M9 5h4v3a2.8 2.8 0 0 1-2 2.7A2.8 2.8 0 0 1 9 8V5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+        <path d="M8 5H6.5v1.2A1.8 1.8 0 0 0 8.3 8H9M14 5h1.5v1.2A1.8 1.8 0 0 1 13.7 8H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M11 10.7V13M9.5 15h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M14.8 14.2 L19 18.4 M14.6 18.4 L18.8 14.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
     </button>
     <button class="tb-btn" data-act="settings" aria-label="Réglages">
       <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z" stroke="currentColor" stroke-width="1.5"/></svg>
@@ -2498,8 +2504,8 @@ function renderModesMenu(){
         <div class="sr-badge">🏆</div>
       </button>
       <button class="search-result" data-mode-open="lms">
-        <div class="sr-info"><div class="sr-name">Last man standing</div><div class="sr-meta">Préselectionne un profil et fais-le affronter des ELO de plus en plus élevés jusqu'à sa défaite.</div></div>
-        <div class="sr-badge">📈</div>
+        <div class="sr-info"><div class="sr-name">Last man standing</div><div class="sr-meta">Départ choisi ou aléatoire, puis montée contre des ELO de plus en plus élevés jusqu'à la défaite.</div></div>
+        <div class="sr-badge">⚔🏆</div>
       </button>
     </div>`;
   $$('[data-mode-open]', $('#modes-body')).forEach(b=>b.addEventListener('click',()=>{
@@ -2512,7 +2518,7 @@ function renderModesMenu(){
 
 /* ============ LAST MAN STANDING ============ */
 function openLms(){
-  ui.lms={ stage:'setup', filter:'all', selectedId:'', currentId:'', opponentId:'', streak:0, beaten:[], photoIdx:{} };
+  ui.lms={ stage:'setup', filter:'all', startMode:'selected', selectedId:'', currentId:'', opponentId:'', streak:0, beaten:[], photoIdx:{} };
   renderLms();
   openModal('modal-lms');
 }
@@ -2536,9 +2542,17 @@ function pickLmsOpponent(){
   return fallback[0]||null;
 }
 function startLms(){
-  if(!ui.lms.selectedId) return;
+  const pool=getLmsPool();
+  if(pool.length<2) return;
+  let startId=ui.lms.selectedId;
+  if(ui.lms.startMode==='random'){
+    const pick=pool[Math.floor(Math.random()*pool.length)];
+    startId=pick?.id || '';
+    ui.lms.selectedId=startId;
+  }
+  if(!startId) return;
   ui.lms.stage='playing';
-  ui.lms.currentId=ui.lms.selectedId;
+  ui.lms.currentId=startId;
   ui.lms.streak=0;
   ui.lms.beaten=[];
   ui.lms.opponentId=pickLmsOpponent()?.id || '';
@@ -2553,8 +2567,8 @@ function renderLms(){
     const options=pool.slice().sort((a,b)=>a.name.localeCompare(b.name,'fr')).map(p=>`<option value="${p.id}" ${ui.lms.selectedId===p.id?'selected':''}>${esc(p.name)} · ELO ${getElo(u,p.id)}</option>`).join('');
     $('#lms-body').innerHTML=`
       <div class="tour-hero">
-        <div class="tico">📈</div>
-        <div><h3>Last man standing</h3><p>Choisis une personne à tester. Elle rencontrera ensuite des adversaires au score ELO de plus en plus élevé jusqu'à sa défaite.</p></div>
+        <div class="tico">🏆</div>
+        <div><h3>Last man standing</h3><p>Choisis un profil de départ ou lance un tirage aléatoire. Il rencontrera ensuite des adversaires au score ELO de plus en plus élevé jusqu'à sa défaite.</p></div>
       </div>
       <div class="field" style="margin-bottom:12px">
         <label>Catégorie</label>
@@ -2565,15 +2579,24 @@ function renderLms(){
         </div>
       </div>
       <div class="field" style="margin-bottom:12px">
+        <label>Départ</label>
+        <div class="tour-opts c2" style="grid-template-columns:1fr 1fr">
+          <button class="${ui.lms.startMode==='selected'?'on':''}" data-lms-start-mode="selected">Profil choisi</button>
+          <button class="${ui.lms.startMode==='random'?'on':''}" data-lms-start-mode="random">Aléatoire</button>
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:12px" ${ui.lms.startMode==='random'?'hidden':''}>
         <label>Profil de départ</label>
         <select id="lms-selected">
           <option value="">Choisir une personne</option>
           ${options}
         </select>
       </div>
-      <button class="btn btn-primary btn-block" id="lms-start" ${pool.length<2||!ui.lms.selectedId?'disabled':''}>Lancer le mode</button>
+      <div class="search-hint" style="margin-bottom:12px">${ui.lms.startMode==='random'?'Le profil de départ sera tiré au sort dans le filtre actif.':'Le profil choisi affrontera ensuite des ELO de plus en plus élevés.'}</div>
+      <button class="btn btn-primary btn-block" id="lms-start" ${pool.length<2||(ui.lms.startMode==='selected'&&!ui.lms.selectedId)?'disabled':''}>${ui.lms.startMode==='random'?'Lancer en aléatoire':'Lancer le mode'}</button>
       ${pool.length<2?'<div class="search-hint">Il faut au moins 2 profils dans ce filtre.</div>':''}`;
     $$('#lms-body [data-lfs]').forEach(b=>b.addEventListener('click',()=>{ ui.lms.filter=b.getAttribute('data-lfs'); ui.lms.selectedId=''; renderLms(); }));
+    $$('#lms-body [data-lms-start-mode]').forEach(b=>b.addEventListener('click',()=>{ ui.lms.startMode=b.getAttribute('data-lms-start-mode'); if(ui.lms.startMode==='random') ui.lms.selectedId=''; renderLms(); }));
     $('#lms-selected')?.addEventListener('change',e=>{ ui.lms.selectedId=e.target.value; renderLms(); });
     $('#lms-start')?.addEventListener('click',startLms);
     return;
@@ -2616,7 +2639,7 @@ function renderLms(){
   };
   $('#lms-body').innerHTML=`
     <div class="tour-hero">
-      <div class="tico">📈</div>
+      <div class="tico">⚔</div>
       <div><h3>Last man standing</h3><p>${esc(champ.name)} continue jusqu'à sa défaite. Chaque victoire enchaîne un adversaire plus fort.</p></div>
     </div>
     <div class="stat-hero">
