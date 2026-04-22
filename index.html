@@ -1988,11 +1988,9 @@ function finishManualReorder(e){
   e.preventDefault();
   e.stopPropagation();
   const drag=manualDrag;
-  let targetIndex=0;
-  for(const child of [...drag.body.children]){
-    if(child===drag.placeholder) break;
-    if(child.matches?.('.row[data-pid]') && child!==drag.row) targetIndex++;
-  }
+  const flow=[...drag.body.children].filter(el=>el.matches?.('.row[data-pid], .row-drop-placeholder'));
+  const placeholderIndex=flow.indexOf(drag.placeholder);
+  const targetIndex=Math.max(0, placeholderIndex);
   cleanupManualDrag(false);
   if(targetIndex!==drag.startIndex){
     applyManualReorder(drag.pid, drag.startIndex, targetIndex);
@@ -2017,53 +2015,63 @@ function cleanupManualDrag(skipRender){
 
 function applyManualReorder(pid, fromIndex, targetIndex){
   const userId=state.settings.currentUser;
-  const ordered=sortPeople(filterPeople());
-  const currentIndex=ordered.findIndex(p=>p.id===pid);
+  const visibleOrdered=sortPeople(filterPeople());
+  const currentIndex=visibleOrdered.findIndex(p=>p.id===pid);
   if(currentIndex<0) return;
-  const [moved]=ordered.splice(currentIndex,1);
-  ordered.splice(targetIndex,0,moved);
-  const originalScores=ordered.map(p=>getElo(userId,p.id));
-  const finalScores=computeMinimalCascadeScores(originalScores, targetIndex);
+  const safeTarget=Math.max(0, Math.min(targetIndex, visibleOrdered.length-1));
+  if(currentIndex===safeTarget) return;
+  const [moved]=visibleOrdered.splice(currentIndex,1);
+  visibleOrdered.splice(safeTarget,0,moved);
+
+  const originalScores=visibleOrdered.map(p=>getElo(userId,p.id));
+  const finalScores=computeManualPlacementScores(originalScores, safeTarget);
+
   if(!state.elo[userId]) state.elo[userId]={};
-  ordered.forEach((p,i)=>{ state.elo[userId][p.id]=finalScores[i]; });
+  visibleOrdered.forEach((p,i)=>{ state.elo[userId][p.id]=finalScores[i]; });
   saveState();
   renderList();
-  toast(`Position mise à jour : ${moved.name}`,'ok');
+  toast(`Position mise à jour : ${moved.name} · ELO ${finalScores[safeTarget]}`,'ok');
 }
 
-function computeMinimalCascadeScores(scores, pivotIndex){
+function computeManualPlacementScores(scores, pivotIndex){
   const oldPivot=scores[pivotIndex];
   const above=pivotIndex>0 ? scores[pivotIndex-1] : null;
   const below=pivotIndex<scores.length-1 ? scores[pivotIndex+1] : null;
-  const candidates=new Set([oldPivot]);
-  if(above!=null){ candidates.add(above); candidates.add(above-1); candidates.add(above+1); }
-  if(below!=null){ candidates.add(below); candidates.add(below-1); candidates.add(below+1); }
+  const candidates=new Set([Math.round(oldPivot)]);
+
   if(above!=null && below!=null){
+    candidates.add(above-1);
+    candidates.add(below+1);
+    candidates.add(Math.round((above+below)/2));
     candidates.add(Math.floor((above+below)/2));
     candidates.add(Math.ceil((above+below)/2));
     candidates.add(Math.min(above-1, Math.max(below+1, oldPivot)));
-  } else if(above!=null){
+  }else if(above!=null){
+    candidates.add(above-1);
     candidates.add(Math.min(oldPivot, above-1));
-  } else if(below!=null){
+  }else if(below!=null){
+    candidates.add(below+1);
     candidates.add(Math.max(oldPivot, below+1));
   }
+
   let best=null;
   for(const cand of [...candidates]){
     const arr=scores.slice();
     arr[pivotIndex]=Math.round(cand);
+
     for(let i=pivotIndex-1;i>=0;i--){
-      if(arr[i] <= arr[i+1]) arr[i]=arr[i+1]+1;
-      else break;
+      arr[i]=Math.max(arr[i], arr[i+1]+1);
     }
     for(let i=pivotIndex+1;i<arr.length;i++){
-      if(arr[i] >= arr[i-1]) arr[i]=arr[i-1]-1;
-      else break;
+      arr[i]=Math.min(arr[i], arr[i-1]-1);
     }
+
     let valid=true;
     for(let i=1;i<arr.length;i++){
-      if(!(arr[i-1] > arr[i])){ valid=false; break; }
+      if(arr[i-1] <= arr[i]){ valid=false; break; }
     }
     if(!valid) continue;
+
     const cost=arr.reduce((sum,v,i)=>sum+Math.abs(v-scores[i]),0);
     const changed=arr.reduce((sum,v,i)=>sum+(v!==scores[i]?1:0),0);
     const pivotDistance=Math.abs(arr[pivotIndex]-oldPivot);
@@ -2072,7 +2080,14 @@ function computeMinimalCascadeScores(scores, pivotIndex){
       best={arr,key};
     }
   }
-  return best ? best.arr : scores.slice();
+
+  if(best) return best.arr;
+
+  const fallback=scores.slice();
+  fallback[pivotIndex]=above!=null ? above-1 : ((below!=null ? below+1 : oldPivot));
+  for(let i=pivotIndex-1;i>=0;i--) fallback[i]=Math.max(fallback[i], fallback[i+1]+1);
+  for(let i=pivotIndex+1;i<fallback.length;i++) fallback[i]=Math.min(fallback[i], fallback[i-1]-1);
+  return fallback;
 }
 
 /* ============ MODALS ============ */
