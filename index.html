@@ -3539,25 +3539,6 @@ function renderConsult(){
 
 /* ============ SETTINGS MODAL ============ */
 function openSettings(){ renderSettings(); openModal('modal-settings'); }
-function resetEloByGenderStep10(userId){
-  if(!state.elo[userId]) state.elo[userId] = {};
-  const assignGroup = (gender)=>{
-    const group = state.people
-      .filter(p=>p.gender===gender)
-      .slice()
-      .sort((a,b)=>{
-        const diff = getElo(userId,b.id) - getElo(userId,a.id);
-        if(diff) return diff;
-        return (a.name||'').localeCompare((b.name||''),'fr');
-      });
-    for(let i=0;i<group.length;i++){
-      const p = group[i];
-      state.elo[userId][p.id] = 1000 + 10 * (group.length - 1 - i);
-    }
-  };
-  assignGroup('M');
-  assignGroup('F');
-}
 function renderSettings(){
   $('#settings-body').innerHTML=`
     <div class="setting-section">
@@ -3600,10 +3581,6 @@ function renderSettings(){
           <option value="name" ${state.settings.sortBy==='name'?'selected':''}>Nom A-Z</option>
           <option value="added" ${state.settings.sortBy==='added'?'selected':''}>Récemment ajouté</option>
         </select>
-      </div>
-      <div class="setting-row">
-        <div class="sr-info"><div class="sr-name">Réétaler l'ELO par genre</div><div class="sr-desc">Conserve l'ordre actuel ELO et réassigne les scores par pas de 10. Le dernier homme et la dernière femme reçoivent 1000.</div></div>
-        <button class="btn btn-small" id="reset-elo-by-gender">Appliquer</button>
       </div>
     </div>
 
@@ -3670,17 +3647,6 @@ function renderSettings(){
   $('#sort-select').addEventListener('change',e=>{
     state.settings.sortBy=e.target.value;
     saveState(); renderList();
-  });
-  $('#reset-elo-by-gender').addEventListener('click',()=>{
-    const userId = state.settings.currentUser;
-    const userName = getUser(userId).name;
-    const ok = confirm(`Réétaler l'ELO de ${userName} par genre ?\n\nHommes : le dernier aura 1000, puis +10 en remontant.\nFemmes : le dernier aura 1000, puis +10 en remontant.`);
-    if(!ok) return;
-    resetEloByGenderStep10(userId);
-    saveState();
-    renderList();
-    renderSettings();
-    toast(`ELO réétalé par genre pour ${userName}`,'ok');
   });
   // ==== Export complet (avec photos uploadées) ====
   $('#export-data').addEventListener('click',()=>{
