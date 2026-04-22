@@ -2973,7 +2973,7 @@ function renderModesMenu(){
   $('#modes-body').innerHTML=`
     <div class="tour-hero" style="margin-bottom:12px">
       <div class="tico">⚡</div>
-      <div><h3>Choisis un mode</h3><p>Joueur : ${esc(user.name)}. Les trois modes utilisent le même classement ELO.</p></div>
+      <div><h3>Choisis un mode</h3><p>Joueur : ${esc(user.name)}. Les trois modes utilisent le même classement en points.</p></div>
     </div>
     <div style="display:grid;gap:10px">
       <button class="search-result" data-mode-open="duel">
@@ -2985,12 +2985,13 @@ function renderModesMenu(){
         <div class="sr-badge">🏆</div>
       </button>
       <button class="search-result" data-mode-open="lms">
-        <div class="sr-info"><div class="sr-name">Last man standing</div><div class="sr-meta">Départ choisi ou aléatoire, puis montée contre des ELO de plus en plus élevés jusqu'à la défaite.</div></div>
+        <div class="sr-info"><div class="sr-name">Last man standing</div><div class="sr-meta">Départ choisi ou aléatoire, puis montée contre des profils de plus en plus hauts en points jusqu'à la défaite.</div></div>
         <div class="sr-badge">⚔🏆</div>
       </button>
     </div>`;
   $$('[data-mode-open]', $('#modes-body')).forEach(b=>b.addEventListener('click',()=>{
     const mode=b.getAttribute('data-mode-open');
+    closeAllModals();
     if(mode==='duel') openDuel();
     else if(mode==='tournament') openTournament();
     else if(mode==='lms') openLms();
@@ -3112,7 +3113,7 @@ function renderLms(){
       <div>
         <div class="duel-stats"><button class="duel-vote-btn" data-lms-pick="${p.id}" type="button">Vote</button></div>
         <div class="d-name">${esc(p.name)} ${isChamp?'<span style="color:var(--amber)">• cible</span>':''}</div>
-        <div class="d-sub">ELO ${getElo(u,p.id)}</div>
+        <div class="d-sub">${getElo(u,p.id)} points</div>
       </div>
     </div>`;
   };
@@ -3237,14 +3238,14 @@ function renderDuel(){
       <div>
         <div class="duel-stats"><button class="duel-vote-btn" data-pick="${p.id}" type="button">Vote</button></div>
         <div class="d-name">${esc(p.name)}</div>
-        <div class="d-sub">ELO ${getElo(u,p.id)}</div>
+        <div class="d-sub">${getElo(u,p.id)} points</div>
       </div>
     </div>`;
   };
   body.innerHTML=filterBar+`
     <div class="duel-hero-card">
       <div class="hico">⚔</div>
-      <div><h3>Duel libre</h3><p>Utilise le bouton Vote sous la photo. L'ELO est mis à jour automatiquement.</p></div>
+      <div><h3>Duel libre</h3><p>Utilise le bouton Vote sous la photo. Les points s'ajustent automatiquement.</p></div>
     </div>
     <div class="duel-actions">
       <button class="btn btn-small" data-act="skip">Passer</button>
