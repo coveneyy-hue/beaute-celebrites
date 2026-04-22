@@ -218,7 +218,6 @@ body.show-date .row{min-width:420px}
 .note-card .nc-tiny{font-size:10px;font-weight:600;color:var(--text-3);margin-top:3px}
 
 .hint{font-size:12px;color:var(--text-3);padding:10px 12px;background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.15);border-radius:10px;display:flex;align-items:center;gap:8px;margin-bottom:14px}
-.sim-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(168,85,247,.14);border:1px solid rgba(168,85,247,.35);color:var(--julie-hi);font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px}
 
 
 
@@ -1302,7 +1301,7 @@ const state = {
     compareB: 'victor',
   },
 };
-const ui = { currentPersonId:null, draft:null, duel:null, tour:null, lms:null, photoIdx:0, simHistory:[] };
+const ui = { currentPersonId:null, draft:null, duel:null, tour:null, lms:null, photoIdx:0 };
 let pendingImport = null;
 
 /* ============ UTILITIES ============ */
@@ -1372,24 +1371,6 @@ function ensureBuckets(u){
   if(!state.tournaments[u]) state.tournaments[u]=[];
 }
 function getElo(u,p){ return state.elo[u]?.[p]??1500; }
-function competitionsAffectPoints(){ return state.settings.competitionAffectsPoints!==false; }
-function cloneUserPoints(u){ return Object.assign({}, state.elo[u]||{}); }
-function getLivePoints(u,pid,map){ return map && map[pid]!==undefined ? map[pid] : getElo(u,pid); }
-function applyPointsRuleToMap(u,w,l,map){
-  if(!map) return null;
-  const winnerBefore=getLivePoints(u,w,map);
-  const loserBefore=getLivePoints(u,l,map);
-  map[w]=Math.max(winnerBefore, loserBefore + 1);
-  if(map[l]===undefined) map[l]=getElo(u,l);
-  return { winnerBefore, loserBefore, winnerAfter:map[w], loserAfter:getLivePoints(u,l,map) };
-}
-function pushSimHistory(entry){
-  ui.simHistory = ui.simHistory || [];
-  ui.simHistory.push(entry);
-}
-function getCombinedDuelHistory(u){
-  return [ ...(state.duelHistory[u]||[]), ...((ui.simHistory||[]).filter(d=>d.userId===u)) ];
-}
 function getHeadToHeadWins(u,a,b){
   const hist = state.duelHistory[u]||[];
   let aWins=0,bWins=0;
@@ -1429,7 +1410,7 @@ function loadState(){
     const d=JSON.parse(r);
     Object.assign(state,d);
     USERS.forEach(u=>ensureBuckets(u.id));
-    state.settings=Object.assign({currentUser:'lily',tmdbKey:'',sortBy:'elo',sortDir:'desc',showDateCol:false,filter:'F',query:'',consultSort:'elo',compareA:'lily',compareB:'victor',heightUnit:'metric',competitionAffectsPoints:true},state.settings||{});
+    state.settings=Object.assign({currentUser:'lily',tmdbKey:'',sortBy:'elo',sortDir:'desc',showDateCol:false,filter:'F',query:'',consultSort:'elo',compareA:'lily',compareB:'victor',heightUnit:'metric'},state.settings||{});
   }catch(e){ console.warn(e); }
 }
 
@@ -2765,7 +2746,7 @@ function renderDetails(){
   const idx=Math.min(ui.photoIdx||0,Math.max(0,photos.length-1));
   const main=photos[idx]||'';
   const elo=getElo(u,p.id);
-  const duels=getCombinedDuelHistory(u).filter(d=>d.winnerId===p.id || d.loserId===p.id);
+  const duels=(state.duelHistory[u]||[]).filter(d=>d.winnerId===p.id || d.loserId===p.id);
   const wins=duels.filter(d=>d.winnerId===p.id).length;
   const losses=duels.filter(d=>d.loserId===p.id).length;
   const duelHistoryHtml = duels.length ? `
@@ -2785,14 +2766,7 @@ function renderDetails(){
             const text = d.winnerId===p.id
               ? `Victoire contre ${esc(opponent)}`
               : `Défaite contre ${esc(opponent)}`;
-            const before = d.winnerId===p.id ? d.winnerBefore : d.loserBefore;
-            const after = d.winnerId===p.id ? d.winnerAfter : d.loserAfter;
-            const pointsLine = (Number.isFinite(before) && Number.isFinite(after))
-              ? `<div style="margin-top:4px;font-size:12px;color:var(--text-3)">Points : <strong style="color:var(--text)">${before}</strong> → <strong style="color:var(--amber)">${after}</strong></div>`
-              : '';
-            const modeLabel = d.affectsPoints===false ? 'Simulation' : 'Classement';
-            const sourceLabel = d.source==='tournament' ? 'Tournoi' : (d.source==='lms' ? 'Last man standing' : 'Duel');
-            return `<div class="duel-history-item"><span class="duel-history-date">${esc(date)}</span> - <strong>${text}</strong><div style="margin-top:4px;font-size:12px;color:var(--text-3)">Mode : <strong style="color:${d.affectsPoints===false?'var(--julie-hi)':'var(--victor-hi)'}">${modeLabel}</strong> · Source : <strong style="color:var(--text-2)">${sourceLabel}</strong></div>${pointsLine}</div>`;
+            return `<div class="duel-history-item"><span class="duel-history-date">${esc(date)}</span> - <strong>${text}</strong></div>`;
           })
           .join('')}
       </div>
@@ -3026,7 +3000,7 @@ function renderModesMenu(){
 
 /* ============ LAST MAN STANDING ============ */
 function openLms(){
-  ui.lms={ stage:'setup', filter:'F', startMode:'selected', selectedId:'', currentId:'', opponentId:'', streak:0, beaten:[], photoIdx:{}, simElo:competitionsAffectPoints()?null:cloneUserPoints(state.settings.currentUser), sessionDuels:0 };
+  ui.lms={ stage:'setup', filter:'F', startMode:'selected', selectedId:'', currentId:'', opponentId:'', streak:0, beaten:[], photoIdx:{} };
   renderLms();
   openModal('modal-lms');
 }
@@ -3041,12 +3015,12 @@ function pickLmsOpponent(){
   const excluded=new Set([champId, ...beatenIds]);
   const pool=getLmsPool()
     .filter(p=>!excluded.has(p.id))
-    .sort((a,b)=>getLivePoints(u,a.id,ui.lms?.simElo)-getLivePoints(u,b.id,ui.lms?.simElo) || a.name.localeCompare(b.name,'fr'));
+    .sort((a,b)=>getElo(u,a.id)-getElo(u,b.id) || a.name.localeCompare(b.name,'fr'));
   if(!pool.length) return null;
 
   const referenceId = beatenIds.length ? beatenIds[beatenIds.length-1] : champId;
-  const referenceElo = getLivePoints(u, referenceId, ui.lms?.simElo);
-  return pool.find(p=>getLivePoints(u,p.id,ui.lms?.simElo)>referenceElo) || null;
+  const referenceElo = getElo(u, referenceId);
+  return pool.find(p=>getElo(u,p.id)>referenceElo) || null;
 }
 function startLms(){
   const pool=getLmsPool();
@@ -3071,12 +3045,11 @@ function renderLms(){
   const pool=getLmsPool();
   $('#lms-sub').textContent='Joueur : '+user.name;
   if(ui.lms.stage==='setup'){
-    const options=pool.slice().sort((a,b)=>a.name.localeCompare(b.name,'fr')).map(p=>`<option value="${p.id}" ${ui.lms.selectedId===p.id?'selected':''}>${esc(p.name)} · ${getLivePoints(u,p.id,ui.lms.simElo)} points</option>`).join('');
+    const options=pool.slice().sort((a,b)=>a.name.localeCompare(b.name,'fr')).map(p=>`<option value="${p.id}" ${ui.lms.selectedId===p.id?'selected':''}>${esc(p.name)} · ELO ${getElo(u,p.id)}</option>`).join('');
     $('#lms-body').innerHTML=`
-      ${!competitionsAffectPoints()?'<div class="sim-badge">Simulation en cours</div>':''}
       <div class="tour-hero">
         <div class="tico">🏆</div>
-        <div><h3>Last man standing</h3><p>Choisis un profil de départ ou lance un tirage aléatoire. Il rencontrera ensuite à chaque victoire le prochain adversaire ayant 1 point de plus ou davantage jusqu'à sa défaite. ${competitionsAffectPoints()?"Les points sont mis à jour.":"Simulation : les points évoluent seulement dans cette partie."}</p></div>
+        <div><h3>Last man standing</h3><p>Choisis un profil de départ ou lance un tirage aléatoire. Il rencontrera ensuite à chaque victoire le prochain adversaire ayant la cote ELO immédiatement au-dessus jusqu'à sa défaite.</p></div>
       </div>
       <div class="field" style="margin-bottom:12px">
         <label>Catégorie</label>
@@ -3099,7 +3072,7 @@ function renderLms(){
           ${options}
         </select>
       </div>
-      <div class="search-hint" style="margin-bottom:12px">${ui.lms.startMode==='random'?'Le profil de départ sera tiré au sort dans le genre actif.':'Le profil choisi affrontera ensuite le prochain profil juste au-dessus en points à chaque victoire.'}</div>
+      <div class="search-hint" style="margin-bottom:12px">${ui.lms.startMode==='random'?'Le profil de départ sera tiré au sort dans le genre actif.':'Le profil choisi affrontera ensuite le prochain point juste au-dessus à chaque victoire.'}</div>
       <button class="btn btn-primary btn-block" id="lms-start" ${pool.length<2||(ui.lms.startMode==='selected'&&!ui.lms.selectedId)?'disabled':''}>${ui.lms.startMode==='random'?'Lancer en aléatoire':'Lancer le mode'}</button>
       ${pool.length<2?'<div class="search-hint">Il faut au moins 2 profils dans ce filtre.</div>':''}`;
     $$('#lms-body [data-lfs]').forEach(b=>b.addEventListener('click',()=>{ ui.lms.filter=b.getAttribute('data-lfs'); ui.lms.selectedId=''; renderLms(); }));
@@ -3123,7 +3096,7 @@ function renderLms(){
         <div class="tico">👑</div>
         <div><h3>Parcours terminé</h3><p>${esc(champ.name)} a survécu à tous les adversaires disponibles dans ce filtre.</p></div>
       </div>
-      <div class="stat-hero"><div class="box"><div class="v">${ui.lms.streak}</div><div class="l">Victoires</div></div><div class="box"><div class="v">${getLivePoints(u,champ.id,ui.lms.simElo)}</div><div class="l">Points finaux</div></div></div>
+      <div class="stat-hero"><div class="box"><div class="v">${ui.lms.streak}</div><div class="l">Victoires</div></div><div class="box"><div class="v">${getElo(u,champ.id)}</div><div class="l">Points finaux</div></div></div>
       <button class="btn btn-primary btn-block" id="lms-restart">Recommencer</button>`;
     $('#lms-restart')?.addEventListener('click',()=>openLms());
     return;
@@ -3140,20 +3113,19 @@ function renderLms(){
       <div>
         <div class="duel-stats"><button class="duel-vote-btn" data-lms-pick="${p.id}" type="button">Vote</button></div>
         <div class="d-name">${esc(p.name)} ${isChamp?'<span style="color:var(--amber)">• cible</span>':''}</div>
-        <div class="d-sub">${getLivePoints(u,p.id,ui.lms.simElo)} points</div>
+        <div class="d-sub">${getElo(u,p.id)} points</div>
       </div>
     </div>`;
   };
   $('#lms-body').innerHTML=`
-    ${!competitionsAffectPoints()?'<div class="sim-badge">Simulation en cours</div>':''}
     <div class="tour-hero">
       <div class="tico">⚔</div>
-      <div><h3>Last man standing</h3><p>${esc(champ.name)} continue jusqu'à sa défaite. Chaque victoire enchaîne le prochain adversaire juste au-dessus en points. ${competitionsAffectPoints()?"Les points sont actifs.":"Simulation : les points restent locaux à cette partie."}</p></div>
+      <div><h3>Last man standing</h3><p>${esc(champ.name)} continue jusqu'à sa défaite. Chaque victoire enchaîne le prochain adversaire juste au-dessus en ELO.</p></div>
     </div>
     <div class="stat-hero">
       <div class="box"><div class="v">${ui.lms.streak}</div><div class="l">Série</div></div>
-      <div class="box"><div class="v">${getLivePoints(u,champ.id,ui.lms.simElo)}</div><div class="l">Points cible</div></div>
-      <div class="box"><div class="v">${getLivePoints(u,opp.id,ui.lms.simElo)}</div><div class="l">Points adverse</div></div>
+      <div class="box"><div class="v">${getElo(u,champ.id)}</div><div class="l">ELO cible</div></div>
+      <div class="box"><div class="v">${getElo(u,opp.id)}</div><div class="l">ELO adverse</div></div>
       <div class="box"><div class="v">${ui.lms.beaten.length}</div><div class="l">Battus</div></div>
     </div>
     <div class="duel-actions">
@@ -3173,22 +3145,12 @@ function lmsVote(winnerId){
   const oppId=ui.lms.opponentId;
   if(!champId || !oppId || winnerId!==champId && winnerId!==oppId) return;
   const loserId=winnerId===champId?oppId:champId;
-  if(competitionsAffectPoints()){
-    const winnerBefore=getElo(u, winnerId);
-    const loserBefore=getElo(u, loserId);
-    updateElo(u, winnerId, loserId);
-    const winnerAfter=getElo(u, winnerId);
-    const loserAfter=getElo(u, loserId);
-    state.duels[u]=(state.duels[u]||0)+1;
-    state.duelHistory[u]=state.duelHistory[u]||[];
-    state.duelHistory[u].push({ winnerId, loserId, t:Date.now(), source:'lms', affectsPoints:true, winnerBefore, loserBefore, winnerAfter, loserAfter });
-    saveState();
-    renderList();
-  }else{
-    const pointsChange = applyPointsRuleToMap(u, winnerId, loserId, ui.lms.simElo);
-    ui.lms.sessionDuels = (ui.lms.sessionDuels||0) + 1;
-    pushSimHistory({ userId:u, winnerId, loserId, t:Date.now(), source:'lms', affectsPoints:false, ...pointsChange });
-  }
+  updateElo(u, winnerId, loserId);
+  state.duels[u]=(state.duels[u]||0)+1;
+  state.duelHistory[u]=state.duelHistory[u]||[];
+  state.duelHistory[u].push({ winnerId, loserId, t:Date.now(), source:'lms' });
+  saveState();
+  renderList();
   if(winnerId===champId){
     ui.lms.streak += 1;
     ui.lms.beaten.push(oppId);
@@ -3202,7 +3164,7 @@ function lmsVote(winnerId){
         <div class="tico">⛔</div>
         <div><h3>Défaite de ${esc(champ?.name||'la cible')}</h3><p>Parcours arrêté après ${ui.lms.streak} victoire${ui.lms.streak>1?'s':''}.</p></div>
       </div>
-      <div class="stat-hero"><div class="box"><div class="v">${ui.lms.streak}</div><div class="l">Victoires</div></div><div class="box"><div class="v">${getLivePoints(u,champId,ui.lms.simElo)}</div><div class="l">Points finaux</div></div><div class="box"><div class="v">${getLivePoints(u,oppId,ui.lms.simElo)}</div><div class="l">Vainqueur</div></div></div>
+      <div class="stat-hero"><div class="box"><div class="v">${ui.lms.streak}</div><div class="l">Victoires</div></div><div class="box"><div class="v">${getElo(u,champId)}</div><div class="l">Points finaux</div></div><div class="box"><div class="v">${getElo(u,oppId)}</div><div class="l">Vainqueur</div></div></div>
       <button class="btn btn-primary btn-block" id="lms-restart">Recommencer</button>`;
     $('#lms-restart')?.addEventListener('click',()=>openLms());
     toast('La cible a perdu','err');
@@ -3213,7 +3175,7 @@ function lmsVote(winnerId){
 
 /* ============ DUEL MODAL ============ */
 function openDuel(){
-  ui.duel={ filter:'F', pair:null, photoIdx:{}, simElo:competitionsAffectPoints()?null:cloneUserPoints(state.settings.currentUser), sessionDuels:0 };
+  ui.duel={ filter:'F', pair:null, photoIdx:{} };
   renderDuel();
   openModal('modal-duel');
 }
@@ -3230,9 +3192,9 @@ function pickPair(){
   const sliceSize=Math.max(4,Math.ceil(sorted.length*0.25));
   const candidates=sorted.slice(0,sliceSize);
   const a=candidates[Math.floor(Math.random()*candidates.length)];
-  const ae=getLivePoints(u,a.id,ui.duel?.simElo);
+  const ae=getElo(u,a.id);
   // Among remaining pool, pick within 8 closest ELO
-  const rest=pool.filter(p=>p.id!==a.id).map(p=>({p,d:Math.abs(getLivePoints(u,p.id,ui.duel?.simElo)-ae)}));
+  const rest=pool.filter(p=>p.id!==a.id).map(p=>({p,d:Math.abs(getElo(u,p.id)-ae)}));
   rest.sort((x,y)=>x.d-y.d);
   const near=rest.slice(0,Math.min(8,rest.length));
   return [a,near[Math.floor(Math.random()*near.length)].p];
@@ -3253,7 +3215,7 @@ function renderDuel(){
     <button class="${ui.duel.filter==='M'?'on m':''}" data-f="M">Hommes</button>
   </div>`;
   if(!pair){
-    body.innerHTML=filterBar+`${!competitionsAffectPoints()?'<div class="sim-badge">Simulation en cours</div>':''}<div class="empty-state"><div class="big">⚔</div><h3>Pas assez dans ce filtre</h3><p>Change de filtre ou ajoute plus de profils.</p></div>`;
+    body.innerHTML=filterBar+`<div class="empty-state"><div class="big">⚔</div><h3>Pas assez dans ce filtre</h3><p>Change de filtre ou ajoute plus de profils.</p></div>`;
     $$('#duel-body [data-f]').forEach(b=>b.addEventListener('click',()=>{ ui.duel.filter=b.getAttribute('data-f'); ui.duel.pair=null; renderDuel(); }));
     return;
   }
@@ -3276,22 +3238,21 @@ function renderDuel(){
       <div>
         <div class="duel-stats"><button class="duel-vote-btn" data-pick="${p.id}" type="button">Vote</button></div>
         <div class="d-name">${esc(p.name)}</div>
-        <div class="d-sub">${getLivePoints(u,p.id,ui.duel.simElo)} points</div>
+        <div class="d-sub">${getElo(u,p.id)} points</div>
       </div>
     </div>`;
   };
   body.innerHTML=filterBar+`
-    ${!competitionsAffectPoints()?'<div class="sim-badge">Simulation en cours</div>':''}
     <div class="duel-hero-card">
       <div class="hico">⚔</div>
-      <div><h3>Duel libre</h3><p>Utilise le bouton Vote sous la photo. ${competitionsAffectPoints()?"Les points s\'ajustent automatiquement.":"Simulation : les points évoluent seulement dans ce duel libre."}</p></div>
+      <div><h3>Duel libre</h3><p>Utilise le bouton Vote sous la photo. Les points s'ajustent automatiquement.</p></div>
     </div>
     <div class="duel-actions">
       <button class="btn btn-small" data-act="skip">Passer</button>
       <button class="btn btn-small btn-danger" data-act="close">Terminer</button>
     </div>
     <div class="duel-arena">${card(a,wA)}${card(b,wB)}</div>
-    <div style="margin-top:14px;text-align:center;font-size:12px;color:var(--text-3)">${competitionsAffectPoints()?(state.duels[u]||0):(ui.duel.sessionDuels||0)} duel${(competitionsAffectPoints()?(state.duels[u]||0):(ui.duel.sessionDuels||0))>1?'s':''} ${competitionsAffectPoints()?'au total':'dans cette simulation'}</div>`;
+    <div style="margin-top:14px;text-align:center;font-size:12px;color:var(--text-3)">${state.duels[u]||0} duel${(state.duels[u]||0)>1?'s':''} au total</div>`;
   $$('#duel-body [data-f]').forEach(x=>x.addEventListener('click',()=>{ ui.duel.filter=x.getAttribute('data-f'); ui.duel.pair=null; renderDuel(); }));
   $$('#duel-body [data-trash]').forEach(el=>el.addEventListener('click',e=>{
     // Prevent the parent duel-card button from firing (which would count as a vote)
@@ -3352,28 +3313,18 @@ function renderDuel(){
 function recordDuel(w,l){
   const u=state.settings.currentUser;
   ensureBuckets(u);
-  if(competitionsAffectPoints()){
-    const winnerBefore=getElo(u,w);
-    const loserBefore=getElo(u,l);
-    state.duels[u]=(state.duels[u]||0)+1;
-    updateElo(u,w,l);
-    const winnerAfter=getElo(u,w);
-    const loserAfter=getElo(u,l);
-    state.duelHistory[u].push({ winnerId:w, loserId:l, t:Date.now(), source:'duel', affectsPoints:true, winnerBefore, loserBefore, winnerAfter, loserAfter });
-    saveState();
-    renderList();
-  }else{
-    const pointsChange = applyPointsRuleToMap(u,w,l,ui.duel.simElo);
-    ui.duel.sessionDuels = (ui.duel.sessionDuels||0) + 1;
-    pushSimHistory({ userId:u, winnerId:w, loserId:l, t:Date.now(), source:'duel', affectsPoints:false, ...pointsChange });
-  }
+  state.duels[u]=(state.duels[u]||0)+1;
+  state.duelHistory[u].push({ winnerId:w, loserId:l, t:Date.now() });
+  updateElo(u,w,l);
+  saveState();
+  renderList();
   ui.duel.pair=null;
   renderDuel();
 }
 
 /* ============ TOURNAMENT ============ */
 function openTournament(){
-  ui.tour={ stage:'setup', config:{ filter:'F', size:32, blind:false, seeding:'random' }, data:null, photoIdx:{}, simElo:competitionsAffectPoints()?null:cloneUserPoints(state.settings.currentUser) };
+  ui.tour={ stage:'setup', config:{ filter:'F', size:32, blind:false, seeding:'random' }, data:null, photoIdx:{} };
   renderTournament();
   openModal('modal-tournament');
 }
@@ -3394,10 +3345,9 @@ function renderTourSetup(){
   $('#tour-title').textContent='Nouveau tournoi';
   $('#tour-sub').textContent='Joueur : '+getUser(u).name;
   $('#tour-body').innerHTML=`
-    ${!competitionsAffectPoints()?'<div class="sim-badge">Simulation en cours</div>':''}
     <div class="tour-hero">
       <div class="tico">🏆</div>
-      <div><h3>Tournoi 32 — tirage aléatoire</h3><p>Chaque combat est journalisé. ${competitionsAffectPoints()?"Le classement est mis à jour.":"Simulation : les points évoluent seulement dans ce tournoi."}</p></div>
+      <div><h3>Tournoi 32 — tirage aléatoire</h3><p>Chaque combat est journalisé et l'ELO est mis à jour.</p></div>
     </div>
     <div class="field" style="margin-bottom:12px">
       <label>Catégorie</label>
@@ -3442,10 +3392,10 @@ function startTournament(config){
   let n=config.size/2;
   while(n>=2){ n=n/2; const m=[]; for(let i=0;i<n;i++) m.push({a:null,b:null,winner:null}); rounds.push({matches:m}); }
   const tour={ id:'t_'+Date.now(), createdAt:Date.now(), config, rounds, currentRound:0, currentMatch:0, status:'playing', winnerId:null };
-  if(competitionsAffectPoints()) state.tournaments[u].push(tour);
+  state.tournaments[u].push(tour);
   ui.tour.stage='playing';
   ui.tour.data=tour;
-  if(competitionsAffectPoints()) saveState();
+  saveState();
   renderTournament();
 }
 function renderTourPlay(){
@@ -3602,21 +3552,15 @@ function tourAdvance(winId){
   m.winner=winId;
   const loseId=m.a===winId?m.b:m.a;
   // Capture ELO before update to compute delta
-  const scoreMap = competitionsAffectPoints() ? null : ui.tour.simElo;
-  const eloWBefore=competitionsAffectPoints()?getElo(u,winId):getLivePoints(u,winId,scoreMap);
-  const eloLBefore=competitionsAffectPoints()?getElo(u,loseId):getLivePoints(u,loseId,scoreMap);
-  if(competitionsAffectPoints()) updateElo(u,winId,loseId);
-  else applyPointsRuleToMap(u,winId,loseId,scoreMap);
-  const eloWAfter=competitionsAffectPoints()?getElo(u,winId):getLivePoints(u,winId,scoreMap);
-  const eloLAfter=competitionsAffectPoints()?getElo(u,loseId):getLivePoints(u,loseId,scoreMap);
+  const eloWBefore=getElo(u,winId);
+  const eloLBefore=getElo(u,loseId);
+  updateElo(u,winId,loseId);
+  const eloWAfter=getElo(u,winId);
+  const eloLAfter=getElo(u,loseId);
   m.eloDeltas={ [winId]: eloWAfter-eloWBefore, [loseId]: eloLAfter-eloLBefore };
-  if(competitionsAffectPoints()){
-    state.duels[u]=(state.duels[u]||0)+1;
-    state.duelHistory[u]=state.duelHistory[u]||[];
-    state.duelHistory[u].push({ winnerId:winId, loserId:loseId, t:Date.now(), source:'tournament', affectsPoints:true, winnerBefore:eloWBefore, loserBefore:eloLBefore, winnerAfter:eloWAfter, loserAfter:eloLAfter });
-  } else {
-    pushSimHistory({ userId:u, winnerId:winId, loserId:loseId, t:Date.now(), source:'tournament', affectsPoints:false, winnerBefore:eloWBefore, loserBefore:eloLBefore, winnerAfter:eloWAfter, loserAfter:eloLAfter });
-  }
+  state.duels[u]=(state.duels[u]||0)+1;
+  state.duelHistory[u]=state.duelHistory[u]||[];
+  state.duelHistory[u].push({ winnerId:winId, loserId:loseId, t:Date.now(), source:'tournament' });
   if(t.currentMatch+1<r.matches.length){ t.currentMatch+=1; }
   else if(t.currentRound+1<t.rounds.length){
     const nx=t.rounds[t.currentRound+1];
@@ -3629,10 +3573,8 @@ function tourAdvance(winId){
     t.status='complete'; t.winnerId=winId;
     ui.tour.stage='podium';
   }
-  if(competitionsAffectPoints()){
-    saveState();
-    renderList();
-  }
+  saveState();
+  renderList();
   renderTournament();
 }
 function renderTourPodium(){
@@ -3667,7 +3609,6 @@ function renderTourPodium(){
   $('#tour-title').textContent='Podium';
   $('#tour-sub').textContent='Tournoi terminé';
   $('#tour-body').innerHTML=`
-    ${!competitionsAffectPoints()?'<div class="sim-badge">Simulation en cours</div>':''}
     <div class="tour-hero" style="background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(251,113,133,.12));border-color:rgba(245,158,11,.4)">
       <div class="tico" style="background:rgba(245,158,11,.3);color:var(--amber-hi)">👑</div>
       <div><h3>Champion${champ&&champ.gender==='F'?'ne':''} : ${esc(champ?.name||'?')}</h3><p>${esc(getUser(u).name)} a couronné ${t.config.filter==='F'?'une gagnante':t.config.filter==='M'?'un gagnant':'un(e) gagnant(e)'} en ${t.rounds.length} rounds.</p></div>
@@ -3867,13 +3808,6 @@ function renderSettings(){
           <option value="imperial" ${state.settings.heightUnit==='imperial'?'selected':''}>Impérial</option>
         </select>
       </div>
-      <div class="setting-row">
-        <div class="sr-info"><div class="sr-name">Mode des compétitions</div><div class="sr-desc">Classement met à jour la base. Simulation garde les points seulement dans la partie en cours</div></div>
-        <select class="field" style="padding:7px 10px;border-radius:8px;background:var(--bg-3);border:1px solid var(--border)" id="competition-points-select">
-          <option value="on" ${state.settings.competitionAffectsPoints!==false?'selected':''}>Classement</option>
-          <option value="off" ${state.settings.competitionAffectsPoints===false?'selected':''}>Simulation</option>
-        </select>
-      </div>
     </div>
 
     <div class="setting-section">
@@ -3931,12 +3865,6 @@ function renderSettings(){
     try{ if($('#modal-consult')?.classList.contains('is-open')) renderConsult(); }catch(_){}
     try{ if($('#modal-detail')?.classList.contains('is-open') && detailPersonId) openDetails(detailPersonId); }catch(_){}
     toast(state.settings.heightUnit==='imperial' ? 'Taille affichée en pieds et pouces' : 'Taille affichée en centimètres','ok');
-  });
-  $('#competition-points-select')?.addEventListener('change',e=>{
-    state.settings.competitionAffectsPoints = e.target.value !== 'off';
-    saveState();
-    renderSettings();
-    toast(state.settings.competitionAffectsPoints ? 'Mode classement activé' : 'Mode simulation activé : aucun résultat n\'est enregistré','ok');
   });
   $('#test-tmdb-key').addEventListener('click',async()=>{
     const k=$('#tmdb-key-input').value.trim();
