@@ -1410,7 +1410,7 @@ function loadState(){
     const d=JSON.parse(r);
     Object.assign(state,d);
     USERS.forEach(u=>ensureBuckets(u.id));
-    state.settings=Object.assign({currentUser:'lily',tmdbKey:'',sortBy:'elo',sortDir:'desc',showDateCol:false,filter:'all',query:'',consultSort:'elo',compareA:'lily',compareB:'victor',heightUnit:'metric'},state.settings||{});
+    state.settings=Object.assign({currentUser:'lily',tmdbKey:'',sortBy:'elo',sortDir:'desc',showDateCol:false,filter:'F',query:'',consultSort:'elo',compareA:'lily',compareB:'victor',heightUnit:'metric'},state.settings||{});
   }catch(e){ console.warn(e); }
 }
 
@@ -2981,7 +2981,7 @@ function renderModesMenu(){
         <div class="sr-badge">⚔</div>
       </button>
       <button class="search-result" data-mode-open="tournament">
-        <div class="sr-info"><div class="sr-name">Tournoi</div><div class="sr-meta">Bracket 32 avec filtre Femmes, Hommes ou Mixte.</div></div>
+        <div class="sr-info"><div class="sr-name">Tournoi</div><div class="sr-meta">Bracket 32 avec filtre Femmes ou Hommes.</div></div>
         <div class="sr-badge">🏆</div>
       </button>
       <button class="search-result" data-mode-open="lms">
@@ -2999,13 +2999,13 @@ function renderModesMenu(){
 
 /* ============ LAST MAN STANDING ============ */
 function openLms(){
-  ui.lms={ stage:'setup', filter:'all', startMode:'selected', selectedId:'', currentId:'', opponentId:'', streak:0, beaten:[], photoIdx:{} };
+  ui.lms={ stage:'setup', filter:'F', startMode:'selected', selectedId:'', currentId:'', opponentId:'', streak:0, beaten:[], photoIdx:{} };
   renderLms();
   openModal('modal-lms');
 }
 function getLmsPool(){
   const f=ui.lms.filter;
-  return state.people.filter(p=>f==='all'||p.gender===f);
+  return state.people.filter(p=>p.gender===f);
 }
 function pickLmsOpponent(){
   const u=state.settings.currentUser;
@@ -3052,8 +3052,7 @@ function renderLms(){
       </div>
       <div class="field" style="margin-bottom:12px">
         <label>Catégorie</label>
-        <div class="tour-opts c3">
-          <button class="${ui.lms.filter==='all'?'on':''}" data-lfs="all">Tous (${state.people.length})</button>
+        <div class="tour-opts c2">
           <button class="${ui.lms.filter==='F'?'on f':''}" data-lfs="F">Femmes (${state.people.filter(p=>p.gender==='F').length})</button>
           <button class="${ui.lms.filter==='M'?'on m':''}" data-lfs="M">Hommes (${state.people.filter(p=>p.gender==='M').length})</button>
         </div>
@@ -3072,7 +3071,7 @@ function renderLms(){
           ${options}
         </select>
       </div>
-      <div class="search-hint" style="margin-bottom:12px">${ui.lms.startMode==='random'?'Le profil de départ sera tiré au sort dans le filtre actif.':'Le profil choisi affrontera ensuite le prochain ELO juste au-dessus à chaque victoire.'}</div>
+      <div class="search-hint" style="margin-bottom:12px">${ui.lms.startMode==='random'?'Le profil de départ sera tiré au sort dans le genre actif.':'Le profil choisi affrontera ensuite le prochain point juste au-dessus à chaque victoire.'}</div>
       <button class="btn btn-primary btn-block" id="lms-start" ${pool.length<2||(ui.lms.startMode==='selected'&&!ui.lms.selectedId)?'disabled':''}>${ui.lms.startMode==='random'?'Lancer en aléatoire':'Lancer le mode'}</button>
       ${pool.length<2?'<div class="search-hint">Il faut au moins 2 profils dans ce filtre.</div>':''}`;
     $$('#lms-body [data-lfs]').forEach(b=>b.addEventListener('click',()=>{ ui.lms.filter=b.getAttribute('data-lfs'); ui.lms.selectedId=''; renderLms(); }));
@@ -3096,7 +3095,7 @@ function renderLms(){
         <div class="tico">👑</div>
         <div><h3>Parcours terminé</h3><p>${esc(champ.name)} a survécu à tous les adversaires disponibles dans ce filtre.</p></div>
       </div>
-      <div class="stat-hero"><div class="box"><div class="v">${ui.lms.streak}</div><div class="l">Victoires</div></div><div class="box"><div class="v">${getElo(u,champ.id)}</div><div class="l">ELO final</div></div></div>
+      <div class="stat-hero"><div class="box"><div class="v">${ui.lms.streak}</div><div class="l">Victoires</div></div><div class="box"><div class="v">${getElo(u,champ.id)}</div><div class="l">Points finaux</div></div></div>
       <button class="btn btn-primary btn-block" id="lms-restart">Recommencer</button>`;
     $('#lms-restart')?.addEventListener('click',()=>openLms());
     return;
@@ -3164,7 +3163,7 @@ function lmsVote(winnerId){
         <div class="tico">⛔</div>
         <div><h3>Défaite de ${esc(champ?.name||'la cible')}</h3><p>Parcours arrêté après ${ui.lms.streak} victoire${ui.lms.streak>1?'s':''}.</p></div>
       </div>
-      <div class="stat-hero"><div class="box"><div class="v">${ui.lms.streak}</div><div class="l">Victoires</div></div><div class="box"><div class="v">${getElo(u,champId)}</div><div class="l">ELO final</div></div><div class="box"><div class="v">${getElo(u,oppId)}</div><div class="l">Vainqueur</div></div></div>
+      <div class="stat-hero"><div class="box"><div class="v">${ui.lms.streak}</div><div class="l">Victoires</div></div><div class="box"><div class="v">${getElo(u,champId)}</div><div class="l">Points finaux</div></div><div class="box"><div class="v">${getElo(u,oppId)}</div><div class="l">Vainqueur</div></div></div>
       <button class="btn btn-primary btn-block" id="lms-restart">Recommencer</button>`;
     $('#lms-restart')?.addEventListener('click',()=>openLms());
     toast('La cible a perdu','err');
@@ -3175,13 +3174,13 @@ function lmsVote(winnerId){
 
 /* ============ DUEL MODAL ============ */
 function openDuel(){
-  ui.duel={ filter:'all', pair:null, photoIdx:{} };
+  ui.duel={ filter:'F', pair:null, photoIdx:{} };
   renderDuel();
   openModal('modal-duel');
 }
 function pickPair(){
   const f=ui.duel.filter;
-  const pool=state.people.filter(p=>f==='all'||p.gender===f);
+  const pool=state.people.filter(p=>p.gender===f);
   if(pool.length<2) return null;
   const u=state.settings.currentUser;
   const hist=state.duelHistory[u]||[];
@@ -3210,8 +3209,7 @@ function renderDuel(){
     body.innerHTML=`<div class="empty-state"><div class="big">⚔</div><h3>Pas assez de personnes</h3><p>Ajoute au moins 2 profils pour lancer un duel.</p></div>`;
     return;
   }
-  const filterBar=`<div class="tour-opts c3" style="margin-bottom:14px">
-    <button class="${ui.duel.filter==='all'?'on':''}" data-f="all">Tous</button>
+  const filterBar=`<div class="tour-opts c2" style="margin-bottom:14px">
     <button class="${ui.duel.filter==='F'?'on f':''}" data-f="F">Femmes</button>
     <button class="${ui.duel.filter==='M'?'on m':''}" data-f="M">Hommes</button>
   </div>`;
@@ -3342,7 +3340,7 @@ function renderTourSetup(){
   const pA=state.people.length;
   t.config.size=32;
   t.config.seeding='random';
-  const cur=t.config.filter==='all'?pA:t.config.filter==='F'?pF:pM;
+  const cur=t.config.filter==='F'?pF:pM;
   $('#tour-title').textContent='Nouveau tournoi';
   $('#tour-sub').textContent='Joueur : '+getUser(u).name;
   $('#tour-body').innerHTML=`
@@ -3352,10 +3350,9 @@ function renderTourSetup(){
     </div>
     <div class="field" style="margin-bottom:12px">
       <label>Catégorie</label>
-      <div class="tour-opts" style="grid-template-columns:1fr 1fr 1fr">
+      <div class="tour-opts c2" style="grid-template-columns:1fr 1fr">
         <button class="${t.config.filter==='F'?'on f':''}" data-tf="F">Femmes (${pF})</button>
         <button class="${t.config.filter==='M'?'on m':''}" data-tf="M">Hommes (${pM})</button>
-        <button class="${t.config.filter==='all'?'on':''}" data-tf="all">Mixte (${pA})</button>
       </div>
     </div>
     <div style="margin-top:6px">
@@ -3372,7 +3369,7 @@ function renderTourSetup(){
     hist.innerHTML=state.tournaments[u].slice().reverse().slice(0,10).map(x=>{
       const win=state.people.find(p=>p.id===x.winnerId);
       const d=new Date(x.createdAt);
-      const label=x.config.filter==='F'?'Femmes':x.config.filter==='M'?'Hommes':'Mixte';
+      const label=x.config.filter==='F'?'Femmes':'Hommes';
       return `<div class="top-item" style="cursor:default">
         ${win?.mainPhoto?`<img src="${esc(win.mainPhoto)}" onerror="this.style.display='none'">`:`<div style="width:30px;height:42px;background:var(--bg-3);border-radius:6px"></div>`}
         <div class="nm">${label} ${x.config.size} · ${x.status==='complete'?'Champion : '+esc(win?.name||'?'):'En cours'}</div>
@@ -3384,7 +3381,7 @@ function renderTourSetup(){
 function startTournament(config){
   const u=state.settings.currentUser;
   ensureBuckets(u);
-  let pool=state.people.filter(p=>config.filter==='all'||p.gender===config.filter);
+  let pool=state.people.filter(p=>p.gender===config.filter);
   if(config.seeding==='elo') pool.sort((a,b)=>getElo(u,b.id)-getElo(u,a.id));
   else pool=pool.sort(()=>Math.random()-0.5);
   const parts=pool.slice(0,config.size);
@@ -3431,7 +3428,7 @@ function renderTourPlay(){
       </div>
     </div>`;
   };
-  const label=t.config.filter==='F'?'Femmes':t.config.filter==='M'?'Hommes':'Mixte';
+  const label=t.config.filter==='F'?'Femmes':'Hommes';
   $('#tour-body').innerHTML=`
     <div class="tour-hero">
       <div class="tico">🏆</div>
