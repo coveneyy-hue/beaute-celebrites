@@ -86,9 +86,9 @@ body.show-date .list-head{min-width:420px}
 body.show-date .row{min-width:420px}
 .row:last-child{border-bottom:none}
 .row:active{background:var(--card-hover)}
-.row-rank{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:15px;font-weight:700;color:var(--text);position:relative}
-.row-reorder-handle{display:none;width:30px;height:30px;border-radius:10px;align-items:center;justify-content:center;color:var(--text-2);background:var(--bg-2);border:1px solid var(--border);touch-action:none;cursor:grab;transition:background .15s,border-color .15s,color .15s,transform .1s}
-.row-reorder-handle svg{width:16px;height:16px}
+.row-rank{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:15px;font-weight:700;color:var(--text);position:relative}
+.row-reorder-handle{display:none;width:32px;height:32px;border-radius:10px;align-items:center;justify-content:center;color:var(--text-3);background:var(--bg-2);border:1px solid var(--border);touch-action:none;cursor:grab;transition:background .15s,border-color .15s,color .15s,transform .1s}
+.row-reorder-handle svg{width:18px;height:18px}
 .row-reorder-handle:active{transform:scale(.94)}
 .row.is-reorderable .row-reorder-handle{display:inline-flex}
 .row.is-reorderable .row-rank{gap:4px}
@@ -103,8 +103,8 @@ body.show-date .row{min-width:420px}
 .thumb{width:52px;height:72px;border-radius:10px;flex:none;background:var(--bg-3);object-fit:cover;border:1px solid var(--border)}
 .thumb.placeholder{display:grid;place-items:center;color:var(--text-4);font-size:11px}
 .row-info{min-width:0;flex:1}
-.row-name{font-size:16px;font-weight:800;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.row-sub{margin-top:4px;font-size:12.5px;color:var(--text-3);line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-name{font-size:16px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-sub{margin-top:4px;font-size:12px;color:var(--text-3);line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .row-badge{margin-top:4px;display:inline-flex;max-width:100%;min-width:0}
 .row-badge .badge{max-width:100%;padding:2px 7px;font-size:10.5px;gap:4px}
 .row-badge .badge svg{width:10px;height:10px}
@@ -120,7 +120,7 @@ body.show-date .row{min-width:420px}
 .badge-style{background:rgba(16,185,129,.12);color:var(--victor-hi);border:1px solid rgba(16,185,129,.3)}
 .badge-muse{background:linear-gradient(90deg,rgba(245,158,11,.18),rgba(251,113,133,.18));color:var(--amber-hi);border:1px solid rgba(245,158,11,.4)}
 
-.row-elo{text-align:center;font-size:13px;font-weight:700;color:var(--text-2);display:none}
+.row-elo{text-align:center;font-size:13px;font-weight:700;color:var(--text-2);min-width:76px}
 .row-elo small{display:block;color:var(--text-4);font-size:10px;font-weight:600;margin-top:1px}
 
 .empty-state{padding:40px 20px;text-align:center;color:var(--text-3)}
@@ -462,19 +462,22 @@ body.show-date .row{min-width:420px}
 .tour-opts button.on.f{background:rgba(236,72,153,.2);color:var(--lily-hi)}
 .tour-opts button:disabled{opacity:.35;pointer-events:none}
 
-/* ---- Date column visibility ---- */
-.col-date{ display:none }
-body.show-date .col-date{ display:block }
-.list-head .col-date{ display:none }
-body.show-date .list-head .col-date{ display:flex }
-/* Grid columns: 3-col default, 4-col when date visible */
-.list-head, .row{ grid-template-columns:64px 1fr }
-body.show-date .list-head, body.show-date .row{ grid-template-columns:64px 1fr 150px }
-/* In bulk mode the rank col shrinks to fit checkbox */
-body.bulk-mode .list-head, body.bulk-mode .row{ grid-template-columns:44px 1fr }
-body.bulk-mode.show-date .list-head, body.bulk-mode.show-date .row{ grid-template-columns:44px 1fr 150px }
-#sort-elo{display:none !important}
-/* Sort arrow indicator */
+/* ---- Main list optional columns ---- */
+.col-date,.col-points{display:none}
+body.show-date .col-date,
+body.show-points .col-points{display:block}
+.list-head .col-date,
+.list-head .col-points{display:none}
+body.show-date .list-head .col-date,
+body.show-points .list-head .col-points{display:flex}
+.list-head, .row{grid-template-columns:52px minmax(0,1fr)}
+body.show-points .list-head, body.show-points .row{grid-template-columns:52px minmax(0,1fr) 76px}
+body.show-date .list-head, body.show-date .row{grid-template-columns:52px minmax(0,1fr) 150px}
+body.show-points.show-date .list-head, body.show-points.show-date .row{grid-template-columns:52px minmax(0,1fr) 76px 150px}
+body.bulk-mode .list-head, body.bulk-mode .row{grid-template-columns:36px minmax(0,1fr)}
+body.bulk-mode.show-points .list-head, body.bulk-mode.show-points .row{grid-template-columns:36px minmax(0,1fr) 76px}
+body.bulk-mode.show-date .list-head, body.bulk-mode.show-date .row{grid-template-columns:36px minmax(0,1fr) 150px}
+body.bulk-mode.show-points.show-date .list-head, body.bulk-mode.show-points.show-date .row{grid-template-columns:36px minmax(0,1fr) 76px 150px}
 .sort-btn .sort-arrow{ font-size:10px; margin-left:3px; opacity:.7; display:inline-block }
 .tb-btn.is-active-eye{ background:rgba(245,158,11,.15); color:var(--amber-hi); border-color:rgba(245,158,11,.4) }
 
@@ -543,7 +546,7 @@ body.bulk-mode .list-head-check{display:flex}
   .tb-btn{width:34px;height:34px}
   .row{gap:6px;padding:9px 10px}
   .list-head{gap:6px;padding:10px 10px}
-  .thumb{width:46px;height:64px}
+  .thumb{width:44px;height:62px}
   .row-badge .badge{padding:2px 6px;font-size:10px}
   .row-badge .badge svg{width:9px;height:9px}
   .stat-hero{grid-template-columns:repeat(2,1fr)}
@@ -588,11 +591,15 @@ body.bulk-mode .list-head-check{display:flex}
       <svg viewBox="0 0 24 24" fill="none"><path d="M7 3v18M17 3v18M3 7h8M13 17h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
     </button>
     <button class="tb-btn" data-act="modes" aria-label="Modes de compétition : duel, tournoi et Last man standing">
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M4 7.5h3M17 7.5h3M5.2 6v3M18.8 6v3" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
-        <path d="M7 7.5h3.2M13.8 7.5H17" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
-        <circle cx="12" cy="5.1" r="1.6" stroke="currentColor" stroke-width="1.7"/>
-        <path d="M12 6.8v5.3M9.4 9.2 12 7.8l2.6 1.4M10 12.1l-1.4 5.2M14 12.1l1.4 5.2M12 12.1l-2.7 2.5M12 12.1l2.7 2.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="4.8" r="2.1" stroke-width="1.8"/>
+        <path d="M12 7.2v5.2" stroke-width="1.8"/>
+        <path d="M8.2 9.4 5.8 12.2" stroke-width="1.8"/>
+        <path d="M15.8 9.4 18.2 12.2" stroke-width="1.8"/>
+        <path d="M9.6 13.2 8.4 18.4" stroke-width="1.8"/>
+        <path d="M14.4 13.2 15.6 18.4" stroke-width="1.8"/>
+        <path d="M4.2 8.1v4.1M5.8 7.4v5.5M18.2 7.4v5.5M19.8 8.1v4.1" stroke-width="1.6"/>
+        <path d="M4.2 10.1h1.6M18.2 10.1h1.6M6.2 10.1h3.3M14.5 10.1h3.3" stroke-width="1.6"/>
       </svg>
     </button>
     <button class="tb-btn" data-act="settings" aria-label="Réglages">
@@ -631,7 +638,7 @@ body.bulk-mode .list-head-check{display:flex}
         </button>
       </div>
       <button class="sort-btn" id="sort-name" style="justify-self:start">PERSONNE</button>
-      <button class="sort-btn" id="sort-elo" style="justify-self:center">POINTS</button>
+      <button class="sort-btn col-points" id="sort-elo" style="justify-self:center">POINTS</button>
       <button class="sort-btn col-date" id="sort-added" style="justify-self:center">AJOUTÉ</button>
     </div>
     <div id="list-body"></div>
@@ -1313,58 +1320,6 @@ function uid(){ return 'p_'+Math.random().toString(36).slice(2,10)+Date.now().to
 function getUser(id){ return USERS.find(u=>u.id===id)||USERS[0]; }
 function esc(s){ if(s==null) return ''; return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function toast(msg,kind=''){ const t=$('#toast'); t.textContent=msg; t.className='show '+kind; clearTimeout(toast._tm); toast._tm=setTimeout(()=>{t.className='';},2400); }
-function getLiveHeightState(person){
-  const input=$('#detail-height');
-  if(input){
-    const raw=(input.value||'').trim().replace(',', '.');
-    if(raw==='') return { hasValue:false, value:null, source:'field', raw:'' };
-    const num=Number(raw);
-    if(!Number.isFinite(num) || num<=0) return { hasValue:false, value:null, source:'field', raw, invalid:true };
-    return { hasValue:true, value:Math.round(num), source:'field', raw };
-  }
-  if(person && Number.isFinite(person.heightCm) && person.heightCm>0){
-    return { hasValue:true, value:Math.round(person.heightCm), source:'saved', raw:String(person.heightCm) };
-  }
-  return { hasValue:false, value:null, source:'saved', raw:'' };
-}
-function syncDetailHeightInput(value){
-  const input=$('#detail-height');
-  if(input) input.value=value==null ? '' : String(value);
-}
-function resolveWikidataHeightChoice(person, candidate){
-  if(!person || !candidate) return { kind:'error', message:'Aucune donnée Wikidata à appliquer.' };
-  const current=getLiveHeightState(person);
-  if(current.invalid){
-    return { kind:'invalid-current', message:'La taille actuellement saisie est invalide. Corrige-la ou vide le champ avant d’utiliser Wikidata.' };
-  }
-  person.wikiId=candidate.wikiId || person.wikiId;
-  if(!candidate.heightCm){
-    saveState();
-    return { kind:'no-height', message:'Wikidata a trouvé cette personne, mais aucune taille exploitable n’est disponible.' };
-  }
-  const wikiHeight=Math.round(candidate.heightCm);
-  if(!current.hasValue){
-    person.heightCm=wikiHeight;
-    syncDetailHeightInput(wikiHeight);
-    saveState();
-    return { kind:'imported', message:`Taille importée depuis Wikidata : ${formatHeight(wikiHeight)}.` };
-  }
-  if(current.value===wikiHeight){
-    person.heightCm=wikiHeight;
-    syncDetailHeightInput(wikiHeight);
-    saveState();
-    return { kind:'same', message:`Wikidata confirme la taille actuelle : ${formatHeight(wikiHeight)}.` };
-  }
-  const overwrite=confirm(`Une taille est déjà présente : ${formatHeight(current.value)}.\nWikidata propose : ${formatHeight(wikiHeight)}.\n\nOK = écraser avec la valeur Wikidata\nAnnuler = conserver la valeur actuelle`);
-  if(overwrite){
-    person.heightCm=wikiHeight;
-    syncDetailHeightInput(wikiHeight);
-    saveState();
-    return { kind:'overwritten', message:`Taille remplacée par la valeur Wikidata : ${formatHeight(wikiHeight)}.` };
-  }
-  saveState();
-  return { kind:'kept', message:`Taille actuelle conservée : ${formatHeight(current.value)}. Valeur Wikidata ignorée : ${formatHeight(wikiHeight)}.` };
-}
 
 /* ====== Data management helpers ====== */
 function downloadJson(obj, filename){
@@ -1511,7 +1466,7 @@ function loadState(){
     const d=JSON.parse(r);
     Object.assign(state,d);
     USERS.forEach(u=>ensureBuckets(u.id));
-    state.settings=Object.assign({currentUser:'lily',tmdbKey:'',sortBy:'elo',sortDir:'desc',showDateCol:false,filter:'all',query:'',consultSort:'elo',compareA:'lily',compareB:'victor',heightUnit:'metric',simulationMode:false},state.settings||{});
+    state.settings=Object.assign({currentUser:'lily',tmdbKey:'',sortBy:'elo',sortDir:'desc',showDateCol:false,showPointsCol:false,filter:'all',query:'',consultSort:'elo',compareA:'lily',compareB:'victor',heightUnit:'metric',simulationMode:false},state.settings||{});
   }catch(e){ console.warn(e); }
 }
 
@@ -1887,12 +1842,98 @@ async function wikiSearchCandidates(person){
   return merged;
 }
 let pendingWikiHeightPersonId = null;
+function getHeightFieldContext(person){
+  const input = ui.currentPersonId===person.id ? $('#detail-height') : null;
+  const raw = input ? input.value.trim().replace(',', '.') : '';
+  if(raw){
+    const value = Number(raw);
+    if(!Number.isFinite(value) || value<=0){
+      return { hasValue:true, invalid:true, source:'field', raw };
+    }
+    return { hasValue:true, invalid:false, source:'field', valueCm:Math.round(value), raw };
+  }
+  const saved = Number(person.heightCm);
+  if(Number.isFinite(saved) && saved>0){
+    return { hasValue:true, invalid:false, source:'saved', valueCm:Math.round(saved), raw:String(Math.round(saved)) };
+  }
+  return { hasValue:false, invalid:false, source:'none', valueCm:null, raw:'' };
+}
+function setDetailHeightFieldValue(person, cm){
+  const input = ui.currentPersonId===person.id ? $('#detail-height') : null;
+  if(input) input.value = cm ? String(Math.round(cm)) : '';
+}
+function applyWikiHeightCandidate(person, candidate){
+  person.wikiId = candidate.wikiId || person.wikiId || null;
+  if(!candidate.heightCm){
+    saveState();
+    return {
+      changed:false,
+      rerender:false,
+      message:"Wikidata n'a trouvé aucune taille pour cette personne. Valeur actuelle inchangée.",
+      tone:'err'
+    };
+  }
+  const proposedCm = Math.round(candidate.heightCm);
+  const current = getHeightFieldContext(person);
+  if(current.invalid){
+    return {
+      changed:false,
+      rerender:false,
+      message:'La taille saisie dans le champ est invalide. Corrige-la avant de comparer avec Wikidata.',
+      tone:'err'
+    };
+  }
+  if(current.hasValue){
+    if(current.valueCm===proposedCm){
+      saveState();
+      return {
+        changed:false,
+        rerender:false,
+        message:`Même taille trouvée sur Wikidata : ${formatHeight(proposedCm)}. Valeur actuelle conservée.`,
+        tone:'ok'
+      };
+    }
+    const overwrite = confirm(`Une taille est déjà présente : ${formatHeight(current.valueCm)}.
+
+Wikidata propose : ${formatHeight(proposedCm)}.
+
+OK : écraser avec la valeur Wikidata
+Annuler : conserver la valeur actuelle`);
+    if(!overwrite){
+      saveState();
+      return {
+        changed:false,
+        rerender:false,
+        message:`Valeur actuelle conservée : ${formatHeight(current.valueCm)}. Proposition Wikidata : ${formatHeight(proposedCm)}.`,
+        tone:'ok'
+      };
+    }
+    person.heightCm = proposedCm;
+    setDetailHeightFieldValue(person, proposedCm);
+    saveState();
+    return {
+      changed:true,
+      rerender:true,
+      message:`Taille remplacée par la valeur Wikidata : ${formatHeight(proposedCm)}.`,
+      tone:'ok'
+    };
+  }
+  person.heightCm = proposedCm;
+  setDetailHeightFieldValue(person, proposedCm);
+  saveState();
+  return {
+    changed:true,
+    rerender:true,
+    message:`Taille importée depuis Wikidata : ${formatHeight(proposedCm)}.`,
+    tone:'ok'
+  };
+}
 function openWikiPickModal(person, candidates){
   pendingWikiHeightPersonId = person.id;
   $('#wikidata-pick-sub').textContent = person.name;
   const body=$('#wikidata-pick-body');
   body.innerHTML = `
-    <div class="wd-pick-head">Plusieurs résultats possibles. Choisis la bonne personne pour importer sa taille.</div>
+    <div class="wd-pick-head">Plusieurs résultats possibles. Choisis la bonne personne.</div>
     <div class="wd-pick-list">
       ${candidates.map(c=>`
         <button class="wd-pick-item" type="button" data-wiki-pick="${esc(c.wikiId)}">
@@ -1910,12 +1951,16 @@ function openWikiPickModal(person, candidates){
     const selected=candidates.find(c=>c.wikiId===wikiId);
     const target=state.people.find(x=>x.id===pendingWikiHeightPersonId);
     if(!selected || !target) return;
-    const outcome=resolveWikidataHeightChoice(target, selected);
-    closeAllModals();
-    openDetails(target.id);
-    toast(outcome.message, ['imported','same','overwritten','kept'].includes(outcome.kind)?'ok':'err');
+    const result = applyWikiHeightCandidate(target, selected);
+    pendingWikiHeightPersonId = null;
+    closeModal('modal-wikidata-pick');
+    if(result.rerender){
+      renderList();
+      if(ui.currentPersonId===target.id) renderDetails();
+    }
+    toast(result.message, result.tone);
   }));
-  $('#wikidata-pick-skip')?.addEventListener('click',()=>{ pendingWikiHeightPersonId=null; closeModal('modal-wikidata-pick'); });
+  $('#wikidata-pick-skip')?.addEventListener('click',()=>{ pendingWikiHeightPersonId=null; closeModal('modal-wikidata-pick'); toast('Import Wikidata annulé. Valeur actuelle conservée.'); });
   openModal('modal-wikidata-pick');
 }
 async function fetchHeightFromWikidataForPerson(person){
@@ -1924,8 +1969,7 @@ async function fetchHeightFromWikidataForPerson(person){
   const withHeight=candidates.filter(c=>c.heightCm || c.mainPhoto);
   const usable=(withHeight.length?withHeight:candidates).slice(0,5);
   if(usable.length===1){
-    const chosen=usable[0];
-    return { mode:'single', candidate:chosen };
+    return { mode:'single', candidate:usable[0] };
   }
   return { mode:'pick', candidates:usable };
 }
@@ -2098,6 +2142,7 @@ function sortPeople(list){
 function renderList(){
   const body=$('#list-body');
   const u=state.settings.currentUser;
+  document.body.classList.toggle('show-points', !!state.settings.showPointsCol);
   // Sync search field with persisted state
   const searchEl=$('#search');
   if(searchEl && searchEl.value!==(state.settings.query||'')) searchEl.value=state.settings.query||'';
@@ -2159,7 +2204,7 @@ function renderList(){
         </span>
       </div>
       <div class="row-main">${th}<div class="row-info"><div class="row-name">${esc(p.name)}</div>${p.heightCm?`<div class="row-sub">${esc(formatHeight(p.heightCm))}</div>`:''}</div></div>
-      <div class="row-elo">${el}<small>POINTS</small></div>
+      <div class="row-elo col-points">${el}<small>POINTS</small></div>
       ${tsHtml}
     </div>`;
   }).join('');
@@ -2363,6 +2408,7 @@ function computeManualPlacementScores(scores, pivotIndex){
 
 /* ============ MODALS ============ */
 function openModal(id){ document.getElementById(id)?.classList.add('is-open'); }
+function closeModal(id){ document.getElementById(id)?.classList.remove('is-open'); }
 function closeAllModals(){ $$('.modal.is-open').forEach(m=>m.classList.remove('is-open')); pendingImport=null; endSimulationSession(); try{ renderList(); }catch(_){} }
 
 /* User switch */
@@ -2909,9 +2955,9 @@ function renderDetails(){
       <label>Taille</label>
       <div class="wd-inline-actions">
         <input id="detail-height" type="text" inputmode="decimal" placeholder="Ex: 175" value="${p.heightCm?esc(String(p.heightCm)):''}">
-        <button class="btn btn-small" type="button" id="detail-height-fetch">Obtenir</button>
+        <button class="btn btn-small" type="button" id="detail-height-fetch">Google</button>
       </div>
-      <div class="search-hint">Saisie manuelle en cm, ou récupération à la demande depuis Wikidata.</div>
+      <div class="search-hint">Saisie manuelle en cm. Le bouton Google ouvre une recherche externe sur la taille pour que tu la recopies toi-même.</div>
     </div>
     <div class="notes-grid">
       <button class="note-card is-current is-editable" id="detail-edit-elo" type="button" aria-label="Modifier les points">
@@ -2993,29 +3039,38 @@ Tenter l'ajout quand même ?`;
     renderDetails();
     toast(`Points mis à jour : ${Math.round(value)}`,'ok');
   });
-  $('#detail-height-fetch')?.addEventListener('click', async e=>{
+  $('#detail-height-fetch')?.addEventListener('click', e=>{
     const btn=e.currentTarget;
-    const original=btn.textContent;
-    btn.disabled=true;
-    btn.textContent='Recherche…';
-    try{
-      const result=await fetchHeightFromWikidataForPerson(p);
-      if(result.mode==='single'){
-        const outcome=resolveWikidataHeightChoice(p, result.candidate);
-        renderList();
-        renderDetails();
-        toast(outcome.message, ['imported','same','overwritten','kept'].includes(outcome.kind)?'ok':'err');
-      }else{
-        btn.disabled=false;
-        btn.textContent=original;
-        openWikiPickModal(p, result.candidates);
-        return;
-      }
-    }catch(err){
-      toast('Wikidata : '+err.message,'err');
+    const personName=(p.name||'').trim();
+    if(!personName){
+      toast('Nom introuvable pour lancer la recherche','err');
+      return;
     }
-    btn.disabled=false;
-    btn.textContent=original;
+    const query=`${personName} celebheight`;
+    const googleUrl='https://www.google.com/search?q='+encodeURIComponent(query);
+
+    let opened=false;
+    const isAndroid=/Android/i.test(navigator.userAgent||'');
+    if(isAndroid){
+      try{
+        const intentUrl='intent://www.google.com/search?q='+encodeURIComponent(query)+'#Intent;scheme=https;package=com.android.chrome;end';
+        const popup=window.open(intentUrl,'_blank');
+        opened=!!popup;
+      }catch(_){}
+    }
+    if(!opened){
+      try{
+        const popup=window.open(googleUrl,'_blank','noopener,noreferrer');
+        opened=!!popup;
+      }catch(_){}
+    }
+    if(!opened){
+      try{
+        window.location.href=googleUrl;
+        opened=true;
+      }catch(_){}
+    }
+    toast(opened ? `Recherche ouverte : ${query}` : 'Impossible d’ouvrir la recherche automatiquement','ok');
   });
 }
 function saveDetails(){
@@ -4969,6 +5024,9 @@ function init(){
     if(eyeBtn) eyeBtn.classList.add('is-active-eye');
     const slash=$('#eye-slash');
     if(slash) slash.style.display='none';
+  }
+  if(state.settings.showPointsCol){
+    document.body.classList.add('show-points');
   }
   renderHeader();
   renderList();
