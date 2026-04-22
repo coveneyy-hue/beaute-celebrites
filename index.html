@@ -587,11 +587,12 @@ body.bulk-mode .list-head-check{display:flex}
     </button>
     <button class="tb-btn" data-act="modes" aria-label="Modes de compétition : duel, tournoi et Last man standing">
       <svg viewBox="0 0 24 24" fill="none">
-        <path d="M7 15 L11.5 10.5 M12.5 9.5 L17 5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
-        <path d="M9 5h4v3a2.8 2.8 0 0 1-2 2.7A2.8 2.8 0 0 1 9 8V5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
-        <path d="M8 5H6.5v1.2A1.8 1.8 0 0 0 8.3 8H9M14 5h1.5v1.2A1.8 1.8 0 0 1 13.7 8H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M11 10.7V13M9.5 15h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-        <path d="M14.8 14.2 L19 18.4 M14.6 18.4 L18.8 14.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M4 6h2M18 6h2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M6 4v4M18 4v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M8 6h2M14 6h2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <circle cx="12" cy="8" r="1.7" stroke="currentColor" stroke-width="1.7"/>
+        <path d="M12 9.9v3.2M12 11.4l-3.2-2.1M12 11.4l3.2-2.1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M12 13.1l-2 3.8M12 13.1l2 3.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </button>
     <button class="tb-btn" data-act="settings" aria-label="Réglages">
@@ -1834,6 +1835,24 @@ async function wikiSearchCandidates(person){
   return merged;
 }
 let pendingWikiHeightPersonId = null;
+function applyWikidataHeightResult(target, selected){
+  if(!target || !selected) return { message:'Aucune taille disponible', tone:'err' };
+  target.wikiId = selected.wikiId;
+  const foundHeight = Number.isFinite(Number(selected.heightCm)) && Number(selected.heightCm) > 0;
+  const existingHeight = Number.isFinite(Number(target.heightCm)) && Number(target.heightCm) > 0;
+  if(foundHeight){
+    const foundValue = Math.round(Number(selected.heightCm));
+    if(existingHeight){
+      saveState();
+      return { message:`Taille trouvée sur Wikidata : ${formatHeight(foundValue)}. Taille existante conservée.`, tone:'ok' };
+    }
+    target.heightCm = foundValue;
+    saveState();
+    return { message:`Taille trouvée sur Wikidata et importée : ${formatHeight(foundValue)}`, tone:'ok' };
+  }
+  saveState();
+  return { message:'Aucune taille disponible', tone:'err' };
+}
 function openWikiPickModal(person, candidates){
   pendingWikiHeightPersonId = person.id;
   $('#wikidata-pick-sub').textContent = person.name;
@@ -1857,12 +1876,10 @@ function openWikiPickModal(person, candidates){
     const selected=candidates.find(c=>c.wikiId===wikiId);
     const target=state.people.find(x=>x.id===pendingWikiHeightPersonId);
     if(!selected || !target) return;
-    target.wikiId = selected.wikiId;
-    if(selected.heightCm) target.heightCm = selected.heightCm;
-    saveState();
+    const result = applyWikidataHeightResult(target, selected);
     closeAllModals();
     openDetails(target.id);
-    toast(selected.heightCm ? `Taille importée : ${formatHeight(selected.heightCm)}` : 'Aucune taille disponible', selected.heightCm?'ok':'err');
+    toast(result.message, result.tone);
   }));
   $('#wikidata-pick-skip')?.addEventListener('click',()=>{ pendingWikiHeightPersonId=null; closeModal('modal-wikidata-pick'); });
   openModal('modal-wikidata-pick');
@@ -1874,10 +1891,8 @@ async function fetchHeightFromWikidataForPerson(person){
   const usable=(withHeight.length?withHeight:candidates).slice(0,5);
   if(usable.length===1){
     const chosen=usable[0];
-    person.wikiId = chosen.wikiId;
-    if(chosen.heightCm) person.heightCm = chosen.heightCm;
-    saveState();
-    return { mode:'single', candidate:chosen };
+    const applyResult = applyWikidataHeightResult(person, chosen);
+    return { mode:'single', candidate:chosen, applyResult };
   }
   return { mode:'pick', candidates:usable };
 }
@@ -2955,7 +2970,9 @@ Tenter l'ajout quand même ?`;
       if(result.mode==='single'){
         renderList();
         renderDetails();
-        toast(result.candidate.heightCm ? `Taille importée : ${formatHeight(result.candidate.heightCm)}` : 'Aucune taille disponible', result.candidate.heightCm?'ok':'err');
+        const msg = result.applyResult?.message || (result.candidate.heightCm ? `Taille trouvée sur Wikidata et importée : ${formatHeight(result.candidate.heightCm)}` : 'Aucune taille disponible');
+        const tone = result.applyResult?.tone || (result.candidate.heightCm ? 'ok' : 'err');
+        toast(msg, tone);
       }else{
         btn.disabled=false;
         btn.textContent=original;
