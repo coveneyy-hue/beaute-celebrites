@@ -1302,7 +1302,7 @@ const state = {
     compareB: 'victor',
   },
 };
-const ui = { currentPersonId:null, draft:null, duel:null, tour:null, lms:null, photoIdx:0 };
+const ui = { currentPersonId:null, draft:null, duel:null, tour:null, lms:null, photoIdx:0, simHistory:[] };
 let pendingImport = null;
 
 /* ============ UTILITIES ============ */
@@ -1382,6 +1382,13 @@ function applyPointsRuleToMap(u,w,l,map){
   map[w]=Math.max(winnerBefore, loserBefore + 1);
   if(map[l]===undefined) map[l]=getElo(u,l);
   return { winnerBefore, loserBefore, winnerAfter:map[w], loserAfter:getLivePoints(u,l,map) };
+}
+function pushSimHistory(entry){
+  ui.simHistory = ui.simHistory || [];
+  ui.simHistory.push(entry);
+}
+function getCombinedDuelHistory(u){
+  return [ ...(state.duelHistory[u]||[]), ...((ui.simHistory||[]).filter(d=>d.userId===u)) ];
 }
 function getHeadToHeadWins(u,a,b){
   const hist = state.duelHistory[u]||[];
@@ -2758,7 +2765,7 @@ function renderDetails(){
   const idx=Math.min(ui.photoIdx||0,Math.max(0,photos.length-1));
   const main=photos[idx]||'';
   const elo=getElo(u,p.id);
-  const duels=(state.duelHistory[u]||[]).filter(d=>d.winnerId===p.id || d.loserId===p.id);
+  const duels=getCombinedDuelHistory(u).filter(d=>d.winnerId===p.id || d.loserId===p.id);
   const wins=duels.filter(d=>d.winnerId===p.id).length;
   const losses=duels.filter(d=>d.loserId===p.id).length;
   const duelHistoryHtml = duels.length ? `
@@ -2778,7 +2785,14 @@ function renderDetails(){
             const text = d.winnerId===p.id
               ? `Victoire contre ${esc(opponent)}`
               : `Défaite contre ${esc(opponent)}`;
-            return `<div class="duel-history-item"><span class="duel-history-date">${esc(date)}</span> - <strong>${text}</strong></div>`;
+            const before = d.winnerId===p.id ? d.winnerBefore : d.loserBefore;
+            const after = d.winnerId===p.id ? d.winnerAfter : d.loserAfter;
+            const pointsLine = (Number.isFinite(before) && Number.isFinite(after))
+              ? `<div style="margin-top:4px;font-size:12px;color:var(--text-3)">Points : <strong style="color:var(--text)">${before}</strong> → <strong style="color:var(--amber)">${after}</strong></div>`
+              : '';
+            const modeLabel = d.affectsPoints===false ? 'Simulation' : 'Classement';
+            const sourceLabel = d.source==='tournament' ? 'Tournoi' : (d.source==='lms' ? 'Last man standing' : 'Duel');
+            return `<div class="duel-history-item"><span class="duel-history-date">${esc(date)}</span> - <strong>${text}</strong><div style="margin-top:4px;font-size:12px;color:var(--text-3)">Mode : <strong style="color:${d.affectsPoints===false?'var(--julie-hi)':'var(--victor-hi)'}">${modeLabel}</strong> · Source : <strong style="color:var(--text-2)">${sourceLabel}</strong></div>${pointsLine}</div>`;
           })
           .join('')}
       </div>
@@ -3160,15 +3174,20 @@ function lmsVote(winnerId){
   if(!champId || !oppId || winnerId!==champId && winnerId!==oppId) return;
   const loserId=winnerId===champId?oppId:champId;
   if(competitionsAffectPoints()){
+    const winnerBefore=getElo(u, winnerId);
+    const loserBefore=getElo(u, loserId);
     updateElo(u, winnerId, loserId);
+    const winnerAfter=getElo(u, winnerId);
+    const loserAfter=getElo(u, loserId);
     state.duels[u]=(state.duels[u]||0)+1;
     state.duelHistory[u]=state.duelHistory[u]||[];
-    state.duelHistory[u].push({ winnerId, loserId, t:Date.now(), source:'lms', affectsPoints:true });
+    state.duelHistory[u].push({ winnerId, loserId, t:Date.now(), source:'lms', affectsPoints:true, winnerBefore, loserBefore, winnerAfter, loserAfter });
     saveState();
     renderList();
   }else{
-    applyPointsRuleToMap(u, winnerId, loserId, ui.lms.simElo);
+    const pointsChange = applyPointsRuleToMap(u, winnerId, loserId, ui.lms.simElo);
     ui.lms.sessionDuels = (ui.lms.sessionDuels||0) + 1;
+    pushSimHistory({ userId:u, winnerId, loserId, t:Date.now(), source:'lms', affectsPoints:false, ...pointsChange });
   }
   if(winnerId===champId){
     ui.lms.streak += 1;
@@ -3257,7 +3276,7 @@ function renderDuel(){
       <div>
         <div class="duel-stats"><button class="duel-vote-btn" data-pick="${p.id}" type="button">Vote</button></div>
         <div class="d-name">${esc(p.name)}</div>
-        <div class="d-sub">${getLivePoints(u,p.id,ui.lms.simElo)} points</div>
+        <div class="d-sub">${getLivePoints(u,p.id,ui.duel.simElo)} points</div>
       </div>
     </div>`;
   };
@@ -3334,14 +3353,19 @@ function recordDuel(w,l){
   const u=state.settings.currentUser;
   ensureBuckets(u);
   if(competitionsAffectPoints()){
+    const winnerBefore=getElo(u,w);
+    const loserBefore=getElo(u,l);
     state.duels[u]=(state.duels[u]||0)+1;
-    state.duelHistory[u].push({ winnerId:w, loserId:l, t:Date.now(), affectsPoints:true });
     updateElo(u,w,l);
+    const winnerAfter=getElo(u,w);
+    const loserAfter=getElo(u,l);
+    state.duelHistory[u].push({ winnerId:w, loserId:l, t:Date.now(), source:'duel', affectsPoints:true, winnerBefore, loserBefore, winnerAfter, loserAfter });
     saveState();
     renderList();
   }else{
-    applyPointsRuleToMap(u,w,l,ui.duel.simElo);
+    const pointsChange = applyPointsRuleToMap(u,w,l,ui.duel.simElo);
     ui.duel.sessionDuels = (ui.duel.sessionDuels||0) + 1;
+    pushSimHistory({ userId:u, winnerId:w, loserId:l, t:Date.now(), source:'duel', affectsPoints:false, ...pointsChange });
   }
   ui.duel.pair=null;
   renderDuel();
@@ -3589,7 +3613,9 @@ function tourAdvance(winId){
   if(competitionsAffectPoints()){
     state.duels[u]=(state.duels[u]||0)+1;
     state.duelHistory[u]=state.duelHistory[u]||[];
-    state.duelHistory[u].push({ winnerId:winId, loserId:loseId, t:Date.now(), source:'tournament', affectsPoints:true });
+    state.duelHistory[u].push({ winnerId:winId, loserId:loseId, t:Date.now(), source:'tournament', affectsPoints:true, winnerBefore:eloWBefore, loserBefore:eloLBefore, winnerAfter:eloWAfter, loserAfter:eloLAfter });
+  } else {
+    pushSimHistory({ userId:u, winnerId:winId, loserId:loseId, t:Date.now(), source:'tournament', affectsPoints:false, winnerBefore:eloWBefore, loserBefore:eloLBefore, winnerAfter:eloWAfter, loserAfter:eloLAfter });
   }
   if(t.currentMatch+1<r.matches.length){ t.currentMatch+=1; }
   else if(t.currentRound+1<t.rounds.length){
