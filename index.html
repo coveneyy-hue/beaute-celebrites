@@ -2081,7 +2081,7 @@ function renderList(){
 
 function canManualReorder(){
   const filter=(state.settings.filter||'all');
-  const allowedFilters=new Set(['all','M','F']);
+  const allowedFilters=new Set(['M','F']);
   return !bulkMode &&
     (state.settings.sortBy||'elo')==='elo' &&
     (state.settings.sortDir||'desc')==='desc' &&
@@ -2984,15 +2984,15 @@ function renderModesMenu(){
   $('#modes-body').innerHTML=`
     <div class="tour-hero" style="margin-bottom:12px">
       <div class="tico">⚡</div>
-      <div><h3>Choisis un mode</h3><p>Joueur : ${esc(user.name)}. Les trois modes utilisent le même classement par points.</p></div>
+      <div><h3>Choisis un mode</h3><p>Joueur : ${esc(user.name)}. Les trois modes utilisent le même classement par points, séparé par genre.</p></div>
     </div>
     <div style="display:grid;gap:10px">
       <button class="search-result" data-mode-open="duel">
-        <div class="sr-info"><div class="sr-name">Duel libre</div><div class="sr-meta">Deux profils, filtre par genre, vote rapide en continu.</div></div>
+        <div class="sr-info"><div class="sr-name">Duel libre</div><div class="sr-meta">Deux profils du même genre, vote rapide en continu.</div></div>
         <div class="sr-badge">⚔</div>
       </button>
       <button class="search-result" data-mode-open="tournament">
-        <div class="sr-info"><div class="sr-name">Tournoi</div><div class="sr-meta">Bracket 32 avec filtre Femmes, Hommes ou Mixte.</div></div>
+        <div class="sr-info"><div class="sr-name">Tournoi</div><div class="sr-meta">Bracket 32 avec filtre Femmes ou Hommes.</div></div>
         <div class="sr-badge">🏆</div>
       </button>
       <button class="search-result" data-mode-open="lms">
@@ -3010,13 +3010,14 @@ function renderModesMenu(){
 
 /* ============ LAST MAN STANDING ============ */
 function openLms(){
-  ui.lms={ stage:'setup', filter:'all', startMode:'selected', selectedId:'', currentId:'', opponentId:'', streak:0, beaten:[], photoIdx:{} };
+  closeAllModals();
+  ui.lms={ stage:'setup', filter:'F', startMode:'selected', selectedId:'', currentId:'', opponentId:'', streak:0, beaten:[], photoIdx:{} };
   renderLms();
   openModal('modal-lms');
 }
 function getLmsPool(){
   const f=ui.lms.filter;
-  return state.people.filter(p=>f==='all'||p.gender===f);
+  return state.people.filter(p=>p.gender===f);
 }
 function pickLmsOpponent(){
   const u=state.settings.currentUser;
@@ -3063,8 +3064,7 @@ function renderLms(){
       </div>
       <div class="field" style="margin-bottom:12px">
         <label>Catégorie</label>
-        <div class="tour-opts c3">
-          <button class="${ui.lms.filter==='all'?'on':''}" data-lfs="all">Tous (${state.people.length})</button>
+        <div class="tour-opts" style="grid-template-columns:1fr 1fr">
           <button class="${ui.lms.filter==='F'?'on f':''}" data-lfs="F">Femmes (${state.people.filter(p=>p.gender==='F').length})</button>
           <button class="${ui.lms.filter==='M'?'on m':''}" data-lfs="M">Hommes (${state.people.filter(p=>p.gender==='M').length})</button>
         </div>
@@ -3186,13 +3186,14 @@ function lmsVote(winnerId){
 
 /* ============ DUEL MODAL ============ */
 function openDuel(){
-  ui.duel={ filter:'all', pair:null, photoIdx:{} };
+  closeAllModals();
+  ui.duel={ filter:'F', pair:null, photoIdx:{} };
   renderDuel();
   openModal('modal-duel');
 }
 function pickPair(){
   const f=ui.duel.filter;
-  const pool=state.people.filter(p=>f==='all'||p.gender===f);
+  const pool=state.people.filter(p=>p.gender===f);
   if(pool.length<2) return null;
   const u=state.settings.currentUser;
   const hist=state.duelHistory[u]||[];
@@ -3221,8 +3222,7 @@ function renderDuel(){
     body.innerHTML=`<div class="empty-state"><div class="big">⚔</div><h3>Pas assez de personnes</h3><p>Ajoute au moins 2 profils pour lancer un duel.</p></div>`;
     return;
   }
-  const filterBar=`<div class="tour-opts c3" style="margin-bottom:14px">
-    <button class="${ui.duel.filter==='all'?'on':''}" data-f="all">Tous</button>
+  const filterBar=`<div class="tour-opts" style="grid-template-columns:1fr 1fr;margin-bottom:14px">
     <button class="${ui.duel.filter==='F'?'on f':''}" data-f="F">Femmes</button>
     <button class="${ui.duel.filter==='M'?'on m':''}" data-f="M">Hommes</button>
   </div>`;
@@ -3336,6 +3336,7 @@ function recordDuel(w,l){
 
 /* ============ TOURNAMENT ============ */
 function openTournament(){
+  closeAllModals();
   ui.tour={ stage:'setup', config:{ filter:'F', size:32, blind:false, seeding:'random' }, data:null, photoIdx:{} };
   renderTournament();
   openModal('modal-tournament');
@@ -3350,10 +3351,9 @@ function renderTourSetup(){
   const u=state.settings.currentUser;
   const pF=state.people.filter(p=>p.gender==='F').length;
   const pM=state.people.filter(p=>p.gender==='M').length;
-  const pA=state.people.length;
   t.config.size=32;
   t.config.seeding='random';
-  const cur=t.config.filter==='all'?pA:t.config.filter==='F'?pF:pM;
+  const cur=t.config.filter==='F'?pF:pM;
   $('#tour-title').textContent='Nouveau tournoi';
   $('#tour-sub').textContent='Joueur : '+getUser(u).name;
   $('#tour-body').innerHTML=`
@@ -3363,10 +3363,9 @@ function renderTourSetup(){
     </div>
     <div class="field" style="margin-bottom:12px">
       <label>Catégorie</label>
-      <div class="tour-opts" style="grid-template-columns:1fr 1fr 1fr">
+      <div class="tour-opts" style="grid-template-columns:1fr 1fr">
         <button class="${t.config.filter==='F'?'on f':''}" data-tf="F">Femmes (${pF})</button>
         <button class="${t.config.filter==='M'?'on m':''}" data-tf="M">Hommes (${pM})</button>
-        <button class="${t.config.filter==='all'?'on':''}" data-tf="all">Mixte (${pA})</button>
       </div>
     </div>
     <div style="margin-top:6px">
@@ -3383,7 +3382,7 @@ function renderTourSetup(){
     hist.innerHTML=state.tournaments[u].slice().reverse().slice(0,10).map(x=>{
       const win=state.people.find(p=>p.id===x.winnerId);
       const d=new Date(x.createdAt);
-      const label=x.config.filter==='F'?'Femmes':x.config.filter==='M'?'Hommes':'Mixte';
+      const label=x.config.filter==='F'?'Femmes':'Hommes';
       return `<div class="top-item" style="cursor:default">
         ${win?.mainPhoto?`<img src="${esc(win.mainPhoto)}" onerror="this.style.display='none'">`:`<div style="width:30px;height:42px;background:var(--bg-3);border-radius:6px"></div>`}
         <div class="nm">${label} ${x.config.size} · ${x.status==='complete'?'Champion : '+esc(win?.name||'?'):'En cours'}</div>
@@ -3395,7 +3394,7 @@ function renderTourSetup(){
 function startTournament(config){
   const u=state.settings.currentUser;
   ensureBuckets(u);
-  let pool=state.people.filter(p=>config.filter==='all'||p.gender===config.filter);
+  let pool=state.people.filter(p=>p.gender===config.filter);
   if(config.seeding==='elo') pool.sort((a,b)=>getElo(u,b.id)-getElo(u,a.id));
   else pool=pool.sort(()=>Math.random()-0.5);
   const parts=pool.slice(0,config.size);
@@ -3442,7 +3441,7 @@ function renderTourPlay(){
       </div>
     </div>`;
   };
-  const label=t.config.filter==='F'?'Femmes':t.config.filter==='M'?'Hommes':'Mixte';
+  const label=t.config.filter==='F'?'Femmes':'Hommes';
   $('#tour-body').innerHTML=`
     <div class="tour-hero">
       <div class="tico">🏆</div>
