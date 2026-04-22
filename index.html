@@ -1410,7 +1410,7 @@ function loadState(){
     const d=JSON.parse(r);
     Object.assign(state,d);
     USERS.forEach(u=>ensureBuckets(u.id));
-    state.settings=Object.assign({currentUser:'lily',tmdbKey:'',sortBy:'elo',sortDir:'desc',showDateCol:false,filter:'F',query:'',consultSort:'elo',compareA:'lily',compareB:'victor',heightUnit:'metric'},state.settings||{});
+    state.settings=Object.assign({currentUser:'lily',tmdbKey:'',sortBy:'elo',sortDir:'desc',showDateCol:false,filter:'F',query:'',consultSort:'elo',compareA:'lily',compareB:'victor',heightUnit:'metric',competitionAffectsPoints:true},state.settings||{});
   }catch(e){ console.warn(e); }
 }
 
@@ -3049,7 +3049,7 @@ function renderLms(){
     $('#lms-body').innerHTML=`
       <div class="tour-hero">
         <div class="tico">🏆</div>
-        <div><h3>Last man standing</h3><p>Choisis un profil de départ ou lance un tirage aléatoire. Il rencontrera ensuite à chaque victoire le prochain adversaire ayant la cote ELO immédiatement au-dessus jusqu'à sa défaite.</p></div>
+        <div><h3>Last man standing</h3><p>Choisis un profil de départ ou lance un tirage aléatoire. Il rencontrera ensuite à chaque victoire le prochain adversaire ayant la cote ELO immédiatement au-dessus jusqu'à sa défaite. ${state.settings.competitionAffectsPoints!==false?"Les points sont mis à jour.":"Mode plaisir : aucun point n'est modifié."}</p></div>
       </div>
       <div class="field" style="margin-bottom:12px">
         <label>Catégorie</label>
@@ -3120,7 +3120,7 @@ function renderLms(){
   $('#lms-body').innerHTML=`
     <div class="tour-hero">
       <div class="tico">⚔</div>
-      <div><h3>Last man standing</h3><p>${esc(champ.name)} continue jusqu'à sa défaite. Chaque victoire enchaîne le prochain adversaire juste au-dessus en ELO.</p></div>
+      <div><h3>Last man standing</h3><p>${esc(champ.name)} continue jusqu'à sa défaite. Chaque victoire enchaîne le prochain adversaire juste au-dessus en ELO. ${state.settings.competitionAffectsPoints!==false?"Les points sont actifs.":"Mode plaisir : aucun point n'est modifié."}</p></div>
     </div>
     <div class="stat-hero">
       <div class="box"><div class="v">${ui.lms.streak}</div><div class="l">Série</div></div>
@@ -3245,7 +3245,7 @@ function renderDuel(){
   body.innerHTML=filterBar+`
     <div class="duel-hero-card">
       <div class="hico">⚔</div>
-      <div><h3>Duel libre</h3><p>Utilise le bouton Vote sous la photo. Les points s'ajustent automatiquement.</p></div>
+      <div><h3>Duel libre</h3><p>Utilise le bouton Vote sous la photo. ${state.settings.competitionAffectsPoints!==false?"Les points s'ajustent automatiquement.":"Mode plaisir : aucun point n'est modifié."}</p></div>
     </div>
     <div class="duel-actions">
       <button class="btn btn-small" data-act="skip">Passer</button>
@@ -3314,8 +3314,8 @@ function recordDuel(w,l){
   const u=state.settings.currentUser;
   ensureBuckets(u);
   state.duels[u]=(state.duels[u]||0)+1;
-  state.duelHistory[u].push({ winnerId:w, loserId:l, t:Date.now() });
-  updateElo(u,w,l);
+  state.duelHistory[u].push({ winnerId:w, loserId:l, t:Date.now(), affectsPoints:state.settings.competitionAffectsPoints!==false });
+  if(state.settings.competitionAffectsPoints!==false) updateElo(u,w,l);
   saveState();
   renderList();
   ui.duel.pair=null;
@@ -3347,7 +3347,7 @@ function renderTourSetup(){
   $('#tour-body').innerHTML=`
     <div class="tour-hero">
       <div class="tico">🏆</div>
-      <div><h3>Tournoi 32 — tirage aléatoire</h3><p>Chaque combat est journalisé et l'ELO est mis à jour.</p></div>
+      <div><h3>Tournoi 32 — tirage aléatoire</h3><p>Chaque combat est journalisé. ${state.settings.competitionAffectsPoints!==false?"Le classement est mis à jour.":"Mode plaisir : aucun point n'est modifié."}</p></div>
     </div>
     <div class="field" style="margin-bottom:12px">
       <label>Catégorie</label>
@@ -3527,7 +3527,7 @@ function renderBracketHtml(t){
         if(!p) return '<div class="bracket-slot is-tbd"><span class="bs-name">?</span></div>';
         const win=m.winner===id;
         let eloBadge='';
-        if(m.winner && m.eloDeltas && m.eloDeltas[id]!==undefined){
+        if(state.settings.competitionAffectsPoints!==false && m.winner && m.eloDeltas && m.eloDeltas[id]!==undefined){
           const delta=m.eloDeltas[id];
           const sign=delta>=0?'+':'';
           const color=delta>=0?'var(--green)':'var(--coral)';
@@ -3554,13 +3554,13 @@ function tourAdvance(winId){
   // Capture ELO before update to compute delta
   const eloWBefore=getElo(u,winId);
   const eloLBefore=getElo(u,loseId);
-  updateElo(u,winId,loseId);
+  if(state.settings.competitionAffectsPoints!==false) updateElo(u,winId,loseId);
   const eloWAfter=getElo(u,winId);
   const eloLAfter=getElo(u,loseId);
   m.eloDeltas={ [winId]: eloWAfter-eloWBefore, [loseId]: eloLAfter-eloLBefore };
   state.duels[u]=(state.duels[u]||0)+1;
   state.duelHistory[u]=state.duelHistory[u]||[];
-  state.duelHistory[u].push({ winnerId:winId, loserId:loseId, t:Date.now(), source:'tournament' });
+  state.duelHistory[u].push({ winnerId:winId, loserId:loseId, t:Date.now(), source:'tournament', affectsPoints:state.settings.competitionAffectsPoints!==false });
   if(t.currentMatch+1<r.matches.length){ t.currentMatch+=1; }
   else if(t.currentRound+1<t.rounds.length){
     const nx=t.rounds[t.currentRound+1];
@@ -3808,6 +3808,13 @@ function renderSettings(){
           <option value="imperial" ${state.settings.heightUnit==='imperial'?'selected':''}>Impérial</option>
         </select>
       </div>
+      <div class="setting-row">
+        <div class="sr-info"><div class="sr-name">Influence des compétitions sur le classement</div><div class="sr-desc">Active ou coupe l'effet des duels, tournois et Last man standing sur les points</div></div>
+        <select class="field" style="padding:7px 10px;border-radius:8px;background:var(--bg-3);border:1px solid var(--border)" id="competition-points-select">
+          <option value="on" ${state.settings.competitionAffectsPoints!==false?'selected':''}>Avec influence</option>
+          <option value="off" ${state.settings.competitionAffectsPoints===false?'selected':''}>Sans influence</option>
+        </select>
+      </div>
     </div>
 
     <div class="setting-section">
@@ -3865,6 +3872,12 @@ function renderSettings(){
     try{ if($('#modal-consult')?.classList.contains('is-open')) renderConsult(); }catch(_){}
     try{ if($('#modal-detail')?.classList.contains('is-open') && detailPersonId) openDetails(detailPersonId); }catch(_){}
     toast(state.settings.heightUnit==='imperial' ? 'Taille affichée en pieds et pouces' : 'Taille affichée en centimètres','ok');
+  });
+  $('#competition-points-select')?.addEventListener('change',e=>{
+    state.settings.competitionAffectsPoints = e.target.value !== 'off';
+    saveState();
+    renderSettings();
+    toast(state.settings.competitionAffectsPoints ? 'Les compétitions modifient le classement' : 'Mode plaisir : les compétitions ne changent plus le classement','ok');
   });
   $('#test-tmdb-key').addEventListener('click',async()=>{
     const k=$('#tmdb-key-input').value.trim();
