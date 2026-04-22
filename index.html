@@ -1898,10 +1898,12 @@ function renderList(){
 }
 
 function canManualReorder(){
+  const filter=(state.settings.filter||'all');
+  const allowedFilters=new Set(['all','M','F']);
   return !bulkMode &&
     (state.settings.sortBy||'elo')==='elo' &&
     (state.settings.sortDir||'desc')==='desc' &&
-    (state.settings.filter||'all')==='all' &&
+    allowedFilters.has(filter) &&
     !(state.settings.query||'').trim();
 }
 
