@@ -1942,15 +1942,17 @@ function startManualReorder(e){
   row.classList.add('drag-source');
   const pointerId=e.pointerId;
   handle.setPointerCapture?.(pointerId);
+  const currentOrdered=sortPeople(filterPeople());
   manualDrag={
     pid, body, row, handle, ghost, placeholder, pointerId,
     offsetX:e.clientX-rect.left, offsetY:e.clientY-rect.top,
-    startIndex:sorted.findIndex(p=>p.id===pid)
+    startIndex:currentOrdered.findIndex(p=>p.id===pid)
   };
   document.addEventListener('pointermove', onManualReorderMove, {passive:false});
   document.addEventListener('pointerup', finishManualReorder, true);
   document.addEventListener('pointercancel', finishManualReorder, true);
   document.body.style.userSelect='none';
+  document.body.style.touchAction='none';
 }
 
 function onManualReorderMove(e){
@@ -1959,12 +1961,21 @@ function onManualReorderMove(e){
   const {ghost, offsetX, offsetY, body, row, placeholder}=manualDrag;
   ghost.style.left=(e.clientX-offsetX)+'px';
   ghost.style.top=(e.clientY-offsetY)+'px';
+
+  const edge=90;
+  const step=14;
+  if(e.clientY < edge){
+    window.scrollBy(0, -step);
+  }else if(e.clientY > window.innerHeight - edge){
+    window.scrollBy(0, step);
+  }
+
   const rows=[...body.querySelectorAll('.row[data-pid]')].filter(r=>r!==row);
   let inserted=false;
   for(const candidate of rows){
     const r=candidate.getBoundingClientRect();
     if(e.clientY < r.top + r.height/2){
-      if(candidate!==placeholder.previousElementSibling) body.insertBefore(placeholder, candidate);
+      body.insertBefore(placeholder, candidate);
       inserted=true;
       break;
     }
@@ -1999,6 +2010,7 @@ function cleanupManualDrag(skipRender){
   document.removeEventListener('pointerup', finishManualReorder, true);
   document.removeEventListener('pointercancel', finishManualReorder, true);
   document.body.style.userSelect='';
+  document.body.style.touchAction='';
   manualDrag=null;
   if(skipRender) renderList();
 }
