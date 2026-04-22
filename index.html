@@ -1299,9 +1299,10 @@ const state = {
     consultSort: 'elo',
     compareA: 'lily',
     compareB: 'victor',
+    simulationMode: false,
   },
 };
-const ui = { currentPersonId:null, draft:null, duel:null, tour:null, lms:null, photoIdx:0 };
+const ui = { currentPersonId:null, draft:null, duel:null, tour:null, lms:null, simSession:null, photoIdx:0 };
 let pendingImport = null;
 
 /* ============ UTILITIES ============ */
@@ -1370,9 +1371,30 @@ function ensureBuckets(u){
   if(!state.duelHistory[u]) state.duelHistory[u]=[];
   if(!state.tournaments[u]) state.tournaments[u]=[];
 }
-function getElo(u,p){ return state.elo[u]?.[p]??1500; }
+function isSimulationMode(){ return !!state.settings?.simulationMode; }
+function hasSimulationSession(u){ return !!(isSimulationMode() && ui.simSession && ui.simSession.user===u); }
+function startSimulationSession(){
+  const u=state.settings.currentUser;
+  if(!isSimulationMode()) { ui.simSession=null; return; }
+  ui.simSession={
+    user:u,
+    elo: JSON.parse(JSON.stringify(state.elo[u]||{})),
+    duels: state.duels[u]||0,
+    duelHistory: JSON.parse(JSON.stringify(state.duelHistory[u]||[])),
+  };
+}
+function endSimulationSession(){
+  ui.simSession=null;
+}
+function simulationTagHtml(){
+  return isSimulationMode() ? '<span class="badge" style="margin-left:8px;background:rgba(245,158,11,.12);color:var(--amber-hi);border:1px solid rgba(245,158,11,.35)"><span>En simulation</span></span>' : '';
+}
+function getElo(u,p){
+  if(hasSimulationSession(u)) return ui.simSession.elo?.[p]??1500;
+  return state.elo[u]?.[p]??1500;
+}
 function getHeadToHeadWins(u,a,b){
-  const hist = state.duelHistory[u]||[];
+  const hist = hasSimulationSession(u) ? (ui.simSession.duelHistory||[]) : (state.duelHistory[u]||[]);
   let aWins=0,bWins=0;
   for(const d of hist){
     if((d.winnerId===a && d.loserId===b) || (d.winnerId===b && d.loserId===a)){
@@ -1385,8 +1407,25 @@ function getHeadToHeadWins(u,a,b){
 function updateElo(u,w,l){
   ensureBuckets(u);
   const wo=getElo(u,w), lo=getElo(u,l);
+  if(hasSimulationSession(u)){
+    ui.simSession.elo[w]=Math.max(Math.round(wo), Math.round(lo)+1);
+    ui.simSession.elo[l]=Math.round(lo);
+    return;
+  }
   state.elo[u][w]=Math.max(Math.round(wo), Math.round(lo)+1);
   state.elo[u][l]=Math.round(lo);
+}
+function recordCompetitionOutcome(u,winnerId,loserId,source){
+  ensureBuckets(u);
+  updateElo(u,winnerId,loserId);
+  const entry={ winnerId:winnerId, loserId:loserId, t:Date.now(), source:source };
+  if(hasSimulationSession(u)){
+    ui.simSession.duels=(ui.simSession.duels||0)+1;
+    (ui.simSession.duelHistory=ui.simSession.duelHistory||[]).push(entry);
+    return;
+  }
+  state.duels[u]=(state.duels[u]||0)+1;
+  (state.duelHistory[u]=state.duelHistory[u]||[]).push(entry);
 }
 function seedNewPersonPoints(personId, gender){
   const g = gender==='M' ? 'M' : 'F';
@@ -1419,7 +1458,7 @@ function loadState(){
     const d=JSON.parse(r);
     Object.assign(state,d);
     USERS.forEach(u=>ensureBuckets(u.id));
-    state.settings=Object.assign({currentUser:'lily',tmdbKey:'',sortBy:'elo',sortDir:'desc',showDateCol:false,filter:'all',query:'',consultSort:'elo',compareA:'lily',compareB:'victor',heightUnit:'metric'},state.settings||{});
+    state.settings=Object.assign({currentUser:'lily',tmdbKey:'',sortBy:'elo',sortDir:'desc',showDateCol:false,filter:'all',query:'',consultSort:'elo',compareA:'lily',compareB:'victor',heightUnit:'metric',simulationMode:false},state.settings||{});
   }catch(e){ console.warn(e); }
 }
 
@@ -2276,7 +2315,7 @@ function computeManualPlacementScores(scores, pivotIndex){
 
 /* ============ MODALS ============ */
 function openModal(id){ document.getElementById(id)?.classList.add('is-open'); }
-function closeAllModals(){ $$('.modal.is-open').forEach(m=>m.classList.remove('is-open')); pendingImport=null; }
+function closeAllModals(){ $$('.modal.is-open').forEach(m=>m.classList.remove('is-open')); pendingImport=null; endSimulationSession(); try{ renderList(); }catch(_){} }
 
 /* User switch */
 function renderUserSwitch(){
@@ -2984,7 +3023,7 @@ function renderModesMenu(){
   $('#modes-body').innerHTML=`
     <div class="tour-hero" style="margin-bottom:12px">
       <div class="tico">⚡</div>
-      <div><h3>Choisis un mode</h3><p>Joueur : ${esc(user.name)}. Les trois modes utilisent le même classement par points, séparé par genre.</p></div>
+      <div><h3>Choisis un mode ${simulationTagHtml()}</h3><p>Joueur : ${esc(user.name)}. Les trois modes utilisent le même classement par points, séparé par genre.</p></div>
     </div>
     <div style="display:grid;gap:10px">
       <button class="search-result" data-mode-open="duel">
@@ -3011,6 +3050,7 @@ function renderModesMenu(){
 /* ============ LAST MAN STANDING ============ */
 function openLms(){
   closeAllModals();
+  startSimulationSession();
   ui.lms={ stage:'setup', filter:'F', startMode:'selected', selectedId:'', currentId:'', opponentId:'', streak:0, beaten:[], photoIdx:{} };
   renderLms();
   openModal('modal-lms');
@@ -3060,7 +3100,7 @@ function renderLms(){
     $('#lms-body').innerHTML=`
       <div class="tour-hero">
         <div class="tico">🏆</div>
-        <div><h3>Last man standing</h3><p>Choisis un profil de départ ou lance un tirage aléatoire. Il rencontrera ensuite à chaque victoire le prochain adversaire ayant les points immédiatement au-dessus jusqu'à sa défaite.</p></div>
+        <div><h3>Last man standing ${simulationTagHtml()}</h3><p>Choisis un profil de départ ou lance un tirage aléatoire. Il rencontrera ensuite à chaque victoire le prochain adversaire ayant les points immédiatement au-dessus jusqu'à sa défaite.</p></div>
       </div>
       <div class="field" style="margin-bottom:12px">
         <label>Catégorie</label>
@@ -3131,7 +3171,7 @@ function renderLms(){
   $('#lms-body').innerHTML=`
     <div class="tour-hero">
       <div class="tico">⚔</div>
-      <div><h3>Last man standing</h3><p>${esc(champ.name)} continue jusqu'à sa défaite. Chaque victoire enchaîne le prochain adversaire juste au-dessus en points.</p></div>
+      <div><h3>Last man standing ${simulationTagHtml()}</h3><p>${esc(champ.name)} continue jusqu'à sa défaite. Chaque victoire enchaîne le prochain adversaire juste au-dessus en points.</p></div>
     </div>
     <div class="stat-hero">
       <div class="box"><div class="v">${ui.lms.streak}</div><div class="l">Série</div></div>
@@ -3156,11 +3196,8 @@ function lmsVote(winnerId){
   const oppId=ui.lms.opponentId;
   if(!champId || !oppId || winnerId!==champId && winnerId!==oppId) return;
   const loserId=winnerId===champId?oppId:champId;
-  updateElo(u, winnerId, loserId);
-  state.duels[u]=(state.duels[u]||0)+1;
-  state.duelHistory[u]=state.duelHistory[u]||[];
-  state.duelHistory[u].push({ winnerId, loserId, t:Date.now(), source:'lms' });
-  saveState();
+  recordCompetitionOutcome(u, winnerId, loserId, 'lms');
+  if(!hasSimulationSession(u)) saveState();
   renderList();
   if(winnerId===champId){
     ui.lms.streak += 1;
@@ -3187,6 +3224,7 @@ function lmsVote(winnerId){
 /* ============ DUEL MODAL ============ */
 function openDuel(){
   closeAllModals();
+  startSimulationSession();
   ui.duel={ filter:'F', pair:null, photoIdx:{} };
   renderDuel();
   openModal('modal-duel');
@@ -3257,14 +3295,14 @@ function renderDuel(){
   body.innerHTML=filterBar+`
     <div class="duel-hero-card">
       <div class="hico">⚔</div>
-      <div><h3>Duel libre</h3><p>Utilise le bouton Vote sous la photo. Les points sont mis à jour automatiquement.</p></div>
+      <div><h3>Duel libre ${simulationTagHtml()}</h3><p>${isSimulationMode()?'Les points sont recalculés normalement mais jamais enregistrés.':'Utilise le bouton Vote sous la photo. Les points sont mis à jour automatiquement.'}</p></div>
     </div>
     <div class="duel-actions">
       <button class="btn btn-small" data-act="skip">Passer</button>
       <button class="btn btn-small btn-danger" data-act="close">Terminer</button>
     </div>
     <div class="duel-arena">${card(a,wA)}${card(b,wB)}</div>
-    <div style="margin-top:14px;text-align:center;font-size:12px;color:var(--text-3)">${state.duels[u]||0} duel${(state.duels[u]||0)>1?'s':''} au total</div>`;
+    <div style="margin-top:14px;text-align:center;font-size:12px;color:var(--text-3)">${hasSimulationSession(u)?(ui.simSession.duels||0):(state.duels[u]||0)} duel${(hasSimulationSession(u)?(ui.simSession.duels||0):(state.duels[u]||0))>1?'s':''} au total</div>`;
   $$('#duel-body [data-f]').forEach(x=>x.addEventListener('click',()=>{ ui.duel.filter=x.getAttribute('data-f'); ui.duel.pair=null; renderDuel(); }));
   $$('#duel-body [data-trash]').forEach(el=>el.addEventListener('click',e=>{
     // Prevent the parent duel-card button from firing (which would count as a vote)
@@ -3325,10 +3363,8 @@ function renderDuel(){
 function recordDuel(w,l){
   const u=state.settings.currentUser;
   ensureBuckets(u);
-  state.duels[u]=(state.duels[u]||0)+1;
-  state.duelHistory[u].push({ winnerId:w, loserId:l, t:Date.now() });
-  updateElo(u,w,l);
-  saveState();
+  recordCompetitionOutcome(u,w,l,'duel');
+  if(!hasSimulationSession(u)) saveState();
   renderList();
   ui.duel.pair=null;
   renderDuel();
@@ -3337,6 +3373,7 @@ function recordDuel(w,l){
 /* ============ TOURNAMENT ============ */
 function openTournament(){
   closeAllModals();
+  startSimulationSession();
   ui.tour={ stage:'setup', config:{ filter:'F', size:32, blind:false, seeding:'random' }, data:null, photoIdx:{} };
   renderTournament();
   openModal('modal-tournament');
@@ -3359,7 +3396,7 @@ function renderTourSetup(){
   $('#tour-body').innerHTML=`
     <div class="tour-hero">
       <div class="tico">🏆</div>
-      <div><h3>Tournoi 32 — tirage aléatoire</h3><p>Chaque combat est journalisé et les points sont mis à jour.</p></div>
+      <div><h3>Tournoi 32 — tirage aléatoire ${simulationTagHtml()}</h3><p>${isSimulationMode()?'Chaque combat recalcule les points, sans aucun enregistrement final.':'Chaque combat est journalisé et les points sont mis à jour.'}</p></div>
     </div>
     <div class="field" style="margin-bottom:12px">
       <label>Catégorie</label>
@@ -3404,10 +3441,10 @@ function startTournament(config){
   let n=config.size/2;
   while(n>=2){ n=n/2; const m=[]; for(let i=0;i<n;i++) m.push({a:null,b:null,winner:null}); rounds.push({matches:m}); }
   const tour={ id:'t_'+Date.now(), createdAt:Date.now(), config, rounds, currentRound:0, currentMatch:0, status:'playing', winnerId:null };
-  state.tournaments[u].push(tour);
+  if(!isSimulationMode()) state.tournaments[u].push(tour);
   ui.tour.stage='playing';
   ui.tour.data=tour;
-  saveState();
+  if(!isSimulationMode()) saveState();
   renderTournament();
 }
 function renderTourPlay(){
@@ -3445,7 +3482,7 @@ function renderTourPlay(){
   $('#tour-body').innerHTML=`
     <div class="tour-hero">
       <div class="tico">🏆</div>
-      <div><h3>Tournoi ${label} ${t.config.size}</h3><p>Le nombre affiché au-dessus de chaque poster correspond aux victoires en face-à-face entre les deux participants.</p></div>
+      <div><h3>Tournoi ${label} ${t.config.size} ${simulationTagHtml()}</h3><p>Le nombre affiché au-dessus de chaque poster correspond aux victoires en face-à-face entre les deux participants.</p></div>
     </div>
     <div class="duel-actions">
 
@@ -3566,13 +3603,10 @@ function tourAdvance(winId){
   // Capture ELO before update to compute delta
   const eloWBefore=getElo(u,winId);
   const eloLBefore=getElo(u,loseId);
-  updateElo(u,winId,loseId);
+  recordCompetitionOutcome(u,winId,loseId,'tournament');
   const eloWAfter=getElo(u,winId);
   const eloLAfter=getElo(u,loseId);
   m.eloDeltas={ [winId]: eloWAfter-eloWBefore, [loseId]: eloLAfter-eloLBefore };
-  state.duels[u]=(state.duels[u]||0)+1;
-  state.duelHistory[u]=state.duelHistory[u]||[];
-  state.duelHistory[u].push({ winnerId:winId, loserId:loseId, t:Date.now(), source:'tournament' });
   if(t.currentMatch+1<r.matches.length){ t.currentMatch+=1; }
   else if(t.currentRound+1<t.rounds.length){
     const nx=t.rounds[t.currentRound+1];
@@ -3585,7 +3619,7 @@ function tourAdvance(winId){
     t.status='complete'; t.winnerId=winId;
     ui.tour.stage='podium';
   }
-  saveState();
+  if(!isSimulationMode()) saveState();
   renderList();
   renderTournament();
 }
@@ -3623,7 +3657,7 @@ function renderTourPodium(){
   $('#tour-body').innerHTML=`
     <div class="tour-hero" style="background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(251,113,133,.12));border-color:rgba(245,158,11,.4)">
       <div class="tico" style="background:rgba(245,158,11,.3);color:var(--amber-hi)">👑</div>
-      <div><h3>Champion${champ&&champ.gender==='F'?'ne':''} : ${esc(champ?.name||'?')}</h3><p>${esc(getUser(u).name)} a couronné ${t.config.filter==='F'?'une gagnante':t.config.filter==='M'?'un gagnant':'un(e) gagnant(e)'} en ${t.rounds.length} rounds.</p></div>
+      <div><h3>Champion${champ&&champ.gender==='F'?'ne':''} : ${esc(champ?.name||'?')} ${simulationTagHtml()}</h3><p>${esc(getUser(u).name)} a couronné ${t.config.filter==='F'?'une gagnante':t.config.filter==='M'?'un gagnant':'un(e) gagnant(e)'} en ${t.rounds.length} rounds.</p></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
       <div class="note-card" style="--user-color:#FBBF24">
@@ -3820,6 +3854,10 @@ function renderSettings(){
           <option value="imperial" ${state.settings.heightUnit==='imperial'?'selected':''}>Impérial</option>
         </select>
       </div>
+      <div class="setting-row">
+        <div class="sr-info"><div class="sr-name">Mode simulation</div><div class="sr-desc">Les compétitions recalculent les points sans jamais modifier la base locale</div></div>
+        <button class="btn btn-small ${state.settings.simulationMode?'btn-primary':''}" id="toggle-simulation-mode">${state.settings.simulationMode?'Activé':'Désactivé'}</button>
+      </div>
     </div>
 
     <div class="setting-section">
@@ -3868,6 +3906,13 @@ function renderSettings(){
   $('#save-tmdb-key').addEventListener('click',()=>{
     state.settings.tmdbKey=$('#tmdb-key-input').value.trim();
     saveState(); toast('Clé TMDb enregistrée','ok');
+  });
+  $('#toggle-simulation-mode')?.addEventListener('click',()=>{
+    state.settings.simulationMode=!state.settings.simulationMode;
+    endSimulationSession();
+    saveState();
+    renderSettings();
+    toast(state.settings.simulationMode?'Mode simulation activé':'Mode simulation désactivé','ok');
   });
   $('#height-unit-select')?.addEventListener('change',e=>{
     state.settings.heightUnit=e.target.value==='imperial'?'imperial':'metric';
