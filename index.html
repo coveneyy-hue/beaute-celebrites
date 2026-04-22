@@ -1410,7 +1410,7 @@ function loadState(){
     const d=JSON.parse(r);
     Object.assign(state,d);
     USERS.forEach(u=>ensureBuckets(u.id));
-    state.settings=Object.assign({currentUser:'lily',tmdbKey:'',sortBy:'elo',sortDir:'desc',showDateCol:false,filter:'all',query:'',consultSort:'elo',compareA:'lily',compareB:'victor'},state.settings||{});
+    state.settings=Object.assign({currentUser:'lily',tmdbKey:'',sortBy:'elo',sortDir:'desc',showDateCol:false,filter:'all',query:'',consultSort:'elo',compareA:'lily',compareB:'victor',heightUnit:'metric'},state.settings||{});
   }catch(e){ console.warn(e); }
 }
 
@@ -1665,7 +1665,10 @@ async function wikiSearch(q){
   return (await r.json()).search||[];
 }
 async function wikiEntity(qid){
-  const r=await fetch('https://www.wikidata.org/wiki/Special:EntityData/'+qid+'.json');
+  const url=new URL('https://www.wikidata.org/w/api.php');
+  const p={action:'wbgetentities',ids:qid,format:'json',languages:'fr|en',props:'labels|descriptions|claims',origin:'*'};
+  Object.entries(p).forEach(([k,v])=>url.searchParams.set(k,v));
+  const r=await fetch(url.toString());
   if(!r.ok) throw new Error('Wikidata '+r.status);
   return (await r.json()).entities?.[qid];
 }
@@ -1688,10 +1691,27 @@ function heightFromClaims(claims){
   const amount=raw.amount!=null?Number(raw.amount):null;
   return normalizeHeightCm(amount, raw.unit||'');
 }
-function formatHeight(cm){
+function formatHeightMetric(cm){
   const n=Number(cm);
   if(!Number.isFinite(n) || n<=0) return '';
   return `${Math.round(n)} cm`;
+}
+function formatHeightImperial(cm){
+  const n=Number(cm);
+  if(!Number.isFinite(n) || n<=0) return '';
+  const totalInches=n/2.54;
+  const feet=Math.floor(totalInches/12);
+  const inches=Math.round(totalInches-feet*12);
+  if(inches===12) return `${feet+1} pi 0 po`;
+  return `${feet} pi ${inches} po`;
+}
+function formatHeight(cm, mode){
+  const n=Number(cm);
+  if(!Number.isFinite(n) || n<=0) return '';
+  const view=(mode||state.settings?.heightUnit||'metric');
+  const metric=formatHeightMetric(n);
+  const imperial=formatHeightImperial(n);
+  return view==='imperial' ? `${imperial} · ${metric}` : metric;
 }
 function normalizeProfessionText(v){
   return String(v||'').toLowerCase()
@@ -1739,9 +1759,26 @@ async function wikiHydrate(qid){
   return { wikiId:qid, name, gender, bio:desc, birthday:year, heightCm, mainPhoto:wikiImg(imgF,500), photos:imgF?[wikiImg(imgF,800)]:[] };
 }
 async function wikiSearchCandidates(person){
-  const query=[person.name, person.profession].filter(Boolean).join(' ').trim() || person.name;
-  const raw=await wikiSearch(query);
-  const top=raw.slice(0,6);
+  const queries=[
+    [person.name, person.profession].filter(Boolean).join(' ').trim(),
+    person.name,
+    [person.name, person.birthday].filter(Boolean).join(' ').trim()
+  ].filter(Boolean);
+  const seen=new Set();
+  const raw=[];
+  for(const q of queries){
+    try{
+      const res=await wikiSearch(q);
+      for(const item of res){
+        if(item?.id && !seen.has(item.id)){
+          seen.add(item.id);
+          raw.push(item);
+        }
+      }
+      if(raw.length>=8) break;
+    }catch(_){ }
+  }
+  const top=raw.slice(0,8);
   const hydrated=(await Promise.all(top.map(async r=>{ try{ return await wikiHydrate(r.id); }catch(_){ return null; } }))).filter(Boolean);
   const merged=hydrated.map(c=>({ ...c, score: scoreWikiCandidate(c, person) }));
   merged.sort((a,b)=>b.score-a.score || Number(!!b.heightCm)-Number(!!a.heightCm));
@@ -3766,6 +3803,13 @@ function renderSettings(){
           <option value="added" ${state.settings.sortBy==='added'?'selected':''}>Récemment ajouté</option>
         </select>
       </div>
+      <div class="setting-row">
+        <div class="sr-info"><div class="sr-name">Unité pour la taille</div><div class="sr-desc">Métrique en cm ou impérial en pieds et pouces</div></div>
+        <select class="field" style="padding:7px 10px;border-radius:8px;background:var(--bg-3);border:1px solid var(--border)" id="height-unit-select">
+          <option value="metric" ${state.settings.heightUnit!=='imperial'?'selected':''}>Métrique</option>
+          <option value="imperial" ${state.settings.heightUnit==='imperial'?'selected':''}>Impérial</option>
+        </select>
+      </div>
     </div>
 
     <div class="setting-section">
@@ -3814,6 +3858,15 @@ function renderSettings(){
   $('#save-tmdb-key').addEventListener('click',()=>{
     state.settings.tmdbKey=$('#tmdb-key-input').value.trim();
     saveState(); toast('Clé TMDb enregistrée','ok');
+  });
+  $('#height-unit-select')?.addEventListener('change',e=>{
+    state.settings.heightUnit=e.target.value==='imperial'?'imperial':'metric';
+    saveState();
+    renderList();
+    renderSettings();
+    try{ if($('#modal-consult')?.classList.contains('is-open')) renderConsult(); }catch(_){}
+    try{ if($('#modal-detail')?.classList.contains('is-open') && detailPersonId) openDetails(detailPersonId); }catch(_){}
+    toast(state.settings.heightUnit==='imperial' ? 'Taille affichée en pieds et pouces' : 'Taille affichée en centimètres','ok');
   });
   $('#test-tmdb-key').addEventListener('click',async()=>{
     const k=$('#tmdb-key-input').value.trim();
