@@ -103,6 +103,7 @@ body.show-date .row{min-width:420px}
 .thumb.placeholder{display:grid;place-items:center;color:var(--text-4);font-size:11px}
 .row-info{min-width:0;flex:1}
 .row-name{font-size:15px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-sub{margin-top:3px;font-size:11.5px;color:var(--text-3);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .row-badge{margin-top:4px;display:inline-flex;max-width:100%;min-width:0}
 .row-badge .badge{max-width:100%;padding:2px 7px;font-size:10.5px;gap:4px}
 .row-badge .badge svg{width:10px;height:10px}
@@ -162,6 +163,16 @@ body.show-date .row{min-width:420px}
 .search-result .sr-name{font-size:14.5px;font-weight:700;line-height:1.2}
 .search-result .sr-meta{font-size:12px;color:var(--text-3);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .search-result .sr-badge{padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;background:var(--bg-3);color:var(--text-2);flex:none}
+.wd-pick-head{margin-bottom:12px;font-size:12.5px;color:var(--text-2);line-height:1.45}
+.wd-pick-list{display:flex;flex-direction:column;gap:8px}
+.wd-pick-item{display:flex;align-items:center;gap:12px;padding:10px;background:var(--bg-2);border:1px solid var(--border);border-radius:14px;transition:background .15s,border-color .15s;text-align:left;width:100%}
+.wd-pick-item:active{background:var(--card-hover);border-color:var(--amber)}
+.wd-pick-item img{width:48px;height:64px;border-radius:8px;object-fit:cover;background:var(--bg-3);flex:none}
+.wd-pick-info{min-width:0;flex:1}
+.wd-pick-name{font-size:14.5px;font-weight:700;line-height:1.2}
+.wd-pick-meta{font-size:12px;color:var(--text-3);margin-top:3px;line-height:1.35}
+.wd-inline-actions{display:flex;gap:8px;align-items:center}
+.wd-inline-actions .btn{flex:none}
 
 .tabs{display:flex;gap:6px;background:var(--bg-2);padding:4px;border-radius:12px;border:1px solid var(--border);margin-bottom:14px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
 .tabs::-webkit-scrollbar{display:none}
@@ -619,7 +630,7 @@ body.bulk-mode .list-head-check{display:flex}
         </button>
       </div>
       <button class="sort-btn" id="sort-name" style="justify-self:start">PERSONNE</button>
-      <button class="sort-btn" id="sort-elo" style="justify-self:center">Points</button>
+      <button class="sort-btn" id="sort-elo" style="justify-self:center">ELO</button>
       <button class="sort-btn col-date" id="sort-added" style="justify-self:center">AJOUTÉ</button>
     </div>
     <div id="list-body"></div>
@@ -762,6 +773,21 @@ body.bulk-mode .list-head-check{display:flex}
     <div class="modal-footer">
       <button class="btn btn-danger" id="detail-delete">Supprimer</button>
       <button class="btn btn-primary" id="detail-save">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal" id="modal-wikidata-pick">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div><div class="modal-title">Choisir la bonne personne</div><div class="modal-sub" id="wikidata-pick-sub">Résultats Wikidata</div></div>
+      <button class="modal-close" data-close><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="modal-body" id="wikidata-pick-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" data-close>Annuler</button>
+      <button class="btn btn-primary" id="wikidata-pick-skip">Laisser vide</button>
     </div>
   </div>
 </div>
@@ -1345,13 +1371,6 @@ function ensureBuckets(u){
   if(!state.tournaments[u]) state.tournaments[u]=[];
 }
 function getElo(u,p){ return state.elo[u]?.[p]??1500; }
-function getPreferredCompetitionFilter(minCount=2){
-  const countF=state.people.filter(p=>p.gender==='F').length;
-  const countM=state.people.filter(p=>p.gender==='M').length;
-  if(countF>=minCount) return 'F';
-  if(countM>=minCount) return 'M';
-  return 'F';
-}
 function getHeadToHeadWins(u,a,b){
   const hist = state.duelHistory[u]||[];
   let aWins=0,bWins=0;
@@ -1363,33 +1382,12 @@ function getHeadToHeadWins(u,a,b){
   }
   return {aWins,bWins};
 }
-function updateElo(u,w,l){
+function updateElo(u,w,l,K=32){
   ensureBuckets(u);
   const wo=getElo(u,w), lo=getElo(u,l);
-  state.elo[u][w]=Math.max(Math.round(wo), Math.round(lo)+1);
-  state.elo[u][l]=Math.round(lo);
-}
-function getNewPersonStartingPoints(userId, gender){
-  ensureBuckets(userId);
-  const sameGenderIds = state.people.filter(p=>p.gender===gender).map(p=>p.id);
-  if(!sameGenderIds.length) return 1500;
-  let minScore = Infinity;
-  for(const pid of sameGenderIds){
-    const score = getElo(userId, pid);
-    if(score < minScore) minScore = score;
-  }
-  return Number.isFinite(minScore) ? Math.round(minScore) - 1 : 1500;
-}
-function seedNewPersonPoints(person){
-  USERS.forEach(u=>{
-    ensureBuckets(u.id);
-    state.elo[u.id][person.id] = getNewPersonStartingPoints(u.id, person.gender);
-  });
-}
-function addPersonRecord(person){
-  state.people.push(person);
-  seedNewPersonPoints(person);
-  return person;
+  const ew=1/(1+Math.pow(10,(lo-wo)/400));
+  state.elo[u][w]=Math.round(wo+K*(1-ew));
+  state.elo[u][l]=Math.round(lo+K*(0-(1-ew)));
 }
 
 /* ============ STORAGE ============ */
@@ -1675,6 +1673,57 @@ function wikiImg(fn,size=500){
   if(!fn) return null;
   return 'https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/'+encodeURIComponent(fn.replace(/ /g,'_'))+'&width='+size;
 }
+function normalizeHeightCm(value, unit){
+  if(value==null || !Number.isFinite(Number(value))) return null;
+  const n=Math.abs(Number(value));
+  if(unit && /Q11573$/.test(unit)) return Math.round(n*100);
+  if(unit && /Q174728$/.test(unit)) return Math.round(n);
+  if(unit && /Q218593$/.test(unit)) return Math.round(n*30.48);
+  if(unit && /Q3710$/.test(unit)) return Math.round(n*2.54);
+  return n < 3 ? Math.round(n*100) : Math.round(n);
+}
+function heightFromClaims(claims){
+  const raw=claims?.P2048?.[0]?.mainsnak?.datavalue?.value;
+  if(!raw) return null;
+  const amount=raw.amount!=null?Number(raw.amount):null;
+  return normalizeHeightCm(amount, raw.unit||'');
+}
+function formatHeight(cm){
+  const n=Number(cm);
+  if(!Number.isFinite(n) || n<=0) return '';
+  return `${Math.round(n)} cm`;
+}
+function normalizeProfessionText(v){
+  return String(v||'').toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g,'')
+    .replace(/[^a-z0-9 ]+/g,' ')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+function professionTokens(v){
+  const txt=normalizeProfessionText(v);
+  if(!txt) return [];
+  const map={acting:['acteur','actrice','actor','actress','comedien','comedienne','performer'],actor:['acteur','actrice','actor','actress'],actress:['acteur','actrice','actor','actress'],model:['modele','mannequin','model'],directing:['realisateur','realisatrice','director','filmmaker'],sound:['chanteur','chanteuse','singer','musician','musicien','musicienne'],writing:['writer','screenwriter','ecrivain','ecrivaine','auteur','autrice']};
+  const tokens=new Set(txt.split(' ').filter(t=>t.length>2));
+  for(const [key,vals] of Object.entries(map)) if(txt.includes(key)) vals.forEach(v=>tokens.add(v));
+  return Array.from(tokens);
+}
+function scoreWikiCandidate(candidate, person){
+  const candName=normalizeProfessionText(candidate.name);
+  const targetName=normalizeProfessionText(person.name);
+  const desc=normalizeProfessionText(candidate.bio);
+  let score=0;
+  if(candName===targetName) score+=100;
+  else if(candName.startsWith(targetName) || targetName.startsWith(candName)) score+=60;
+  else if(candName.includes(targetName) || targetName.includes(candName)) score+=35;
+  const tokens=professionTokens(person.profession);
+  if(tokens.some(t=>desc.includes(t))) score+=25;
+  if(person.gender && candidate.gender===person.gender) score+=15;
+  if(person.birthday && candidate.birthday===person.birthday) score+=20;
+  if(candidate.heightCm) score+=6;
+  if(candidate.mainPhoto) score+=4;
+  return score;
+}
 async function wikiHydrate(qid){
   const e=await wikiEntity(qid);
   if(!e) return null;
@@ -1686,7 +1735,65 @@ async function wikiHydrate(qid){
   const imgF=c.P18?.[0]?.mainsnak?.datavalue?.value;
   const dob=c.P569?.[0]?.mainsnak?.datavalue?.value?.time;
   const year=dob?parseInt(dob.replace(/^[+-]/,'').slice(0,4)):null;
-  return { wikiId:qid, name, gender, bio:desc, birthday:year, mainPhoto:wikiImg(imgF,500), photos:imgF?[wikiImg(imgF,800)]:[] };
+  const heightCm=heightFromClaims(c);
+  return { wikiId:qid, name, gender, bio:desc, birthday:year, heightCm, mainPhoto:wikiImg(imgF,500), photos:imgF?[wikiImg(imgF,800)]:[] };
+}
+async function wikiSearchCandidates(person){
+  const query=[person.name, person.profession].filter(Boolean).join(' ').trim() || person.name;
+  const raw=await wikiSearch(query);
+  const top=raw.slice(0,6);
+  const hydrated=(await Promise.all(top.map(async r=>{ try{ return await wikiHydrate(r.id); }catch(_){ return null; } }))).filter(Boolean);
+  const merged=hydrated.map(c=>({ ...c, score: scoreWikiCandidate(c, person) }));
+  merged.sort((a,b)=>b.score-a.score || Number(!!b.heightCm)-Number(!!a.heightCm));
+  return merged;
+}
+let pendingWikiHeightPersonId = null;
+function openWikiPickModal(person, candidates){
+  pendingWikiHeightPersonId = person.id;
+  $('#wikidata-pick-sub').textContent = person.name;
+  const body=$('#wikidata-pick-body');
+  body.innerHTML = `
+    <div class="wd-pick-head">Plusieurs résultats possibles. Choisis la bonne personne pour importer sa taille.</div>
+    <div class="wd-pick-list">
+      ${candidates.map(c=>`
+        <button class="wd-pick-item" type="button" data-wiki-pick="${esc(c.wikiId)}">
+          ${c.mainPhoto?`<img src="${esc(c.mainPhoto)}" loading="lazy" onerror="this.style.display='none'">`:`<div style="width:48px;height:64px;background:var(--bg-3);border-radius:8px;display:grid;place-items:center;color:var(--text-4);font-size:11px">?</div>`}
+          <div class="wd-pick-info">
+            <div class="wd-pick-name">${esc(c.name||'Sans nom')}</div>
+            <div class="wd-pick-meta">${esc(c.bio||'Description indisponible')}</div>
+          </div>
+          <div class="sr-badge">${esc(formatHeight(c.heightCm)||'Taille inconnue')}</div>
+        </button>
+      `).join('')}
+    </div>`;
+  $$('#wikidata-pick-body [data-wiki-pick]').forEach(btn=>btn.addEventListener('click',()=>{
+    const wikiId=btn.getAttribute('data-wiki-pick');
+    const selected=candidates.find(c=>c.wikiId===wikiId);
+    const target=state.people.find(x=>x.id===pendingWikiHeightPersonId);
+    if(!selected || !target) return;
+    target.wikiId = selected.wikiId;
+    if(selected.heightCm) target.heightCm = selected.heightCm;
+    saveState();
+    closeAllModals();
+    openDetails(target.id);
+    toast(selected.heightCm ? `Taille importée : ${formatHeight(selected.heightCm)}` : 'Aucune taille disponible', selected.heightCm?'ok':'err');
+  }));
+  $('#wikidata-pick-skip')?.addEventListener('click',()=>{ pendingWikiHeightPersonId=null; closeModal('modal-wikidata-pick'); });
+  openModal('modal-wikidata-pick');
+}
+async function fetchHeightFromWikidataForPerson(person){
+  const candidates=await wikiSearchCandidates(person);
+  if(!candidates.length) throw new Error('Aucun résultat Wikidata');
+  const withHeight=candidates.filter(c=>c.heightCm || c.mainPhoto);
+  const usable=(withHeight.length?withHeight:candidates).slice(0,5);
+  if(usable.length===1){
+    const chosen=usable[0];
+    person.wikiId = chosen.wikiId;
+    if(chosen.heightCm) person.heightCm = chosen.heightCm;
+    saveState();
+    return { mode:'single', candidate:chosen };
+  }
+  return { mode:'pick', candidates:usable };
 }
 
 
@@ -1917,8 +2024,8 @@ function renderList(){
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"${isSelected?'':' style="opacity:0"'}><path d="M5 12l5 5 9-11"/></svg>
         </span>
       </div>
-      <div class="row-main">${th}<div class="row-info"><div class="row-name">${esc(p.name)}</div></div></div>
-      <div class="row-elo">${el}<small>Points</small></div>
+      <div class="row-main">${th}<div class="row-info"><div class="row-name">${esc(p.name)}</div>${p.heightCm?`<div class="row-sub">${esc(formatHeight(p.heightCm))}</div>`:''}</div></div>
+      <div class="row-elo">${el}<small>ELO</small></div>
       ${tsHtml}
     </div>`;
   }).join('');
@@ -1927,7 +2034,7 @@ function renderList(){
 
 function canManualReorder(){
   const filter=(state.settings.filter||'all');
-  const allowedFilters=new Set(['M','F']);
+  const allowedFilters=new Set(['all','M','F']);
   return !bulkMode &&
     (state.settings.sortBy||'elo')==='elo' &&
     (state.settings.sortDir||'desc')==='desc' &&
@@ -2060,7 +2167,7 @@ function applyManualReorder(pid, fromIndex, targetIndex){
   visibleOrdered.forEach((p,i)=>{ state.elo[userId][p.id]=finalScores[i]; });
   saveState();
   renderList();
-  toast(`Position mise à jour : ${moved.name} · ${finalScores[safeTarget]} points`,'ok');
+  toast(`Position mise à jour : ${moved.name} · ELO ${finalScores[safeTarget]}`,'ok');
 }
 
 function computeManualPlacementScores(scores, pivotIndex){
@@ -2134,7 +2241,7 @@ function renderUserSwitch(){
     const act=user.id===cur;
     return `<button class="user-card ${act?'is-current':''}" style="--user-color:${user.color}" data-switch="${user.id}">
       <div class="av" style="background:${user.color}">${user.initial}</div>
-      <div class="info"><div class="un">${user.name}</div><div class="us">${nR} profils classés par points · ${nF} favori${nF>1?'s':''} · ${nD} combat${nD>1?'s':''}</div></div>
+      <div class="info"><div class="un">${user.name}</div><div class="us">${nR} profils classés ELO · ${nF} favori${nF>1?'s':''} · ${nD} combat${nD>1?'s':''}</div></div>
       ${act?`<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5 9-11" stroke="${user.color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`:''}
     </button>`;
   }).join('');
@@ -2253,7 +2360,7 @@ function initAddOnce(){
     const pr=$('#m-prof').value.trim();
     const bo=$('#m-bio').value.trim();
     const newIdM=uid();
-    addPersonRecord({ id:newIdM, name, gender:g.getAttribute('data-g'), mainPhoto:ph||null, photos:ph?[ph]:[], birthday:yr, nationality:nt||null, profession:pr||null, bio:bo||null, addedAt:Date.now() });
+    state.people.push({ id:newIdM, name, gender:g.getAttribute('data-g'), mainPhoto:ph||null, photos:ph?[ph]:[], birthday:yr, nationality:nt||null, profession:pr||null, bio:bo||null, addedAt:Date.now() });
     saveState(); renderList(); closeAllModals();
     toast('Ajouté : '+name,'ok');
     setTimeout(()=>openDetails(newIdM),120);
@@ -2309,7 +2416,7 @@ function renderTmdbResults(results){
       const main=f.profile_path?(TMDB_IMG+f.profile_path):(ph[0]||null);
       const yr=f.birthday?parseInt(f.birthday.slice(0,4)):null;
       const newId1=uid();
-      addPersonRecord({ id:newId1, tmdbId:tid, name:f.name, gender:g==='?'?'F':g, mainPhoto:main, photos:ph.length?ph:(main?[main]:[]), birthday:yr, nationality:f.place_of_birth||null, profession:f.known_for_department||null, bio:f.biography||null, addedAt:Date.now() });
+      state.people.push({ id:newId1, tmdbId:tid, name:f.name, gender:g==='?'?'F':g, mainPhoto:main, photos:ph.length?ph:(main?[main]:[]), birthday:yr, nationality:f.place_of_birth||null, profession:f.known_for_department||null, bio:f.biography||null, addedAt:Date.now() });
       saveState(); renderList(); closeAllModals();
       toast('Ajouté : '+f.name,'ok');
       setTimeout(()=>openDetails(newId1),120);
@@ -2323,7 +2430,7 @@ function addPersonFromTmdbData(f, fallbackGender){
   const ph = (f.images?.profiles||[]).map(x=>TMDB_IMG+x.file_path);
   const main = f.profile_path ? (TMDB_IMG+f.profile_path) : (ph[0]||null);
   const yr = f.birthday ? parseInt(f.birthday.slice(0,4)) : null;
-  addPersonRecord({
+  state.people.push({
     id: uid(), tmdbId: f.id, name: f.name, gender: g,
     mainPhoto: main, photos: ph.length ? ph : (main ? [main] : []),
     birthday: yr, nationality: f.place_of_birth||null,
@@ -2553,7 +2660,7 @@ function renderWikiResults(results){
       if(!h?.name){ toast('Entité incomplète','err'); btn.style.opacity=''; return; }
       if(!h.gender){ toast('Genre manquant, utilise l\'ajout manuel','err'); btn.style.opacity=''; return; }
       const newIdW=uid();
-      addPersonRecord({ id:newIdW, wikiId:qid, name:h.name, gender:h.gender, mainPhoto:h.mainPhoto, photos:h.photos||[], birthday:h.birthday||null, bio:h.bio||null, addedAt:Date.now() });
+      state.people.push({ id:newIdW, wikiId:qid, name:h.name, gender:h.gender, mainPhoto:h.mainPhoto, photos:h.photos||[], birthday:h.birthday||null, bio:h.bio||null, addedAt:Date.now() });
       saveState(); renderList(); closeAllModals();
       toast('Ajouté : '+h.name,'ok');
       setTimeout(()=>openDetails(newIdW),120);
@@ -2595,6 +2702,7 @@ function renderDetails(){
   if(p.profession) sp.push(p.profession);
   if(p.birthday) sp.push(p.birthday);
   if(p.nationality) sp.push(p.nationality);
+  if(p.heightCm) sp.push(formatHeight(p.heightCm));
   const sub=sp.join(' · ');
   const tmdbLink=p.tmdbId?`<a href="https://www.themoviedb.org/person/${p.tmdbId}" target="_blank" rel="noreferrer">Voir sur TMDb ↗</a>`:'';
   const wikiLink=p.wikiId?`<a href="https://www.wikidata.org/wiki/${p.wikiId}" target="_blank" rel="noreferrer">Wikidata ↗</a>`:'';
@@ -2662,9 +2770,17 @@ function renderDetails(){
       ${sub?`<div class="detail-subtitle">${esc(sub)}</div>`:''}
       ${(tmdbLink||wikiLink)?`<div class="detail-links">${tmdbLink} ${wikiLink}</div>`:''}
     </div>
+    <div class="field full" style="margin:8px 0 14px">
+      <label>Taille</label>
+      <div class="wd-inline-actions">
+        <input id="detail-height" type="text" inputmode="decimal" placeholder="Ex: 175" value="${p.heightCm?esc(String(p.heightCm)):''}">
+        <button class="btn btn-small" type="button" id="detail-height-fetch">Obtenir</button>
+      </div>
+      <div class="search-hint">Saisie manuelle en cm, ou récupération à la demande depuis Wikidata.</div>
+    </div>
     <div class="notes-grid">
-      <button class="note-card is-current is-editable" id="detail-edit-elo" type="button" aria-label="Modifier les points">
-        <div class="nc-label">Points</div>
+      <button class="note-card is-current is-editable" id="detail-edit-elo" type="button" aria-label="Modifier la cote ELO">
+        <div class="nc-label">ELO</div>
         <div class="nc-value">${elo}</div>
         <div class="nc-tiny">Classement de ${esc(getUser(u).name)} · Appuyer pour modifier</div>
       </button>
@@ -2728,7 +2844,7 @@ Tenter l'ajout quand même ?`;
   });
   $('#detail-edit-elo')?.addEventListener('click',()=>{
     const current = getElo(u,p.id);
-    const raw = prompt(`Modifier les points de ${p.name}`, String(current));
+    const raw = prompt(`Modifier la cote ELO de ${p.name}`, String(current));
     if(raw===null) return;
     const value = Number(String(raw).replace(',', '.').trim());
     if(!Number.isFinite(value) || value < 0){
@@ -2740,11 +2856,51 @@ Tenter l'ajout quand même ?`;
     saveState();
     renderList();
     renderDetails();
-    toast(`Points mis à jour : ${Math.round(value)}`,'ok');
+    toast(`ELO mis à jour : ${Math.round(value)}`,'ok');
+  });
+  $('#detail-height-fetch')?.addEventListener('click', async e=>{
+    const btn=e.currentTarget;
+    const original=btn.textContent;
+    btn.disabled=true;
+    btn.textContent='Recherche…';
+    try{
+      const result=await fetchHeightFromWikidataForPerson(p);
+      if(result.mode==='single'){
+        renderList();
+        renderDetails();
+        toast(result.candidate.heightCm ? `Taille importée : ${formatHeight(result.candidate.heightCm)}` : 'Aucune taille disponible', result.candidate.heightCm?'ok':'err');
+      }else{
+        btn.disabled=false;
+        btn.textContent=original;
+        openWikiPickModal(p, result.candidates);
+        return;
+      }
+    }catch(err){
+      toast('Wikidata : '+err.message,'err');
+    }
+    btn.disabled=false;
+    btn.textContent=original;
   });
 }
 function saveDetails(){
+  const p=state.people.find(x=>x.id===ui.currentPersonId);
+  if(!p) return;
+  const raw=($('#detail-height')?.value||'').trim().replace(',', '.');
+  if(raw===''){
+    delete p.heightCm;
+  }else{
+    const num=Number(raw);
+    if(!Number.isFinite(num) || num<=0){
+      toast('Taille invalide','err');
+      return;
+    }
+    p.heightCm=Math.round(num);
+  }
+  saveState();
+  renderList();
+  renderDetails();
   closeAllModals();
+  toast('Fiche mise à jour','ok');
 }
 function removePersonFromBank(pid){
   // Removes a person from the bank and strips all per-user data.
@@ -2780,7 +2936,7 @@ function renderModesMenu(){
   $('#modes-body').innerHTML=`
     <div class="tour-hero" style="margin-bottom:12px">
       <div class="tico">⚡</div>
-      <div><h3>Choisis un mode</h3><p>Joueur : ${esc(user.name)}. Les trois modes utilisent le même classement par points.</p></div>
+      <div><h3>Choisis un mode</h3><p>Joueur : ${esc(user.name)}. Les trois modes utilisent le même classement ELO.</p></div>
     </div>
     <div style="display:grid;gap:10px">
       <button class="search-result" data-mode-open="duel">
@@ -2788,11 +2944,11 @@ function renderModesMenu(){
         <div class="sr-badge">⚔</div>
       </button>
       <button class="search-result" data-mode-open="tournament">
-        <div class="sr-info"><div class="sr-name">Tournoi</div><div class="sr-meta">Bracket 32 avec filtre Femmes ou Hommes.</div></div>
+        <div class="sr-info"><div class="sr-name">Tournoi</div><div class="sr-meta">Bracket 32 avec filtre Femmes, Hommes ou Mixte.</div></div>
         <div class="sr-badge">🏆</div>
       </button>
       <button class="search-result" data-mode-open="lms">
-        <div class="sr-info"><div class="sr-name">Last man standing</div><div class="sr-meta">Départ choisi ou aléatoire, puis montée contre des profils de plus en plus hauts en points jusqu'à la défaite.</div></div>
+        <div class="sr-info"><div class="sr-name">Last man standing</div><div class="sr-meta">Départ choisi ou aléatoire, puis montée contre des ELO de plus en plus élevés jusqu'à la défaite.</div></div>
         <div class="sr-badge">⚔🏆</div>
       </button>
     </div>`;
@@ -2806,13 +2962,13 @@ function renderModesMenu(){
 
 /* ============ LAST MAN STANDING ============ */
 function openLms(){
-  ui.lms={ stage:'setup', filter:getPreferredCompetitionFilter(2), startMode:'selected', selectedId:'', currentId:'', opponentId:'', streak:0, beaten:[], photoIdx:{} };
+  ui.lms={ stage:'setup', filter:'all', startMode:'selected', selectedId:'', currentId:'', opponentId:'', streak:0, beaten:[], photoIdx:{} };
   renderLms();
   openModal('modal-lms');
 }
 function getLmsPool(){
   const f=ui.lms.filter;
-  return state.people.filter(p=>p.gender===f);
+  return state.people.filter(p=>f==='all'||p.gender===f);
 }
 function pickLmsOpponent(){
   const u=state.settings.currentUser;
@@ -2851,15 +3007,16 @@ function renderLms(){
   const pool=getLmsPool();
   $('#lms-sub').textContent='Joueur : '+user.name;
   if(ui.lms.stage==='setup'){
-    const options=pool.slice().sort((a,b)=>a.name.localeCompare(b.name,'fr')).map(p=>`<option value="${p.id}" ${ui.lms.selectedId===p.id?'selected':''}>${esc(p.name)} · ${getElo(u,p.id)} points</option>`).join('');
+    const options=pool.slice().sort((a,b)=>a.name.localeCompare(b.name,'fr')).map(p=>`<option value="${p.id}" ${ui.lms.selectedId===p.id?'selected':''}>${esc(p.name)} · ELO ${getElo(u,p.id)}</option>`).join('');
     $('#lms-body').innerHTML=`
       <div class="tour-hero">
         <div class="tico">🏆</div>
-        <div><h3>Last man standing</h3><p>Choisis un profil de départ ou lance un tirage aléatoire. Il rencontrera ensuite à chaque victoire le prochain adversaire ayant immédiatement plus de points que lui jusqu'à sa défaite.</p></div>
+        <div><h3>Last man standing</h3><p>Choisis un profil de départ ou lance un tirage aléatoire. Il rencontrera ensuite à chaque victoire le prochain adversaire ayant la cote ELO immédiatement au-dessus jusqu'à sa défaite.</p></div>
       </div>
       <div class="field" style="margin-bottom:12px">
         <label>Catégorie</label>
-        <div class="tour-opts c2" style="grid-template-columns:1fr 1fr">
+        <div class="tour-opts c3">
+          <button class="${ui.lms.filter==='all'?'on':''}" data-lfs="all">Tous (${state.people.length})</button>
           <button class="${ui.lms.filter==='F'?'on f':''}" data-lfs="F">Femmes (${state.people.filter(p=>p.gender==='F').length})</button>
           <button class="${ui.lms.filter==='M'?'on m':''}" data-lfs="M">Hommes (${state.people.filter(p=>p.gender==='M').length})</button>
         </div>
@@ -2878,7 +3035,7 @@ function renderLms(){
           ${options}
         </select>
       </div>
-      <div class="search-hint" style="margin-bottom:12px">${ui.lms.startMode==='random'?'Le profil de départ sera tiré au sort dans le filtre actif.':'Le profil choisi affrontera ensuite le prochain adversaire juste au-dessus en points à chaque victoire.'}</div>
+      <div class="search-hint" style="margin-bottom:12px">${ui.lms.startMode==='random'?'Le profil de départ sera tiré au sort dans le filtre actif.':'Le profil choisi affrontera ensuite le prochain ELO juste au-dessus à chaque victoire.'}</div>
       <button class="btn btn-primary btn-block" id="lms-start" ${pool.length<2||(ui.lms.startMode==='selected'&&!ui.lms.selectedId)?'disabled':''}>${ui.lms.startMode==='random'?'Lancer en aléatoire':'Lancer le mode'}</button>
       ${pool.length<2?'<div class="search-hint">Il faut au moins 2 profils dans ce filtre.</div>':''}`;
     $$('#lms-body [data-lfs]').forEach(b=>b.addEventListener('click',()=>{ ui.lms.filter=b.getAttribute('data-lfs'); ui.lms.selectedId=''; renderLms(); }));
@@ -2902,7 +3059,7 @@ function renderLms(){
         <div class="tico">👑</div>
         <div><h3>Parcours terminé</h3><p>${esc(champ.name)} a survécu à tous les adversaires disponibles dans ce filtre.</p></div>
       </div>
-      <div class="stat-hero"><div class="box"><div class="v">${ui.lms.streak}</div><div class="l">Victoires</div></div><div class="box"><div class="v">${getElo(u,champ.id)}</div><div class="l">Points finaux</div></div></div>
+      <div class="stat-hero"><div class="box"><div class="v">${ui.lms.streak}</div><div class="l">Victoires</div></div><div class="box"><div class="v">${getElo(u,champ.id)}</div><div class="l">ELO final</div></div></div>
       <button class="btn btn-primary btn-block" id="lms-restart">Recommencer</button>`;
     $('#lms-restart')?.addEventListener('click',()=>openLms());
     return;
@@ -2919,19 +3076,19 @@ function renderLms(){
       <div>
         <div class="duel-stats"><button class="duel-vote-btn" data-lms-pick="${p.id}" type="button">Vote</button></div>
         <div class="d-name">${esc(p.name)} ${isChamp?'<span style="color:var(--amber)">• cible</span>':''}</div>
-        <div class="d-sub">${getElo(u,p.id)} points</div>
+        <div class="d-sub">ELO ${getElo(u,p.id)}</div>
       </div>
     </div>`;
   };
   $('#lms-body').innerHTML=`
     <div class="tour-hero">
       <div class="tico">⚔</div>
-      <div><h3>Last man standing</h3><p>${esc(champ.name)} continue jusqu'à sa défaite. Chaque victoire enchaîne le prochain adversaire juste au-dessus en points.</p></div>
+      <div><h3>Last man standing</h3><p>${esc(champ.name)} continue jusqu'à sa défaite. Chaque victoire enchaîne le prochain adversaire juste au-dessus en ELO.</p></div>
     </div>
     <div class="stat-hero">
       <div class="box"><div class="v">${ui.lms.streak}</div><div class="l">Série</div></div>
-      <div class="box"><div class="v">${getElo(u,champ.id)}</div><div class="l">Points cible</div></div>
-      <div class="box"><div class="v">${getElo(u,opp.id)}</div><div class="l">Points adverses</div></div>
+      <div class="box"><div class="v">${getElo(u,champ.id)}</div><div class="l">ELO cible</div></div>
+      <div class="box"><div class="v">${getElo(u,opp.id)}</div><div class="l">ELO adverse</div></div>
       <div class="box"><div class="v">${ui.lms.beaten.length}</div><div class="l">Battus</div></div>
     </div>
     <div class="duel-actions">
@@ -2970,7 +3127,7 @@ function lmsVote(winnerId){
         <div class="tico">⛔</div>
         <div><h3>Défaite de ${esc(champ?.name||'la cible')}</h3><p>Parcours arrêté après ${ui.lms.streak} victoire${ui.lms.streak>1?'s':''}.</p></div>
       </div>
-      <div class="stat-hero"><div class="box"><div class="v">${ui.lms.streak}</div><div class="l">Victoires</div></div><div class="box"><div class="v">${getElo(u,champId)}</div><div class="l">Points finaux</div></div><div class="box"><div class="v">${getElo(u,oppId)}</div><div class="l">Vainqueur</div></div></div>
+      <div class="stat-hero"><div class="box"><div class="v">${ui.lms.streak}</div><div class="l">Victoires</div></div><div class="box"><div class="v">${getElo(u,champId)}</div><div class="l">ELO final</div></div><div class="box"><div class="v">${getElo(u,oppId)}</div><div class="l">Vainqueur</div></div></div>
       <button class="btn btn-primary btn-block" id="lms-restart">Recommencer</button>`;
     $('#lms-restart')?.addEventListener('click',()=>openLms());
     toast('La cible a perdu','err');
@@ -2981,13 +3138,13 @@ function lmsVote(winnerId){
 
 /* ============ DUEL MODAL ============ */
 function openDuel(){
-  ui.duel={ filter:getPreferredCompetitionFilter(2), pair:null, photoIdx:{} };
+  ui.duel={ filter:'all', pair:null, photoIdx:{} };
   renderDuel();
   openModal('modal-duel');
 }
 function pickPair(){
   const f=ui.duel.filter;
-  const pool=state.people.filter(p=>p.gender===f);
+  const pool=state.people.filter(p=>f==='all'||p.gender===f);
   if(pool.length<2) return null;
   const u=state.settings.currentUser;
   const hist=state.duelHistory[u]||[];
@@ -2999,7 +3156,7 @@ function pickPair(){
   const candidates=sorted.slice(0,sliceSize);
   const a=candidates[Math.floor(Math.random()*candidates.length)];
   const ae=getElo(u,a.id);
-  // Among remaining pool, pick within 8 closest point totals
+  // Among remaining pool, pick within 8 closest ELO
   const rest=pool.filter(p=>p.id!==a.id).map(p=>({p,d:Math.abs(getElo(u,p.id)-ae)}));
   rest.sort((x,y)=>x.d-y.d);
   const near=rest.slice(0,Math.min(8,rest.length));
@@ -3016,7 +3173,8 @@ function renderDuel(){
     body.innerHTML=`<div class="empty-state"><div class="big">⚔</div><h3>Pas assez de personnes</h3><p>Ajoute au moins 2 profils pour lancer un duel.</p></div>`;
     return;
   }
-  const filterBar=`<div class="tour-opts c2" style="margin-bottom:14px;grid-template-columns:1fr 1fr">
+  const filterBar=`<div class="tour-opts c3" style="margin-bottom:14px">
+    <button class="${ui.duel.filter==='all'?'on':''}" data-f="all">Tous</button>
     <button class="${ui.duel.filter==='F'?'on f':''}" data-f="F">Femmes</button>
     <button class="${ui.duel.filter==='M'?'on m':''}" data-f="M">Hommes</button>
   </div>`;
@@ -3044,14 +3202,14 @@ function renderDuel(){
       <div>
         <div class="duel-stats"><button class="duel-vote-btn" data-pick="${p.id}" type="button">Vote</button></div>
         <div class="d-name">${esc(p.name)}</div>
-        <div class="d-sub">${getElo(u,p.id)} points</div>
+        <div class="d-sub">ELO ${getElo(u,p.id)}</div>
       </div>
     </div>`;
   };
   body.innerHTML=filterBar+`
     <div class="duel-hero-card">
       <div class="hico">⚔</div>
-      <div><h3>Duel libre</h3><p>Utilise le bouton Vote sous la photo. Les points s'ajustent automatiquement.</p></div>
+      <div><h3>Duel libre</h3><p>Utilise le bouton Vote sous la photo. L'ELO est mis à jour automatiquement.</p></div>
     </div>
     <div class="duel-actions">
       <button class="btn btn-small" data-act="skip">Passer</button>
@@ -3144,21 +3302,23 @@ function renderTourSetup(){
   const u=state.settings.currentUser;
   const pF=state.people.filter(p=>p.gender==='F').length;
   const pM=state.people.filter(p=>p.gender==='M').length;
+  const pA=state.people.length;
   t.config.size=32;
   t.config.seeding='random';
-  const cur=t.config.filter==='F'?pF:pM;
+  const cur=t.config.filter==='all'?pA:t.config.filter==='F'?pF:pM;
   $('#tour-title').textContent='Nouveau tournoi';
   $('#tour-sub').textContent='Joueur : '+getUser(u).name;
   $('#tour-body').innerHTML=`
     <div class="tour-hero">
       <div class="tico">🏆</div>
-      <div><h3>Tournoi 32 — tirage aléatoire</h3><p>Chaque combat est journalisé et les points sont mis à jour.</p></div>
+      <div><h3>Tournoi 32 — tirage aléatoire</h3><p>Chaque combat est journalisé et l'ELO est mis à jour.</p></div>
     </div>
     <div class="field" style="margin-bottom:12px">
       <label>Catégorie</label>
-      <div class="tour-opts c2" style="grid-template-columns:1fr 1fr">
+      <div class="tour-opts" style="grid-template-columns:1fr 1fr 1fr">
         <button class="${t.config.filter==='F'?'on f':''}" data-tf="F">Femmes (${pF})</button>
         <button class="${t.config.filter==='M'?'on m':''}" data-tf="M">Hommes (${pM})</button>
+        <button class="${t.config.filter==='all'?'on':''}" data-tf="all">Mixte (${pA})</button>
       </div>
     </div>
     <div style="margin-top:6px">
@@ -3175,7 +3335,7 @@ function renderTourSetup(){
     hist.innerHTML=state.tournaments[u].slice().reverse().slice(0,10).map(x=>{
       const win=state.people.find(p=>p.id===x.winnerId);
       const d=new Date(x.createdAt);
-      const label=x.config.filter==='F'?'Femmes':'Hommes';
+      const label=x.config.filter==='F'?'Femmes':x.config.filter==='M'?'Hommes':'Mixte';
       return `<div class="top-item" style="cursor:default">
         ${win?.mainPhoto?`<img src="${esc(win.mainPhoto)}" onerror="this.style.display='none'">`:`<div style="width:30px;height:42px;background:var(--bg-3);border-radius:6px"></div>`}
         <div class="nm">${label} ${x.config.size} · ${x.status==='complete'?'Champion : '+esc(win?.name||'?'):'En cours'}</div>
@@ -3187,7 +3347,7 @@ function renderTourSetup(){
 function startTournament(config){
   const u=state.settings.currentUser;
   ensureBuckets(u);
-  let pool=state.people.filter(p=>p.gender===config.filter);
+  let pool=state.people.filter(p=>config.filter==='all'||p.gender===config.filter);
   if(config.seeding==='elo') pool.sort((a,b)=>getElo(u,b.id)-getElo(u,a.id));
   else pool=pool.sort(()=>Math.random()-0.5);
   const parts=pool.slice(0,config.size);
@@ -3234,7 +3394,7 @@ function renderTourPlay(){
       </div>
     </div>`;
   };
-  const label=t.config.filter==='F'?'Femmes':'Hommes';
+  const label=t.config.filter==='F'?'Femmes':t.config.filter==='M'?'Hommes':'Mixte';
   $('#tour-body').innerHTML=`
     <div class="tour-hero">
       <div class="tico">🏆</div>
@@ -3356,7 +3516,7 @@ function tourAdvance(winId){
   const m=r.matches[t.currentMatch];
   m.winner=winId;
   const loseId=m.a===winId?m.b:m.a;
-  // Capture points before update to compute delta
+  // Capture ELO before update to compute delta
   const eloWBefore=getElo(u,winId);
   const eloLBefore=getElo(u,loseId);
   updateElo(u,winId,loseId);
@@ -3394,7 +3554,7 @@ function renderTourPodium(){
     return state.people.find(p=>p.id===loser);
   }).filter(Boolean);
 
-  // Compute total point delta per participant across all tournament matches
+  // Compute total ELO delta per participant across all tournament matches
   const totalDeltas={};
   t.rounds.forEach(r=>r.matches.forEach(m=>{
     if(m.winner && m.eloDeltas){
@@ -3416,7 +3576,7 @@ function renderTourPodium(){
   $('#tour-body').innerHTML=`
     <div class="tour-hero" style="background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(251,113,133,.12));border-color:rgba(245,158,11,.4)">
       <div class="tico" style="background:rgba(245,158,11,.3);color:var(--amber-hi)">👑</div>
-      <div><h3>Champion${champ&&champ.gender==='F'?'ne':''} : ${esc(champ?.name||'?')}</h3><p>${esc(getUser(u).name)} a couronné ${t.config.filter==='F'?'une gagnante':'un gagnant'} en ${t.rounds.length} rounds.</p></div>
+      <div><h3>Champion${champ&&champ.gender==='F'?'ne':''} : ${esc(champ?.name||'?')}</h3><p>${esc(getUser(u).name)} a couronné ${t.config.filter==='F'?'une gagnante':t.config.filter==='M'?'un gagnant':'un(e) gagnant(e)'} en ${t.rounds.length} rounds.</p></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
       <div class="note-card" style="--user-color:#FBBF24">
@@ -3460,10 +3620,10 @@ function renderStats(){
       <div class="box"><div class="v">${state.people.length}</div><div class="l">Profils</div></div>
       <div class="box"><div class="v">${hist.length}</div><div class="l">Combats</div></div>
       <div class="box"><div class="v">${completed.length}</div><div class="l">Tournois finis</div></div>
-      <div class="box"><div class="v">${avgElo}</div><div class="l">Points moyens</div></div>
+      <div class="box"><div class="v">${avgElo}</div><div class="l">ELO moyen</div></div>
     </div>
     <div class="stat-section">
-      <h3>Top points</h3>
+      <h3>Top ELO</h3>
       <div class="top-list">${eloEntries.slice(0,10).map((x,i)=>`<div class="top-item"><div class="rk ${i===0?'':i===1?'silver':i===2?'bronze':'flat'}">${i+1}</div>${x.p.mainPhoto?`<img src="${esc(x.p.mainPhoto)}" onerror="this.style.display='none'">`:''}<div class="nm">${esc(x.p.name)}</div><div class="vl">${x.elo}</div></div>`).join('')}</div>
     </div>
     <div class="stat-section">
@@ -3485,9 +3645,9 @@ function renderCompare(){
   for(let i=0;i<Math.min(20,maxRows);i++) rows.push({ i, pA:topA[i], pB:topB[i] });
   $('#compare-body').innerHTML=`
     <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:10px;margin-bottom:14px;align-items:center">
-      <button class="user-card" style="--user-color:${uA.color}" data-pick-a><div class="av" style="background:${uA.color}">${uA.initial}</div><div class="info"><div class="un">${uA.name}</div><div class="us">classement par points</div></div></button>
+      <button class="user-card" style="--user-color:${uA.color}" data-pick-a><div class="av" style="background:${uA.color}">${uA.initial}</div><div class="info"><div class="un">${uA.name}</div><div class="us">classement ELO</div></div></button>
       <div style="font-size:11px;font-weight:800;letter-spacing:.15em;color:var(--text-3)">VS</div>
-      <button class="user-card" style="--user-color:${uB.color}" data-pick-b><div class="av" style="background:${uB.color}">${uB.initial}</div><div class="info"><div class="un">${uB.name}</div><div class="us">classement par points</div></div></button>
+      <button class="user-card" style="--user-color:${uB.color}" data-pick-b><div class="av" style="background:${uB.color}">${uB.initial}</div><div class="info"><div class="un">${uB.name}</div><div class="us">classement ELO</div></div></button>
     </div>
     ${topA.length||topB.length?`<div class="compare-rows">
       ${rows.map(({i,pA,pB})=>`<div class="comp-row">
@@ -3495,7 +3655,7 @@ function renderCompare(){
           <div class="comp-mid"><div class="rk">${i+1}</div></div>
           <div class="comp-slot right">${pB?`${pB.mainPhoto?`<img src="${esc(pB.mainPhoto)}" onerror="this.style.display='none'">`:''}<div><div class="nn">${esc(pB.name)}</div><div class="ss" style="color:${uB.color}">${getElo(b,pB.id)}</div></div>`:'<div class="ss">-</div>'}</div>
         </div>`).join('')}
-    </div>`:'<div class="empty-state"><div class="big">📋</div><h3>Aucune donnée</h3><p>Lance quelques combats pour comparer les classements par points.</p></div>'}
+    </div>`:'<div class="empty-state"><div class="big">📋</div><h3>Aucune donnée</h3><p>Lance quelques combats pour comparer les classements ELO.</p></div>'}
   `;
   $('[data-pick-a]').addEventListener('click',()=>pickUserFor('A'));
   $('[data-pick-b]').addEventListener('click',()=>pickUserFor('B'));
@@ -3509,7 +3669,7 @@ function pickUserFor(slot){
         const n=Object.keys(state.elo[u.id]||{}).length;
         return `<button class="user-card ${u.id===current?'is-current':''}" style="--user-color:${u.color}" data-set="${u.id}">
           <div class="av" style="background:${u.color}">${u.initial}</div>
-          <div class="info"><div class="un">${u.name}</div><div class="us">${n} profils classés par points</div></div>
+          <div class="info"><div class="un">${u.name}</div><div class="us">${n} profils classés ELO</div></div>
         </button>`;
       }).join('')}
     </div>
@@ -3536,7 +3696,7 @@ function renderConsult(){
   if(!list.length){ body.innerHTML='<div class="empty-state"><div class="big">👁</div><h3>Aucune personne</h3><p>Ajoute des profils pour consulter.</p></div>'; return; }
   body.innerHTML=`
     <div class="tour-opts c3" style="margin-bottom:14px">
-      <button class="${sortBy==='elo'?'on':''}" data-cs="elo">Points</button>
+      <button class="${sortBy==='elo'?'on':''}" data-cs="elo">ELO</button>
       <button class="${sortBy==='name'?'on':''}" data-cs="name">Alphabétique</button>
       <button class="${sortBy==='gender'?'on':''}" data-cs="gender">Par genre</button>
     </div>
@@ -3549,8 +3709,8 @@ function renderConsult(){
           ${p.mainPhoto?`<img src="${esc(p.mainPhoto)}" onerror="this.style.display='none'">`:`<div style="width:56px;height:76px;background:var(--bg-3);border-radius:8px;flex:none"></div>`}
           <div class="ci">
             <div class="n">${esc(p.name)} <span style="color:${p.gender==='F'?'var(--lily-hi)':'var(--yannick-hi)'};font-weight:600;font-size:11px;margin-left:4px">${p.gender==='F'?'F':'H'}</span></div>
-            <div class="s">${esc([p.profession,p.birthday,p.nationality].filter(Boolean).join(' · '))}</div>
-            <div style="margin-top:6px;font-size:12px;color:var(--text-3)">Points : <strong style="color:var(--amber)">${getElo(u,p.id)}</strong> · Combats : <strong style="color:var(--green)">${wins}V</strong> <strong style="color:var(--coral)">${losses}D</strong></div>
+            <div class="s">${esc([p.profession,p.birthday,p.nationality,p.heightCm?formatHeight(p.heightCm):''].filter(Boolean).join(' · '))}</div>
+            <div style="margin-top:6px;font-size:12px;color:var(--text-3)">ELO : <strong style="color:var(--amber)">${getElo(u,p.id)}</strong> · Combats : <strong style="color:var(--green)">${wins}V</strong> <strong style="color:var(--coral)">${losses}D</strong></div>
           </div>
         </div>`;
       }).join('')}
@@ -3575,7 +3735,7 @@ function renderSettings(){
           const act=u.id===state.settings.currentUser;
           return `<button class="user-card ${act?'is-current':''}" style="--user-color:${u.color}" data-switch="${u.id}">
             <div class="av" style="background:${u.color}">${u.initial}</div>
-            <div class="info"><div class="un">${u.name}</div><div class="us">${n} profils classés par points · ${nF} favoris · ${nD} combats</div></div>
+            <div class="info"><div class="un">${u.name}</div><div class="us">${n} profils classés ELO · ${nF} favoris · ${nD} combats</div></div>
             ${act?`<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5 9-11" stroke="${u.color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`:''}
           </button>`;
         }).join('')}
@@ -3599,9 +3759,9 @@ function renderSettings(){
     <div class="setting-section">
       <h3>Options d'affichage</h3>
       <div class="setting-row">
-        <div class="sr-info"><div class="sr-name">Tri par défaut de la liste</div><div class="sr-desc">Seul le classement par points peut servir de positionnement</div></div>
+        <div class="sr-info"><div class="sr-name">Tri par défaut de la liste</div><div class="sr-desc">Seul le classement ELO peut servir de positionnement</div></div>
         <select class="field" style="padding:7px 10px;border-radius:8px;background:var(--bg-3);border:1px solid var(--border)" id="sort-select">
-          <option value="elo" ${state.settings.sortBy==='elo'?'selected':''}>Points</option>
+          <option value="elo" ${state.settings.sortBy==='elo'?'selected':''}>ELO</option>
           <option value="name" ${state.settings.sortBy==='name'?'selected':''}>Nom A-Z</option>
           <option value="added" ${state.settings.sortBy==='added'?'selected':''}>Récemment ajouté</option>
         </select>
@@ -3894,7 +4054,7 @@ function openImportDialog(d, filename){
 
     <div class="import-section-title">Données par utilisateur</div>
     <div style="font-size:11.5px;color:var(--text-4);margin-bottom:10px;line-height:1.4">
-      Pour chaque utilisateur trouvé dans le fichier, choisis à quel utilisateur local assigner ses notes, favoris, points, duels et tournois. Choisis "Ignorer" pour ne rien importer.
+      Pour chaque utilisateur trouvé dans le fichier, choisis à quel utilisateur local assigner ses notes, favoris, ELO, duels et tournois. Choisis "Ignorer" pour ne rien importer.
     </div>
     ${srcUsers.length?srcUsers.map(src=>{
       const nF = Object.values(d.favorites?.[src.id]||{}).filter(Boolean).length;
@@ -4292,7 +4452,7 @@ function applyDupesDecisions(){
           if(state.favorites[uid][did]) state.favorites[uid][keepId] = true;
           delete state.favorites[uid][did];
         }
-        // Points: conserve la meilleure valeur des deux fiches
+        // ELO: take highest of the two (keeps the "best" track record)
         if(state.elo[uid]){
           if(state.elo[uid][did] != null){
             const cur = state.elo[uid][keepId];
@@ -4525,7 +4685,7 @@ function confirmBulkDelete(){
   if(!n) return;
   const names = [...bulkSelected].map(id => state.people.find(p=>p.id===id)?.name).filter(Boolean);
   const preview = names.slice(0,5).join(', ') + (names.length > 5 ? ` … et ${names.length-5} autre${names.length-5>1?'s':''}` : '');
-  if(!confirm(`Supprimer ${n} personne${n>1?'s':''} de la banque commune ?\n\n${preview}\n\nLes points de tous les utilisateurs pour cette personne seront effacés. Cette action est irréversible.`)) return;
+  if(!confirm(`Supprimer ${n} personne${n>1?'s':''} de la banque commune ?\n\n${preview}\n\nLes notes ELO de tous les utilisateurs seront effacées. Cette action est irréversible.`)) return;
   [...bulkSelected].forEach(id => removePersonFromBank(id));
   const removed = n;
   exitBulkMode();
