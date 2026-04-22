@@ -86,6 +86,14 @@ body.show-date .row{min-width:420px}
 .row:last-child{border-bottom:none}
 .row:active{background:var(--card-hover)}
 .row-rank{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:15px;font-weight:700;color:var(--text);position:relative}
+.row-reorder-handle{display:none;width:22px;height:22px;border-radius:8px;align-items:center;justify-content:center;color:var(--text-3);background:var(--bg-2);border:1px solid var(--border);touch-action:none;cursor:grab;transition:background .15s,border-color .15s,color .15s,transform .1s}
+.row-reorder-handle svg{width:12px;height:12px}
+.row-reorder-handle:active{transform:scale(.94)}
+.row.is-reorderable .row-reorder-handle{display:inline-flex}
+.row.is-reorderable .row-rank{gap:4px}
+.row.drag-source{opacity:.22}
+.row-drop-placeholder{border:1px dashed rgba(245,158,11,.45);border-radius:12px;background:rgba(245,158,11,.08);margin:4px 0}
+.row-drag-ghost{position:fixed;left:0;top:0;z-index:1000;pointer-events:none;opacity:.96;box-shadow:var(--shadow-lg);transform:translate3d(0,0,0)}
 .rank-arrow{width:20px;height:14px;display:grid;place-items:center;color:var(--amber);opacity:.75}
 .rank-arrow:active{opacity:1}
 .rank-arrow svg{width:10px;height:10px}
@@ -1849,6 +1857,8 @@ function renderList(){
   }
   const filt=filterPeople();
   const sorted=sortPeople(filt);
+  const reorderEnabled=canManualReorder();
+  body.classList.toggle('is-reorder-enabled',reorderEnabled);
   $('#count').textContent=filt.length+' / '+state.people.length;
   if(!state.people.length){
     body.innerHTML=`<div class="empty-state"><div class="big">💎</div><h3>Aucune personne dans la banque</h3><p>Appuie sur le bouton + pour ajouter une première célébrité</p></div>`;
@@ -1860,6 +1870,7 @@ function renderList(){
   }
   body.innerHTML=sorted.map((p,i)=>{
     const el=state.elo[u]?.[p.id]??1500;
+    const reorderHandleHtml=reorderEnabled?`<button class="row-reorder-handle" data-reorder-handle="${p.id}" aria-label="Déplacer ${esc(p.name)}" title="Glisser pour réordonner"><svg viewBox="0 0 24 24" fill="none"><path d="M9 6h.01M15 6h.01M9 12h.01M15 12h.01M9 18h.01M15 18h.01" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button>`:'';
     const th=p.mainPhoto?`<img class="thumb" loading="lazy" src="${esc(p.mainPhoto)}" onerror="this.outerHTML='&lt;div class=&quot;thumb placeholder&quot;&gt;?&lt;/div&gt;'">`:`<div class="thumb placeholder">?</div>`;
     let tsHtml='<div class="col-date" style="font-size:10px;color:var(--text-4);text-align:center;line-height:1.5">—</div>';
     if(p.addedAt){
@@ -1870,8 +1881,9 @@ function renderList(){
       tsHtml=`<div class="col-date" style="font-size:10px;color:var(--text-3);text-align:center;line-height:1.5;font-variant-numeric:tabular-nums">${date}<br>${time}</div>`;
     }
     const isSelected=bulkSelected.has(p.id);
-    return `<div class="row${isSelected?' is-selected':''}" data-open="${p.id}" data-pid="${p.id}">
-      <div style="text-align:center;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;gap:0">
+    return `<div class="row${isSelected?' is-selected':''}${reorderEnabled?' is-reorderable':''}" data-open="${p.id}" data-pid="${p.id}">
+      <div class="row-rank" style="text-align:center;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center">
+        ${reorderHandleHtml}
         <span class="row-rank-num">${i+1}</span>
         <span class="row-check"${isSelected?' style="background:var(--coral);border-color:var(--coral)"':''}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"${isSelected?'':' style="opacity:0"'}><path d="M5 12l5 5 9-11"/></svg>
@@ -1882,6 +1894,173 @@ function renderList(){
       ${tsHtml}
     </div>`;
   }).join('');
+  setupManualReorder(body, sorted);
+}
+
+function canManualReorder(){
+  return !bulkMode &&
+    (state.settings.sortBy||'elo')==='elo' &&
+    (state.settings.sortDir||'desc')==='desc' &&
+    (state.settings.filter||'all')==='all' &&
+    !(state.settings.query||'').trim();
+}
+
+let manualDrag = null;
+
+function setupManualReorder(body, sorted){
+  if(manualDrag) cleanupManualDrag(true);
+  const handles = $$('[data-reorder-handle]', body);
+  if(!handles.length || !canManualReorder()) return;
+  handles.forEach(handle=>{
+    handle.addEventListener('click', e=>{ e.preventDefault(); e.stopPropagation(); });
+    handle.addEventListener('pointerdown', startManualReorder);
+  });
+}
+
+function startManualReorder(e){
+  if(e.button!=null && e.button!==0) return;
+  if(!canManualReorder()) return;
+  const handle=e.currentTarget;
+  const pid=handle.getAttribute('data-reorder-handle');
+  const row=handle.closest('.row[data-pid]');
+  const body=$('#list-body');
+  if(!pid || !row || !body) return;
+  e.preventDefault();
+  e.stopPropagation();
+  const rect=row.getBoundingClientRect();
+  const ghost=row.cloneNode(true);
+  ghost.classList.add('row-drag-ghost');
+  ghost.style.width=rect.width+'px';
+  ghost.style.height=rect.height+'px';
+  ghost.style.left=rect.left+'px';
+  ghost.style.top=rect.top+'px';
+  document.body.appendChild(ghost);
+  const placeholder=document.createElement('div');
+  placeholder.className='row-drop-placeholder';
+  placeholder.style.height=rect.height+'px';
+  row.after(placeholder);
+  row.classList.add('drag-source');
+  const pointerId=e.pointerId;
+  handle.setPointerCapture?.(pointerId);
+  manualDrag={
+    pid, body, row, handle, ghost, placeholder, pointerId,
+    offsetX:e.clientX-rect.left, offsetY:e.clientY-rect.top,
+    startIndex:sorted.findIndex(p=>p.id===pid)
+  };
+  document.addEventListener('pointermove', onManualReorderMove, {passive:false});
+  document.addEventListener('pointerup', finishManualReorder, true);
+  document.addEventListener('pointercancel', finishManualReorder, true);
+  document.body.style.userSelect='none';
+}
+
+function onManualReorderMove(e){
+  if(!manualDrag || e.pointerId!==manualDrag.pointerId) return;
+  e.preventDefault();
+  const {ghost, offsetX, offsetY, body, row, placeholder}=manualDrag;
+  ghost.style.left=(e.clientX-offsetX)+'px';
+  ghost.style.top=(e.clientY-offsetY)+'px';
+  const rows=[...body.querySelectorAll('.row[data-pid]')].filter(r=>r!==row);
+  let inserted=false;
+  for(const candidate of rows){
+    const r=candidate.getBoundingClientRect();
+    if(e.clientY < r.top + r.height/2){
+      if(candidate!==placeholder.previousElementSibling) body.insertBefore(placeholder, candidate);
+      inserted=true;
+      break;
+    }
+  }
+  if(!inserted) body.appendChild(placeholder);
+}
+
+function finishManualReorder(e){
+  if(!manualDrag || e.pointerId!==manualDrag.pointerId) return;
+  e.preventDefault();
+  e.stopPropagation();
+  const drag=manualDrag;
+  let targetIndex=0;
+  for(const child of [...drag.body.children]){
+    if(child===drag.placeholder) break;
+    if(child.matches?.('.row[data-pid]') && child!==drag.row) targetIndex++;
+  }
+  cleanupManualDrag(false);
+  if(targetIndex!==drag.startIndex){
+    applyManualReorder(drag.pid, drag.startIndex, targetIndex);
+  }
+}
+
+function cleanupManualDrag(skipRender){
+  if(!manualDrag) return;
+  const {row, ghost, placeholder, handle, pointerId}=manualDrag;
+  try{ handle?.releasePointerCapture?.(pointerId); }catch(err){}
+  row?.classList.remove('drag-source');
+  ghost?.remove();
+  placeholder?.remove();
+  document.removeEventListener('pointermove', onManualReorderMove);
+  document.removeEventListener('pointerup', finishManualReorder, true);
+  document.removeEventListener('pointercancel', finishManualReorder, true);
+  document.body.style.userSelect='';
+  manualDrag=null;
+  if(skipRender) renderList();
+}
+
+function applyManualReorder(pid, fromIndex, targetIndex){
+  const userId=state.settings.currentUser;
+  const ordered=sortPeople(filterPeople());
+  const currentIndex=ordered.findIndex(p=>p.id===pid);
+  if(currentIndex<0) return;
+  const [moved]=ordered.splice(currentIndex,1);
+  ordered.splice(targetIndex,0,moved);
+  const originalScores=ordered.map(p=>getElo(userId,p.id));
+  const finalScores=computeMinimalCascadeScores(originalScores, targetIndex);
+  if(!state.elo[userId]) state.elo[userId]={};
+  ordered.forEach((p,i)=>{ state.elo[userId][p.id]=finalScores[i]; });
+  saveState();
+  renderList();
+  toast(`Position mise à jour : ${moved.name}`,'ok');
+}
+
+function computeMinimalCascadeScores(scores, pivotIndex){
+  const oldPivot=scores[pivotIndex];
+  const above=pivotIndex>0 ? scores[pivotIndex-1] : null;
+  const below=pivotIndex<scores.length-1 ? scores[pivotIndex+1] : null;
+  const candidates=new Set([oldPivot]);
+  if(above!=null){ candidates.add(above); candidates.add(above-1); candidates.add(above+1); }
+  if(below!=null){ candidates.add(below); candidates.add(below-1); candidates.add(below+1); }
+  if(above!=null && below!=null){
+    candidates.add(Math.floor((above+below)/2));
+    candidates.add(Math.ceil((above+below)/2));
+    candidates.add(Math.min(above-1, Math.max(below+1, oldPivot)));
+  } else if(above!=null){
+    candidates.add(Math.min(oldPivot, above-1));
+  } else if(below!=null){
+    candidates.add(Math.max(oldPivot, below+1));
+  }
+  let best=null;
+  for(const cand of [...candidates]){
+    const arr=scores.slice();
+    arr[pivotIndex]=Math.round(cand);
+    for(let i=pivotIndex-1;i>=0;i--){
+      if(arr[i] <= arr[i+1]) arr[i]=arr[i+1]+1;
+      else break;
+    }
+    for(let i=pivotIndex+1;i<arr.length;i++){
+      if(arr[i] >= arr[i-1]) arr[i]=arr[i-1]-1;
+      else break;
+    }
+    let valid=true;
+    for(let i=1;i<arr.length;i++){
+      if(!(arr[i-1] > arr[i])){ valid=false; break; }
+    }
+    if(!valid) continue;
+    const cost=arr.reduce((sum,v,i)=>sum+Math.abs(v-scores[i]),0);
+    const changed=arr.reduce((sum,v,i)=>sum+(v!==scores[i]?1:0),0);
+    const pivotDistance=Math.abs(arr[pivotIndex]-oldPivot);
+    const key=[cost, changed, pivotDistance];
+    if(!best || key[0]<best.key[0] || (key[0]===best.key[0] && (key[1]<best.key[1] || (key[1]===best.key[1] && key[2]<best.key[2])))){
+      best={arr,key};
+    }
+  }
+  return best ? best.arr : scores.slice();
 }
 
 /* ============ MODALS ============ */
