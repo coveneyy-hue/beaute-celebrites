@@ -99,11 +99,11 @@ body.show-date .row{min-width:420px}
 .rank-arrow svg{width:10px;height:10px}
 .rank-num{min-width:20px;text-align:center}
 .row-main{display:flex;align-items:center;gap:10px;min-width:0}
-.thumb{width:52px;height:72px;border-radius:10px;flex:none;background:var(--bg-3);object-fit:cover;border:1px solid var(--border)}
-.thumb.placeholder{display:grid;place-items:center;color:var(--text-4);font-size:13px}
-.row-info{min-width:0;flex:1;display:flex;flex-direction:column;justify-content:center}
-.row-name{font-size:16.5px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.row-sub{margin-top:4px;font-size:12.5px;color:var(--text-3);line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.thumb{width:40px;height:56px;border-radius:8px;flex:none;background:var(--bg-3);object-fit:cover;border:1px solid var(--border)}
+.thumb.placeholder{display:grid;place-items:center;color:var(--text-4);font-size:11px}
+.row-info{min-width:0;flex:1}
+.row-name{font-size:15px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-sub{margin-top:3px;font-size:11.5px;color:var(--text-3);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .row-badge{margin-top:4px;display:inline-flex;max-width:100%;min-width:0}
 .row-badge .badge{max-width:100%;padding:2px 7px;font-size:10.5px;gap:4px}
 .row-badge .badge svg{width:10px;height:10px}
@@ -121,7 +121,6 @@ body.show-date .row{min-width:420px}
 
 .row-elo{text-align:center;font-size:13px;font-weight:700;color:var(--text-2)}
 .row-elo small{display:block;color:var(--text-4);font-size:10px;font-weight:600;margin-top:1px}
-body:not(.show-points) .row-elo,body:not(.show-points) .col-points{display:none}
 
 .empty-state{padding:40px 20px;text-align:center;color:var(--text-3)}
 .empty-state .big{font-size:36px;margin-bottom:10px;opacity:.65}
@@ -468,15 +467,11 @@ body.show-date .col-date{ display:block }
 .list-head .col-date{ display:none }
 body.show-date .list-head .col-date{ display:flex }
 /* Grid columns: 3-col default, 4-col when date visible */
-.list-head, .row{ grid-template-columns:52px 1fr }
-body.show-points .list-head, body.show-points .row{ grid-template-columns:52px 1fr 58px }
-body.show-date .list-head, body.show-date .row{ grid-template-columns:52px 1fr 150px }
-body.show-date.show-points .list-head, body.show-date.show-points .row{ grid-template-columns:52px 1fr 58px 150px }
+.list-head, .row{ grid-template-columns:52px 1fr 58px }
+body.show-date .list-head, body.show-date .row{ grid-template-columns:52px 1fr 58px 150px }
 /* In bulk mode the rank col shrinks to fit checkbox */
-body.bulk-mode .list-head, body.bulk-mode .row{ grid-template-columns:36px 1fr }
-body.bulk-mode.show-points .list-head, body.bulk-mode.show-points .row{ grid-template-columns:36px 1fr 58px }
-body.bulk-mode.show-date .list-head, body.bulk-mode.show-date .row{ grid-template-columns:36px 1fr 150px }
-body.bulk-mode.show-date.show-points .list-head, body.bulk-mode.show-date.show-points .row{ grid-template-columns:36px 1fr 58px 150px }
+body.bulk-mode .list-head, body.bulk-mode .row{ grid-template-columns:36px 1fr 58px }
+body.bulk-mode.show-date .list-head, body.bulk-mode.show-date .row{ grid-template-columns:36px 1fr 58px 150px }
 /* Sort arrow indicator */
 .sort-btn .sort-arrow{ font-size:10px; margin-left:3px; opacity:.7; display:inline-block }
 .tb-btn.is-active-eye{ background:rgba(245,158,11,.15); color:var(--amber-hi); border-color:rgba(245,158,11,.4) }
@@ -546,7 +541,7 @@ body.bulk-mode .list-head-check{display:flex}
   .tb-btn{width:34px;height:34px}
   .row{gap:6px;padding:9px 10px}
   .list-head{gap:6px;padding:10px 10px}
-  .thumb{width:44px;height:62px}
+  .thumb{width:36px;height:50px}
   .row-badge .badge{padding:2px 6px;font-size:10px}
   .row-badge .badge svg{width:9px;height:9px}
   .stat-hero{grid-template-columns:repeat(2,1fr)}
@@ -591,13 +586,12 @@ body.bulk-mode .list-head-check{display:flex}
       <svg viewBox="0 0 24 24" fill="none"><path d="M7 3v18M17 3v18M3 7h8M13 17h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
     </button>
     <button class="tb-btn" data-act="modes" aria-label="Modes de compétition : duel, tournoi et Last man standing">
-      <svg viewBox="0 0 24 24" fill="none">
-        <path d="M4 6h2M18 6h2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-        <path d="M6 4v4M18 4v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-        <path d="M8 6h2M14 6h2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-        <circle cx="12" cy="8" r="1.7" stroke="currentColor" stroke-width="1.7"/>
-        <path d="M12 9.9v3.2M12 11.4l-3.2-2.1M12 11.4l3.2-2.1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M12 13.1l-2 3.8M12 13.1l2 3.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <svg viewBox="0 0 20 20" fill="none">
+        <path d="M5.3 12.8 L9.1 9 M10 8.1 L13.8 4.3" stroke="currentColor" stroke-width="2.05" stroke-linecap="round"/>
+        <path d="M7 4.1h4.3v3.3a3 3 0 0 1-2.15 2.95A3 3 0 0 1 7 7.4V4.1Z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/>
+        <path d="M6 4.1H4.3v1.35A1.95 1.95 0 0 0 6.2 7.4H7M11.3 4.1H13v1.35a1.95 1.95 0 0 1-1.9 1.95h-.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M9.15 10.3V12.6M7.55 14.2h3.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        <path d="M12.2 12.1 L16 15.9 M12 15.9 L15.8 12.1" stroke="currentColor" stroke-width="1.95" stroke-linecap="round"/>
       </svg>
     </button>
     <button class="tb-btn" data-act="settings" aria-label="Réglages">
@@ -636,7 +630,7 @@ body.bulk-mode .list-head-check{display:flex}
         </button>
       </div>
       <button class="sort-btn" id="sort-name" style="justify-self:start">PERSONNE</button>
-      <button class="sort-btn col-points" id="sort-elo" style="justify-self:center">POINTS</button>
+      <button class="sort-btn" id="sort-elo" style="justify-self:center">POINTS</button>
       <button class="sort-btn col-date" id="sort-added" style="justify-self:center">AJOUTÉ</button>
     </div>
     <div id="list-body"></div>
@@ -1305,11 +1299,9 @@ const state = {
     consultSort: 'elo',
     compareA: 'lily',
     compareB: 'victor',
-    simulationMode: false,
-    showPointsCol: false,
   },
 };
-const ui = { currentPersonId:null, draft:null, duel:null, tour:null, lms:null, simSession:null, photoIdx:0 };
+const ui = { currentPersonId:null, draft:null, duel:null, tour:null, lms:null, photoIdx:0 };
 let pendingImport = null;
 
 /* ============ UTILITIES ============ */
@@ -1378,30 +1370,9 @@ function ensureBuckets(u){
   if(!state.duelHistory[u]) state.duelHistory[u]=[];
   if(!state.tournaments[u]) state.tournaments[u]=[];
 }
-function isSimulationMode(){ return !!state.settings?.simulationMode; }
-function hasSimulationSession(u){ return !!(isSimulationMode() && ui.simSession && ui.simSession.user===u); }
-function startSimulationSession(){
-  const u=state.settings.currentUser;
-  if(!isSimulationMode()) { ui.simSession=null; return; }
-  ui.simSession={
-    user:u,
-    elo: JSON.parse(JSON.stringify(state.elo[u]||{})),
-    duels: state.duels[u]||0,
-    duelHistory: JSON.parse(JSON.stringify(state.duelHistory[u]||[])),
-  };
-}
-function endSimulationSession(){
-  ui.simSession=null;
-}
-function simulationTagHtml(){
-  return isSimulationMode() ? '<span class="badge" style="margin-left:8px;background:rgba(245,158,11,.12);color:var(--amber-hi);border:1px solid rgba(245,158,11,.35)"><span>En simulation</span></span>' : '';
-}
-function getElo(u,p){
-  if(hasSimulationSession(u)) return ui.simSession.elo?.[p]??1500;
-  return state.elo[u]?.[p]??1500;
-}
+function getElo(u,p){ return state.elo[u]?.[p]??1500; }
 function getHeadToHeadWins(u,a,b){
-  const hist = hasSimulationSession(u) ? (ui.simSession.duelHistory||[]) : (state.duelHistory[u]||[]);
+  const hist = state.duelHistory[u]||[];
   let aWins=0,bWins=0;
   for(const d of hist){
     if((d.winnerId===a && d.loserId===b) || (d.winnerId===b && d.loserId===a)){
@@ -1414,25 +1385,8 @@ function getHeadToHeadWins(u,a,b){
 function updateElo(u,w,l){
   ensureBuckets(u);
   const wo=getElo(u,w), lo=getElo(u,l);
-  if(hasSimulationSession(u)){
-    ui.simSession.elo[w]=Math.max(Math.round(wo), Math.round(lo)+1);
-    ui.simSession.elo[l]=Math.round(lo);
-    return;
-  }
   state.elo[u][w]=Math.max(Math.round(wo), Math.round(lo)+1);
   state.elo[u][l]=Math.round(lo);
-}
-function recordCompetitionOutcome(u,winnerId,loserId,source){
-  ensureBuckets(u);
-  updateElo(u,winnerId,loserId);
-  const entry={ winnerId:winnerId, loserId:loserId, t:Date.now(), source:source };
-  if(hasSimulationSession(u)){
-    ui.simSession.duels=(ui.simSession.duels||0)+1;
-    (ui.simSession.duelHistory=ui.simSession.duelHistory||[]).push(entry);
-    return;
-  }
-  state.duels[u]=(state.duels[u]||0)+1;
-  (state.duelHistory[u]=state.duelHistory[u]||[]).push(entry);
 }
 function seedNewPersonPoints(personId, gender){
   const g = gender==='M' ? 'M' : 'F';
@@ -1465,7 +1419,7 @@ function loadState(){
     const d=JSON.parse(r);
     Object.assign(state,d);
     USERS.forEach(u=>ensureBuckets(u.id));
-    state.settings=Object.assign({currentUser:'lily',tmdbKey:'',sortBy:'elo',sortDir:'desc',showDateCol:false,showPointsCol:false,filter:'all',query:'',consultSort:'elo',compareA:'lily',compareB:'victor',heightUnit:'metric',simulationMode:false},state.settings||{});
+    state.settings=Object.assign({currentUser:'lily',tmdbKey:'',sortBy:'elo',sortDir:'desc',showDateCol:false,filter:'all',query:'',consultSort:'elo',compareA:'lily',compareB:'victor',heightUnit:'metric'},state.settings||{});
   }catch(e){ console.warn(e); }
 }
 
@@ -1841,58 +1795,8 @@ async function wikiSearchCandidates(person){
   return merged;
 }
 let pendingWikiHeightPersonId = null;
-let pendingWikiHeightInputValue = '';
-function parseHeightInputValue(value){
-  const raw=String(value||'').trim().replace(',', '.');
-  if(!raw) return null;
-  const num=Number(raw);
-  return Number.isFinite(num) && num > 0 ? Math.round(num) : null;
-}
-function applyWikidataHeightResult(target, selected, options={}){
-  if(!target || !selected) return { message:'Aucune taille disponible', tone:'err' };
-  target.wikiId = selected.wikiId;
-  const foundHeight = Number.isFinite(Number(selected.heightCm)) && Number(selected.heightCm) > 0;
-  const existingHeight = Number.isFinite(Number(target.heightCm)) && Number(target.heightCm) > 0;
-  const draftHeight = parseHeightInputValue(options.currentInputValue);
-  const hasDraftHeight = Number.isFinite(draftHeight) && draftHeight > 0;
-  const askBeforeOverwrite = options.askBeforeOverwrite !== false;
-  if(foundHeight){
-    const foundValue = Math.round(Number(selected.heightCm));
-    if(hasDraftHeight){
-      if(askBeforeOverwrite){
-        const shouldOverwrite = window.confirm(`Une taille est déjà saisie (${formatHeight(draftHeight)}). Remplacer par la taille Wikidata ${formatHeight(foundValue)} ?`);
-        if(!shouldOverwrite){
-          saveState();
-          return { message:`Taille trouvée sur Wikidata : ${formatHeight(foundValue)}. Taille saisie (${formatHeight(draftHeight)}) conservée.`, tone:'ok', preservedInputValue:String(draftHeight) };
-        }
-      }
-      target.heightCm = foundValue;
-      saveState();
-      return { message:`Taille existante écrasée par la valeur Wikidata : ${formatHeight(foundValue)}`, tone:'ok', importedHeightCm:foundValue };
-    }
-    if(existingHeight){
-      if(askBeforeOverwrite){
-        const shouldOverwrite = window.confirm(`Une taille est déjà enregistrée (${formatHeight(target.heightCm)}). Remplacer par la taille Wikidata ${formatHeight(foundValue)} ?`);
-        if(!shouldOverwrite){
-          saveState();
-          return { message:`Taille trouvée sur Wikidata : ${formatHeight(foundValue)}. Taille existante conservée.`, tone:'ok' };
-        }
-      }
-      target.heightCm = foundValue;
-      saveState();
-      return { message:`Taille existante écrasée par la valeur Wikidata : ${formatHeight(foundValue)}`, tone:'ok', importedHeightCm:foundValue };
-    }
-    target.heightCm = foundValue;
-    saveState();
-    return { message:`Taille trouvée sur Wikidata et importée : ${formatHeight(foundValue)}`, tone:'ok', importedHeightCm:foundValue };
-  }
-  saveState();
-  if(hasDraftHeight) return { message:`Aucune taille trouvée sur Wikidata. Taille saisie (${formatHeight(draftHeight)}) conservée.`, tone:'ok', preservedInputValue:String(draftHeight) };
-  return { message:'Aucune taille disponible', tone:'err' };
-}
 function openWikiPickModal(person, candidates){
   pendingWikiHeightPersonId = person.id;
-  pendingWikiHeightInputValue = $('#detail-height')?.value || '';
   $('#wikidata-pick-sub').textContent = person.name;
   const body=$('#wikidata-pick-body');
   body.innerHTML = `
@@ -1914,29 +1818,27 @@ function openWikiPickModal(person, candidates){
     const selected=candidates.find(c=>c.wikiId===wikiId);
     const target=state.people.find(x=>x.id===pendingWikiHeightPersonId);
     if(!selected || !target) return;
-    const result = applyWikidataHeightResult(target, selected, { currentInputValue: pendingWikiHeightInputValue });
+    target.wikiId = selected.wikiId;
+    if(selected.heightCm) target.heightCm = selected.heightCm;
+    saveState();
     closeAllModals();
     openDetails(target.id);
-    if(result.preservedInputValue!=null){
-      const input=$('#detail-height');
-      if(input) input.value=result.preservedInputValue;
-    }
-    pendingWikiHeightPersonId = null;
-    pendingWikiHeightInputValue = '';
-    toast(result.message, result.tone);
+    toast(selected.heightCm ? `Taille importée : ${formatHeight(selected.heightCm)}` : 'Aucune taille disponible', selected.heightCm?'ok':'err');
   }));
-  $('#wikidata-pick-skip')?.addEventListener('click',()=>{ pendingWikiHeightPersonId=null; pendingWikiHeightInputValue=''; closeModal('modal-wikidata-pick'); });
+  $('#wikidata-pick-skip')?.addEventListener('click',()=>{ pendingWikiHeightPersonId=null; closeModal('modal-wikidata-pick'); });
   openModal('modal-wikidata-pick');
 }
-async function fetchHeightFromWikidataForPerson(person, currentInputValue=''){
+async function fetchHeightFromWikidataForPerson(person){
   const candidates=await wikiSearchCandidates(person);
   if(!candidates.length) throw new Error('Aucun résultat Wikidata');
   const withHeight=candidates.filter(c=>c.heightCm || c.mainPhoto);
   const usable=(withHeight.length?withHeight:candidates).slice(0,5);
   if(usable.length===1){
     const chosen=usable[0];
-    const applyResult = applyWikidataHeightResult(person, chosen, { currentInputValue });
-    return { mode:'single', candidate:chosen, applyResult };
+    person.wikiId = chosen.wikiId;
+    if(chosen.heightCm) person.heightCm = chosen.heightCm;
+    saveState();
+    return { mode:'single', candidate:chosen };
   }
   return { mode:'pick', candidates:usable };
 }
@@ -2374,7 +2276,7 @@ function computeManualPlacementScores(scores, pivotIndex){
 
 /* ============ MODALS ============ */
 function openModal(id){ document.getElementById(id)?.classList.add('is-open'); }
-function closeAllModals(){ $$('.modal.is-open').forEach(m=>m.classList.remove('is-open')); pendingImport=null; endSimulationSession(); try{ renderList(); }catch(_){} }
+function closeAllModals(){ $$('.modal.is-open').forEach(m=>m.classList.remove('is-open')); pendingImport=null; }
 
 /* User switch */
 function renderUserSwitch(){
@@ -3010,18 +2912,11 @@ Tenter l'ajout quand même ?`;
     btn.disabled=true;
     btn.textContent='Recherche…';
     try{
-      const currentHeightInput = $('#detail-height')?.value || '';
-      const result=await fetchHeightFromWikidataForPerson(p, currentHeightInput);
+      const result=await fetchHeightFromWikidataForPerson(p);
       if(result.mode==='single'){
         renderList();
         renderDetails();
-        if(result.applyResult?.preservedInputValue!=null){
-          const input=$('#detail-height');
-          if(input) input.value=result.applyResult.preservedInputValue;
-        }
-        const msg = result.applyResult?.message || (result.candidate.heightCm ? `Taille trouvée sur Wikidata et importée : ${formatHeight(result.candidate.heightCm)}` : 'Aucune taille disponible');
-        const tone = result.applyResult?.tone || (result.candidate.heightCm ? 'ok' : 'err');
-        toast(msg, tone);
+        toast(result.candidate.heightCm ? `Taille importée : ${formatHeight(result.candidate.heightCm)}` : 'Aucune taille disponible', result.candidate.heightCm?'ok':'err');
       }else{
         btn.disabled=false;
         btn.textContent=original;
@@ -3089,7 +2984,7 @@ function renderModesMenu(){
   $('#modes-body').innerHTML=`
     <div class="tour-hero" style="margin-bottom:12px">
       <div class="tico">⚡</div>
-      <div><h3>Choisis un mode ${simulationTagHtml()}</h3><p>Joueur : ${esc(user.name)}. Les trois modes utilisent le même classement par points, séparé par genre.</p></div>
+      <div><h3>Choisis un mode</h3><p>Joueur : ${esc(user.name)}. Les trois modes utilisent le même classement par points, séparé par genre.</p></div>
     </div>
     <div style="display:grid;gap:10px">
       <button class="search-result" data-mode-open="duel">
@@ -3116,7 +3011,6 @@ function renderModesMenu(){
 /* ============ LAST MAN STANDING ============ */
 function openLms(){
   closeAllModals();
-  startSimulationSession();
   ui.lms={ stage:'setup', filter:'F', startMode:'selected', selectedId:'', currentId:'', opponentId:'', streak:0, beaten:[], photoIdx:{} };
   renderLms();
   openModal('modal-lms');
@@ -3166,7 +3060,7 @@ function renderLms(){
     $('#lms-body').innerHTML=`
       <div class="tour-hero">
         <div class="tico">🏆</div>
-        <div><h3>Last man standing ${simulationTagHtml()}</h3><p>Choisis un profil de départ ou lance un tirage aléatoire. Il rencontrera ensuite à chaque victoire le prochain adversaire ayant les points immédiatement au-dessus jusqu'à sa défaite.</p></div>
+        <div><h3>Last man standing</h3><p>Choisis un profil de départ ou lance un tirage aléatoire. Il rencontrera ensuite à chaque victoire le prochain adversaire ayant les points immédiatement au-dessus jusqu'à sa défaite.</p></div>
       </div>
       <div class="field" style="margin-bottom:12px">
         <label>Catégorie</label>
@@ -3237,7 +3131,7 @@ function renderLms(){
   $('#lms-body').innerHTML=`
     <div class="tour-hero">
       <div class="tico">⚔</div>
-      <div><h3>Last man standing ${simulationTagHtml()}</h3><p>${esc(champ.name)} continue jusqu'à sa défaite. Chaque victoire enchaîne le prochain adversaire juste au-dessus en points.</p></div>
+      <div><h3>Last man standing</h3><p>${esc(champ.name)} continue jusqu'à sa défaite. Chaque victoire enchaîne le prochain adversaire juste au-dessus en points.</p></div>
     </div>
     <div class="stat-hero">
       <div class="box"><div class="v">${ui.lms.streak}</div><div class="l">Série</div></div>
@@ -3262,8 +3156,11 @@ function lmsVote(winnerId){
   const oppId=ui.lms.opponentId;
   if(!champId || !oppId || winnerId!==champId && winnerId!==oppId) return;
   const loserId=winnerId===champId?oppId:champId;
-  recordCompetitionOutcome(u, winnerId, loserId, 'lms');
-  if(!hasSimulationSession(u)) saveState();
+  updateElo(u, winnerId, loserId);
+  state.duels[u]=(state.duels[u]||0)+1;
+  state.duelHistory[u]=state.duelHistory[u]||[];
+  state.duelHistory[u].push({ winnerId, loserId, t:Date.now(), source:'lms' });
+  saveState();
   renderList();
   if(winnerId===champId){
     ui.lms.streak += 1;
@@ -3290,7 +3187,6 @@ function lmsVote(winnerId){
 /* ============ DUEL MODAL ============ */
 function openDuel(){
   closeAllModals();
-  startSimulationSession();
   ui.duel={ filter:'F', pair:null, photoIdx:{} };
   renderDuel();
   openModal('modal-duel');
@@ -3361,14 +3257,14 @@ function renderDuel(){
   body.innerHTML=filterBar+`
     <div class="duel-hero-card">
       <div class="hico">⚔</div>
-      <div><h3>Duel libre ${simulationTagHtml()}</h3><p>${isSimulationMode()?'Les points sont recalculés normalement mais jamais enregistrés.':'Utilise le bouton Vote sous la photo. Les points sont mis à jour automatiquement.'}</p></div>
+      <div><h3>Duel libre</h3><p>Utilise le bouton Vote sous la photo. Les points sont mis à jour automatiquement.</p></div>
     </div>
     <div class="duel-actions">
       <button class="btn btn-small" data-act="skip">Passer</button>
       <button class="btn btn-small btn-danger" data-act="close">Terminer</button>
     </div>
     <div class="duel-arena">${card(a,wA)}${card(b,wB)}</div>
-    <div style="margin-top:14px;text-align:center;font-size:12px;color:var(--text-3)">${hasSimulationSession(u)?(ui.simSession.duels||0):(state.duels[u]||0)} duel${(hasSimulationSession(u)?(ui.simSession.duels||0):(state.duels[u]||0))>1?'s':''} au total</div>`;
+    <div style="margin-top:14px;text-align:center;font-size:12px;color:var(--text-3)">${state.duels[u]||0} duel${(state.duels[u]||0)>1?'s':''} au total</div>`;
   $$('#duel-body [data-f]').forEach(x=>x.addEventListener('click',()=>{ ui.duel.filter=x.getAttribute('data-f'); ui.duel.pair=null; renderDuel(); }));
   $$('#duel-body [data-trash]').forEach(el=>el.addEventListener('click',e=>{
     // Prevent the parent duel-card button from firing (which would count as a vote)
@@ -3429,8 +3325,10 @@ function renderDuel(){
 function recordDuel(w,l){
   const u=state.settings.currentUser;
   ensureBuckets(u);
-  recordCompetitionOutcome(u,w,l,'duel');
-  if(!hasSimulationSession(u)) saveState();
+  state.duels[u]=(state.duels[u]||0)+1;
+  state.duelHistory[u].push({ winnerId:w, loserId:l, t:Date.now() });
+  updateElo(u,w,l);
+  saveState();
   renderList();
   ui.duel.pair=null;
   renderDuel();
@@ -3439,7 +3337,6 @@ function recordDuel(w,l){
 /* ============ TOURNAMENT ============ */
 function openTournament(){
   closeAllModals();
-  startSimulationSession();
   ui.tour={ stage:'setup', config:{ filter:'F', size:32, blind:false, seeding:'random' }, data:null, photoIdx:{} };
   renderTournament();
   openModal('modal-tournament');
@@ -3462,7 +3359,7 @@ function renderTourSetup(){
   $('#tour-body').innerHTML=`
     <div class="tour-hero">
       <div class="tico">🏆</div>
-      <div><h3>Tournoi 32 — tirage aléatoire ${simulationTagHtml()}</h3><p>${isSimulationMode()?'Chaque combat recalcule les points, sans aucun enregistrement final.':'Chaque combat est journalisé et les points sont mis à jour.'}</p></div>
+      <div><h3>Tournoi 32 — tirage aléatoire</h3><p>Chaque combat est journalisé et les points sont mis à jour.</p></div>
     </div>
     <div class="field" style="margin-bottom:12px">
       <label>Catégorie</label>
@@ -3507,10 +3404,10 @@ function startTournament(config){
   let n=config.size/2;
   while(n>=2){ n=n/2; const m=[]; for(let i=0;i<n;i++) m.push({a:null,b:null,winner:null}); rounds.push({matches:m}); }
   const tour={ id:'t_'+Date.now(), createdAt:Date.now(), config, rounds, currentRound:0, currentMatch:0, status:'playing', winnerId:null };
-  if(!isSimulationMode()) state.tournaments[u].push(tour);
+  state.tournaments[u].push(tour);
   ui.tour.stage='playing';
   ui.tour.data=tour;
-  if(!isSimulationMode()) saveState();
+  saveState();
   renderTournament();
 }
 function renderTourPlay(){
@@ -3548,7 +3445,7 @@ function renderTourPlay(){
   $('#tour-body').innerHTML=`
     <div class="tour-hero">
       <div class="tico">🏆</div>
-      <div><h3>Tournoi ${label} ${t.config.size} ${simulationTagHtml()}</h3><p>Le nombre affiché au-dessus de chaque poster correspond aux victoires en face-à-face entre les deux participants.</p></div>
+      <div><h3>Tournoi ${label} ${t.config.size}</h3><p>Le nombre affiché au-dessus de chaque poster correspond aux victoires en face-à-face entre les deux participants.</p></div>
     </div>
     <div class="duel-actions">
 
@@ -3669,10 +3566,13 @@ function tourAdvance(winId){
   // Capture ELO before update to compute delta
   const eloWBefore=getElo(u,winId);
   const eloLBefore=getElo(u,loseId);
-  recordCompetitionOutcome(u,winId,loseId,'tournament');
+  updateElo(u,winId,loseId);
   const eloWAfter=getElo(u,winId);
   const eloLAfter=getElo(u,loseId);
   m.eloDeltas={ [winId]: eloWAfter-eloWBefore, [loseId]: eloLAfter-eloLBefore };
+  state.duels[u]=(state.duels[u]||0)+1;
+  state.duelHistory[u]=state.duelHistory[u]||[];
+  state.duelHistory[u].push({ winnerId:winId, loserId:loseId, t:Date.now(), source:'tournament' });
   if(t.currentMatch+1<r.matches.length){ t.currentMatch+=1; }
   else if(t.currentRound+1<t.rounds.length){
     const nx=t.rounds[t.currentRound+1];
@@ -3685,7 +3585,7 @@ function tourAdvance(winId){
     t.status='complete'; t.winnerId=winId;
     ui.tour.stage='podium';
   }
-  if(!isSimulationMode()) saveState();
+  saveState();
   renderList();
   renderTournament();
 }
@@ -3723,7 +3623,7 @@ function renderTourPodium(){
   $('#tour-body').innerHTML=`
     <div class="tour-hero" style="background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(251,113,133,.12));border-color:rgba(245,158,11,.4)">
       <div class="tico" style="background:rgba(245,158,11,.3);color:var(--amber-hi)">👑</div>
-      <div><h3>Champion${champ&&champ.gender==='F'?'ne':''} : ${esc(champ?.name||'?')} ${simulationTagHtml()}</h3><p>${esc(getUser(u).name)} a couronné ${t.config.filter==='F'?'une gagnante':t.config.filter==='M'?'un gagnant':'un(e) gagnant(e)'} en ${t.rounds.length} rounds.</p></div>
+      <div><h3>Champion${champ&&champ.gender==='F'?'ne':''} : ${esc(champ?.name||'?')}</h3><p>${esc(getUser(u).name)} a couronné ${t.config.filter==='F'?'une gagnante':t.config.filter==='M'?'un gagnant':'un(e) gagnant(e)'} en ${t.rounds.length} rounds.</p></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
       <div class="note-card" style="--user-color:#FBBF24">
@@ -3920,14 +3820,6 @@ function renderSettings(){
           <option value="imperial" ${state.settings.heightUnit==='imperial'?'selected':''}>Impérial</option>
         </select>
       </div>
-      <div class="setting-row">
-        <div class="sr-info"><div class="sr-name">Mode simulation</div><div class="sr-desc">Les compétitions recalculent les points sans jamais modifier la base locale</div></div>
-        <button class="btn btn-small ${state.settings.simulationMode?'btn-primary':''}" id="toggle-simulation-mode">${state.settings.simulationMode?'Activé':'Désactivé'}</button>
-      </div>
-      <div class="setting-row">
-        <div class="sr-info"><div class="sr-name">Colonne points sur la liste principale</div><div class="sr-desc">Masquée par défaut pour donner plus d’espace à la photo et aux infos</div></div>
-        <button class="btn btn-small ${state.settings.showPointsCol?'btn-primary':''}" id="toggle-points-col">${state.settings.showPointsCol?'Affichée':'Masquée'}</button>
-      </div>
     </div>
 
     <div class="setting-section">
@@ -3976,21 +3868,6 @@ function renderSettings(){
   $('#save-tmdb-key').addEventListener('click',()=>{
     state.settings.tmdbKey=$('#tmdb-key-input').value.trim();
     saveState(); toast('Clé TMDb enregistrée','ok');
-  });
-  $('#toggle-simulation-mode')?.addEventListener('click',()=>{
-    state.settings.simulationMode=!state.settings.simulationMode;
-    endSimulationSession();
-    saveState();
-    renderSettings();
-    toast(state.settings.simulationMode?'Mode simulation activé':'Mode simulation désactivé','ok');
-  });
-  $('#toggle-points-col')?.addEventListener('click',()=>{
-    state.settings.showPointsCol=!state.settings.showPointsCol;
-    document.body.classList.toggle('show-points', !!state.settings.showPointsCol);
-    saveState();
-    renderList();
-    renderSettings();
-    toast(state.settings.showPointsCol?'Colonne points affichée':'Colonne points masquée','ok');
   });
   $('#height-unit-select')?.addEventListener('change',e=>{
     state.settings.heightUnit=e.target.value==='imperial'?'imperial':'metric';
@@ -4160,7 +4037,7 @@ function renderSettings(){
     localStorage.removeItem(STORAGE_KEY);
     Object.assign(state,{
       people:[], favorites:{}, elo:{}, duels:{}, duelHistory:{}, tournaments:{},
-      settings:{ currentUser:'lily', tmdbKey:'', sortBy:'elo', showPointsCol:false, filter:'all', query:'', consultSort:'elo', compareA:'lily', compareB:'victor' }
+      settings:{ currentUser:'lily', tmdbKey:'', sortBy:'elo', filter:'all', query:'', consultSort:'elo', compareA:'lily', compareB:'victor' }
     });
     USERS.forEach(u=>ensureBuckets(u.id));
     saveState(); renderHeader(); renderList(); renderSettings();
@@ -4991,10 +4868,7 @@ function registerSW(){
 function init(){
   try{ loadState(); }catch(e){}
   USERS.forEach(u=>ensureBuckets(u.id));
-  // Restore list column visibility from saved state
-  if(state.settings.showPointsCol){
-    document.body.classList.add('show-points');
-  }
+  // Restore date column visibility from saved state
   if(state.settings.showDateCol){
     document.body.classList.add('show-date');
     const eyeBtn=$('#tb-toggle-date');
