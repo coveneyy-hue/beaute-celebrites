@@ -57,6 +57,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .toolbar{display:flex;justify-content:center;gap:6px;margin:6px 0 16px;flex-wrap:nowrap;overflow-x:hidden}
 .tb-btn{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:var(--card);border:1px solid var(--border);color:var(--text-2);transition:transform .1s,background .15s,color .15s,border-color .15s;position:relative;flex:0 0 auto}
 .tb-btn svg{width:18px;height:18px}
+.tb-btn[data-act="modes"] svg{width:24px;height:24px}
 .tb-btn:active{transform:scale(.94)}
 .tb-btn.is-primary{background:linear-gradient(180deg,var(--amber-hi),var(--amber));color:#1A1200;border-color:rgba(0,0,0,.2);box-shadow:0 6px 16px rgba(245,158,11,.35),inset 0 1px 0 rgba(255,255,255,.35)}
 .tb-btn.is-danger{color:var(--coral);border-color:rgba(251,113,133,.3)}
@@ -85,9 +86,9 @@ body.show-date .list-head{min-width:420px}
 body.show-date .row{min-width:420px}
 .row:last-child{border-bottom:none}
 .row:active{background:var(--card-hover)}
-.row-rank{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:15px;font-weight:700;color:var(--text);position:relative}
-.row-reorder-handle{display:none;width:22px;height:22px;border-radius:8px;align-items:center;justify-content:center;color:var(--text-3);background:var(--bg-2);border:1px solid var(--border);touch-action:none;cursor:grab;transition:background .15s,border-color .15s,color .15s,transform .1s}
-.row-reorder-handle svg{width:12px;height:12px}
+.row-rank{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:15px;font-weight:700;color:var(--text);position:relative}
+.row-reorder-handle{display:none;width:30px;height:30px;border-radius:10px;align-items:center;justify-content:center;color:var(--text-2);background:var(--bg-2);border:1px solid var(--border);touch-action:none;cursor:grab;transition:background .15s,border-color .15s,color .15s,transform .1s}
+.row-reorder-handle svg{width:16px;height:16px}
 .row-reorder-handle:active{transform:scale(.94)}
 .row.is-reorderable .row-reorder-handle{display:inline-flex}
 .row.is-reorderable .row-rank{gap:4px}
@@ -98,12 +99,12 @@ body.show-date .row{min-width:420px}
 .rank-arrow:active{opacity:1}
 .rank-arrow svg{width:10px;height:10px}
 .rank-num{min-width:20px;text-align:center}
-.row-main{display:flex;align-items:center;gap:10px;min-width:0}
-.thumb{width:40px;height:56px;border-radius:8px;flex:none;background:var(--bg-3);object-fit:cover;border:1px solid var(--border)}
+.row-main{display:flex;align-items:center;gap:12px;min-width:0}
+.thumb{width:52px;height:72px;border-radius:10px;flex:none;background:var(--bg-3);object-fit:cover;border:1px solid var(--border)}
 .thumb.placeholder{display:grid;place-items:center;color:var(--text-4);font-size:11px}
 .row-info{min-width:0;flex:1}
-.row-name{font-size:15px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.row-sub{margin-top:3px;font-size:11.5px;color:var(--text-3);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-name{font-size:16px;font-weight:800;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-sub{margin-top:4px;font-size:12.5px;color:var(--text-3);line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .row-badge{margin-top:4px;display:inline-flex;max-width:100%;min-width:0}
 .row-badge .badge{max-width:100%;padding:2px 7px;font-size:10.5px;gap:4px}
 .row-badge .badge svg{width:10px;height:10px}
@@ -119,7 +120,7 @@ body.show-date .row{min-width:420px}
 .badge-style{background:rgba(16,185,129,.12);color:var(--victor-hi);border:1px solid rgba(16,185,129,.3)}
 .badge-muse{background:linear-gradient(90deg,rgba(245,158,11,.18),rgba(251,113,133,.18));color:var(--amber-hi);border:1px solid rgba(245,158,11,.4)}
 
-.row-elo{text-align:center;font-size:13px;font-weight:700;color:var(--text-2)}
+.row-elo{text-align:center;font-size:13px;font-weight:700;color:var(--text-2);display:none}
 .row-elo small{display:block;color:var(--text-4);font-size:10px;font-weight:600;margin-top:1px}
 
 .empty-state{padding:40px 20px;text-align:center;color:var(--text-3)}
@@ -467,11 +468,12 @@ body.show-date .col-date{ display:block }
 .list-head .col-date{ display:none }
 body.show-date .list-head .col-date{ display:flex }
 /* Grid columns: 3-col default, 4-col when date visible */
-.list-head, .row{ grid-template-columns:52px 1fr 58px }
-body.show-date .list-head, body.show-date .row{ grid-template-columns:52px 1fr 58px 150px }
+.list-head, .row{ grid-template-columns:64px 1fr }
+body.show-date .list-head, body.show-date .row{ grid-template-columns:64px 1fr 150px }
 /* In bulk mode the rank col shrinks to fit checkbox */
-body.bulk-mode .list-head, body.bulk-mode .row{ grid-template-columns:36px 1fr 58px }
-body.bulk-mode.show-date .list-head, body.bulk-mode.show-date .row{ grid-template-columns:36px 1fr 58px 150px }
+body.bulk-mode .list-head, body.bulk-mode .row{ grid-template-columns:44px 1fr }
+body.bulk-mode.show-date .list-head, body.bulk-mode.show-date .row{ grid-template-columns:44px 1fr 150px }
+#sort-elo{display:none !important}
 /* Sort arrow indicator */
 .sort-btn .sort-arrow{ font-size:10px; margin-left:3px; opacity:.7; display:inline-block }
 .tb-btn.is-active-eye{ background:rgba(245,158,11,.15); color:var(--amber-hi); border-color:rgba(245,158,11,.4) }
@@ -541,7 +543,7 @@ body.bulk-mode .list-head-check{display:flex}
   .tb-btn{width:34px;height:34px}
   .row{gap:6px;padding:9px 10px}
   .list-head{gap:6px;padding:10px 10px}
-  .thumb{width:36px;height:50px}
+  .thumb{width:46px;height:64px}
   .row-badge .badge{padding:2px 6px;font-size:10px}
   .row-badge .badge svg{width:9px;height:9px}
   .stat-hero{grid-template-columns:repeat(2,1fr)}
@@ -586,12 +588,11 @@ body.bulk-mode .list-head-check{display:flex}
       <svg viewBox="0 0 24 24" fill="none"><path d="M7 3v18M17 3v18M3 7h8M13 17h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
     </button>
     <button class="tb-btn" data-act="modes" aria-label="Modes de compétition : duel, tournoi et Last man standing">
-      <svg viewBox="0 0 24 24" fill="none">
-        <path d="M7 15 L11.5 10.5 M12.5 9.5 L17 5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
-        <path d="M9 5h4v3a2.8 2.8 0 0 1-2 2.7A2.8 2.8 0 0 1 9 8V5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
-        <path d="M8 5H6.5v1.2A1.8 1.8 0 0 0 8.3 8H9M14 5h1.5v1.2A1.8 1.8 0 0 1 13.7 8H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M11 10.7V13M9.5 15h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-        <path d="M14.8 14.2 L19 18.4 M14.6 18.4 L18.8 14.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M4 7.5h3M17 7.5h3M5.2 6v3M18.8 6v3" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+        <path d="M7 7.5h3.2M13.8 7.5H17" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+        <circle cx="12" cy="5.1" r="1.6" stroke="currentColor" stroke-width="1.7"/>
+        <path d="M12 6.8v5.3M9.4 9.2 12 7.8l2.6 1.4M10 12.1l-1.4 5.2M14 12.1l1.4 5.2M12 12.1l-2.7 2.5M12 12.1l2.7 2.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </button>
     <button class="tb-btn" data-act="settings" aria-label="Réglages">
@@ -1312,6 +1313,58 @@ function uid(){ return 'p_'+Math.random().toString(36).slice(2,10)+Date.now().to
 function getUser(id){ return USERS.find(u=>u.id===id)||USERS[0]; }
 function esc(s){ if(s==null) return ''; return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function toast(msg,kind=''){ const t=$('#toast'); t.textContent=msg; t.className='show '+kind; clearTimeout(toast._tm); toast._tm=setTimeout(()=>{t.className='';},2400); }
+function getLiveHeightState(person){
+  const input=$('#detail-height');
+  if(input){
+    const raw=(input.value||'').trim().replace(',', '.');
+    if(raw==='') return { hasValue:false, value:null, source:'field', raw:'' };
+    const num=Number(raw);
+    if(!Number.isFinite(num) || num<=0) return { hasValue:false, value:null, source:'field', raw, invalid:true };
+    return { hasValue:true, value:Math.round(num), source:'field', raw };
+  }
+  if(person && Number.isFinite(person.heightCm) && person.heightCm>0){
+    return { hasValue:true, value:Math.round(person.heightCm), source:'saved', raw:String(person.heightCm) };
+  }
+  return { hasValue:false, value:null, source:'saved', raw:'' };
+}
+function syncDetailHeightInput(value){
+  const input=$('#detail-height');
+  if(input) input.value=value==null ? '' : String(value);
+}
+function resolveWikidataHeightChoice(person, candidate){
+  if(!person || !candidate) return { kind:'error', message:'Aucune donnée Wikidata à appliquer.' };
+  const current=getLiveHeightState(person);
+  if(current.invalid){
+    return { kind:'invalid-current', message:'La taille actuellement saisie est invalide. Corrige-la ou vide le champ avant d’utiliser Wikidata.' };
+  }
+  person.wikiId=candidate.wikiId || person.wikiId;
+  if(!candidate.heightCm){
+    saveState();
+    return { kind:'no-height', message:'Wikidata a trouvé cette personne, mais aucune taille exploitable n’est disponible.' };
+  }
+  const wikiHeight=Math.round(candidate.heightCm);
+  if(!current.hasValue){
+    person.heightCm=wikiHeight;
+    syncDetailHeightInput(wikiHeight);
+    saveState();
+    return { kind:'imported', message:`Taille importée depuis Wikidata : ${formatHeight(wikiHeight)}.` };
+  }
+  if(current.value===wikiHeight){
+    person.heightCm=wikiHeight;
+    syncDetailHeightInput(wikiHeight);
+    saveState();
+    return { kind:'same', message:`Wikidata confirme la taille actuelle : ${formatHeight(wikiHeight)}.` };
+  }
+  const overwrite=confirm(`Une taille est déjà présente : ${formatHeight(current.value)}.\nWikidata propose : ${formatHeight(wikiHeight)}.\n\nOK = écraser avec la valeur Wikidata\nAnnuler = conserver la valeur actuelle`);
+  if(overwrite){
+    person.heightCm=wikiHeight;
+    syncDetailHeightInput(wikiHeight);
+    saveState();
+    return { kind:'overwritten', message:`Taille remplacée par la valeur Wikidata : ${formatHeight(wikiHeight)}.` };
+  }
+  saveState();
+  return { kind:'kept', message:`Taille actuelle conservée : ${formatHeight(current.value)}. Valeur Wikidata ignorée : ${formatHeight(wikiHeight)}.` };
+}
 
 /* ====== Data management helpers ====== */
 function downloadJson(obj, filename){
@@ -1857,12 +1910,10 @@ function openWikiPickModal(person, candidates){
     const selected=candidates.find(c=>c.wikiId===wikiId);
     const target=state.people.find(x=>x.id===pendingWikiHeightPersonId);
     if(!selected || !target) return;
-    target.wikiId = selected.wikiId;
-    if(selected.heightCm) target.heightCm = selected.heightCm;
-    saveState();
+    const outcome=resolveWikidataHeightChoice(target, selected);
     closeAllModals();
     openDetails(target.id);
-    toast(selected.heightCm ? `Taille importée : ${formatHeight(selected.heightCm)}` : 'Aucune taille disponible', selected.heightCm?'ok':'err');
+    toast(outcome.message, ['imported','same','overwritten','kept'].includes(outcome.kind)?'ok':'err');
   }));
   $('#wikidata-pick-skip')?.addEventListener('click',()=>{ pendingWikiHeightPersonId=null; closeModal('modal-wikidata-pick'); });
   openModal('modal-wikidata-pick');
@@ -1874,9 +1925,6 @@ async function fetchHeightFromWikidataForPerson(person){
   const usable=(withHeight.length?withHeight:candidates).slice(0,5);
   if(usable.length===1){
     const chosen=usable[0];
-    person.wikiId = chosen.wikiId;
-    if(chosen.heightCm) person.heightCm = chosen.heightCm;
-    saveState();
     return { mode:'single', candidate:chosen };
   }
   return { mode:'pick', candidates:usable };
@@ -2953,9 +3001,10 @@ Tenter l'ajout quand même ?`;
     try{
       const result=await fetchHeightFromWikidataForPerson(p);
       if(result.mode==='single'){
+        const outcome=resolveWikidataHeightChoice(p, result.candidate);
         renderList();
         renderDetails();
-        toast(result.candidate.heightCm ? `Taille importée : ${formatHeight(result.candidate.heightCm)}` : 'Aucune taille disponible', result.candidate.heightCm?'ok':'err');
+        toast(outcome.message, ['imported','same','overwritten','kept'].includes(outcome.kind)?'ok':'err');
       }else{
         btn.disabled=false;
         btn.textContent=original;
