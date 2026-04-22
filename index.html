@@ -218,6 +218,7 @@ body.show-date .row{min-width:420px}
 .note-card .nc-tiny{font-size:10px;font-weight:600;color:var(--text-3);margin-top:3px}
 
 .hint{font-size:12px;color:var(--text-3);padding:10px 12px;background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.15);border-radius:10px;display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.sim-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(168,85,247,.14);border:1px solid rgba(168,85,247,.35);color:var(--julie-hi);font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px}
 
 
 
@@ -3058,6 +3059,7 @@ function renderLms(){
   if(ui.lms.stage==='setup'){
     const options=pool.slice().sort((a,b)=>a.name.localeCompare(b.name,'fr')).map(p=>`<option value="${p.id}" ${ui.lms.selectedId===p.id?'selected':''}>${esc(p.name)} · ${getLivePoints(u,p.id,ui.lms.simElo)} points</option>`).join('');
     $('#lms-body').innerHTML=`
+      ${!competitionsAffectPoints()?'<div class="sim-badge">Simulation en cours</div>':''}
       <div class="tour-hero">
         <div class="tico">🏆</div>
         <div><h3>Last man standing</h3><p>Choisis un profil de départ ou lance un tirage aléatoire. Il rencontrera ensuite à chaque victoire le prochain adversaire ayant 1 point de plus ou davantage jusqu'à sa défaite. ${competitionsAffectPoints()?"Les points sont mis à jour.":"Simulation : les points évoluent seulement dans cette partie."}</p></div>
@@ -3129,6 +3131,7 @@ function renderLms(){
     </div>`;
   };
   $('#lms-body').innerHTML=`
+    ${!competitionsAffectPoints()?'<div class="sim-badge">Simulation en cours</div>':''}
     <div class="tour-hero">
       <div class="tico">⚔</div>
       <div><h3>Last man standing</h3><p>${esc(champ.name)} continue jusqu'à sa défaite. Chaque victoire enchaîne le prochain adversaire juste au-dessus en points. ${competitionsAffectPoints()?"Les points sont actifs.":"Simulation : les points restent locaux à cette partie."}</p></div>
@@ -3231,7 +3234,7 @@ function renderDuel(){
     <button class="${ui.duel.filter==='M'?'on m':''}" data-f="M">Hommes</button>
   </div>`;
   if(!pair){
-    body.innerHTML=filterBar+`<div class="empty-state"><div class="big">⚔</div><h3>Pas assez dans ce filtre</h3><p>Change de filtre ou ajoute plus de profils.</p></div>`;
+    body.innerHTML=filterBar+`${!competitionsAffectPoints()?'<div class="sim-badge">Simulation en cours</div>':''}<div class="empty-state"><div class="big">⚔</div><h3>Pas assez dans ce filtre</h3><p>Change de filtre ou ajoute plus de profils.</p></div>`;
     $$('#duel-body [data-f]').forEach(b=>b.addEventListener('click',()=>{ ui.duel.filter=b.getAttribute('data-f'); ui.duel.pair=null; renderDuel(); }));
     return;
   }
@@ -3259,6 +3262,7 @@ function renderDuel(){
     </div>`;
   };
   body.innerHTML=filterBar+`
+    ${!competitionsAffectPoints()?'<div class="sim-badge">Simulation en cours</div>':''}
     <div class="duel-hero-card">
       <div class="hico">⚔</div>
       <div><h3>Duel libre</h3><p>Utilise le bouton Vote sous la photo. ${competitionsAffectPoints()?"Les points s\'ajustent automatiquement.":"Simulation : les points évoluent seulement dans ce duel libre."}</p></div>
@@ -3366,6 +3370,7 @@ function renderTourSetup(){
   $('#tour-title').textContent='Nouveau tournoi';
   $('#tour-sub').textContent='Joueur : '+getUser(u).name;
   $('#tour-body').innerHTML=`
+    ${!competitionsAffectPoints()?'<div class="sim-badge">Simulation en cours</div>':''}
     <div class="tour-hero">
       <div class="tico">🏆</div>
       <div><h3>Tournoi 32 — tirage aléatoire</h3><p>Chaque combat est journalisé. ${competitionsAffectPoints()?"Le classement est mis à jour.":"Simulation : les points évoluent seulement dans ce tournoi."}</p></div>
@@ -3636,6 +3641,7 @@ function renderTourPodium(){
   $('#tour-title').textContent='Podium';
   $('#tour-sub').textContent='Tournoi terminé';
   $('#tour-body').innerHTML=`
+    ${!competitionsAffectPoints()?'<div class="sim-badge">Simulation en cours</div>':''}
     <div class="tour-hero" style="background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(251,113,133,.12));border-color:rgba(245,158,11,.4)">
       <div class="tico" style="background:rgba(245,158,11,.3);color:var(--amber-hi)">👑</div>
       <div><h3>Champion${champ&&champ.gender==='F'?'ne':''} : ${esc(champ?.name||'?')}</h3><p>${esc(getUser(u).name)} a couronné ${t.config.filter==='F'?'une gagnante':t.config.filter==='M'?'un gagnant':'un(e) gagnant(e)'} en ${t.rounds.length} rounds.</p></div>
