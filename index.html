@@ -473,22 +473,26 @@ body.show-size .col-size{display:block}
 body.show-date .list-head .col-date,
 body.show-points .list-head .col-points,
 body.show-size .list-head .col-size{display:flex}
-.list-head, .row{grid-template-columns:52px minmax(0,1fr)}
-body.show-points .list-head, body.show-points .row{grid-template-columns:52px minmax(0,1fr) 76px}
-body.show-size .list-head, body.show-size .row{grid-template-columns:52px minmax(0,1fr) 150px}
-body.show-date .list-head, body.show-date .row{grid-template-columns:52px minmax(0,1fr) 150px}
-body.show-points.show-size .list-head, body.show-points.show-size .row{grid-template-columns:52px minmax(0,1fr) 76px 150px}
-body.show-points.show-date .list-head, body.show-points.show-date .row{grid-template-columns:52px minmax(0,1fr) 76px 150px}
-body.show-size.show-date .list-head, body.show-size.show-date .row{grid-template-columns:52px minmax(0,1fr) 150px 150px}
-body.show-points.show-size.show-date .list-head, body.show-points.show-size.show-date .row{grid-template-columns:52px minmax(0,1fr) 76px 150px 150px}
-body.bulk-mode .list-head, body.bulk-mode .row{grid-template-columns:36px minmax(0,1fr)}
-body.bulk-mode.show-points .list-head, body.bulk-mode.show-points .row{grid-template-columns:36px minmax(0,1fr) 76px}
-body.bulk-mode.show-size .list-head, body.bulk-mode.show-size .row{grid-template-columns:36px minmax(0,1fr) 150px}
-body.bulk-mode.show-date .list-head, body.bulk-mode.show-date .row{grid-template-columns:36px minmax(0,1fr) 150px}
-body.bulk-mode.show-points.show-size .list-head, body.bulk-mode.show-points.show-size .row{grid-template-columns:36px minmax(0,1fr) 76px 150px}
-body.bulk-mode.show-points.show-date .list-head, body.bulk-mode.show-points.show-date .row{grid-template-columns:36px minmax(0,1fr) 76px 150px}
-body.bulk-mode.show-size.show-date .list-head, body.bulk-mode.show-size.show-date .row{grid-template-columns:36px minmax(0,1fr) 150px 150px}
-body.bulk-mode.show-points.show-size.show-date .list-head, body.bulk-mode.show-points.show-size.show-date .row{grid-template-columns:36px minmax(0,1fr) 76px 150px 150px}
+.list-head, .row{grid-template-columns:52px minmax(170px,1fr)}
+body.show-points .list-head, body.show-points .row{grid-template-columns:52px minmax(170px,1fr) 92px;min-width:314px}
+body.show-size .list-head, body.show-size .row{grid-template-columns:52px minmax(170px,1fr) 150px;min-width:372px}
+body.show-date .list-head, body.show-date .row{grid-template-columns:52px minmax(170px,1fr) 150px;min-width:372px}
+body.show-points.show-size .list-head, body.show-points.show-size .row{grid-template-columns:52px minmax(170px,1fr) 92px 150px;min-width:464px}
+body.show-points.show-date .list-head, body.show-points.show-date .row{grid-template-columns:52px minmax(170px,1fr) 92px 150px;min-width:464px}
+body.show-size.show-date .list-head, body.show-size.show-date .row{grid-template-columns:52px minmax(170px,1fr) 150px 150px;min-width:522px}
+body.show-points.show-size.show-date .list-head, body.show-points.show-size.show-date .row{grid-template-columns:52px minmax(170px,1fr) 92px 150px 150px;min-width:614px}
+body.bulk-mode .list-head, body.bulk-mode .row{grid-template-columns:36px minmax(170px,1fr)}
+body.bulk-mode.show-points .list-head, body.bulk-mode.show-points .row{grid-template-columns:36px minmax(170px,1fr) 92px;min-width:298px}
+body.bulk-mode.show-size .list-head, body.bulk-mode.show-size .row{grid-template-columns:36px minmax(170px,1fr) 150px;min-width:356px}
+body.bulk-mode.show-date .list-head, body.bulk-mode.show-date .row{grid-template-columns:36px minmax(170px,1fr) 150px;min-width:356px}
+body.bulk-mode.show-points.show-size .list-head, body.bulk-mode.show-points.show-size .row{grid-template-columns:36px minmax(170px,1fr) 92px 150px;min-width:448px}
+body.bulk-mode.show-points.show-date .list-head, body.bulk-mode.show-points.show-date .row{grid-template-columns:36px minmax(170px,1fr) 92px 150px;min-width:448px}
+body.bulk-mode.show-size.show-date .list-head, body.bulk-mode.show-size.show-date .row{grid-template-columns:36px minmax(170px,1fr) 150px 150px;min-width:506px}
+body.bulk-mode.show-points.show-size.show-date .list-head, body.bulk-mode.show-points.show-size.show-date .row{grid-template-columns:36px minmax(170px,1fr) 92px 150px 150px;min-width:598px}
+body.show-size .row-main .row-sub,
+body.show-points.show-size .row-main .row-sub,
+body.show-size.show-date .row-main .row-sub,
+body.show-points.show-size.show-date .row-main .row-sub{display:none}
 .sort-btn .sort-arrow{ font-size:10px; margin-left:3px; opacity:.7; display:inline-block }
 .tb-btn.is-active-eye{ background:rgba(245,158,11,.15); color:var(--amber-hi); border-color:rgba(245,158,11,.4) }
 
