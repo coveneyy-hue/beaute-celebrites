@@ -2201,8 +2201,14 @@ function renderList(){
     clearBtn.style.display=hasFilter?'grid':'none';
   }
   const filt=filterPeople();
-  const globalSorted=sortPeople(state.people.slice());
-  const rankMap=new Map(globalSorted.map((person,idx)=>[person.id, idx+1]));
+  const baseFilter=view.filter||'all';
+  const rankBaseList=sortPeople(state.people.filter(p=>{
+    if(baseFilter==='M') return p.gender==='M';
+    if(baseFilter==='F') return p.gender==='F';
+    if(baseFilter==='fav') return !!state.favorites[u]?.[p.id];
+    return true;
+  }));
+  const rankMap=new Map(rankBaseList.map((person,idx)=>[person.id, idx+1]));
   const sorted=sortPeople(filt);
   const reorderEnabled=canManualReorder();
   body.classList.toggle('is-reorder-enabled',reorderEnabled);
