@@ -2173,6 +2173,8 @@ function renderList(){
     clearBtn.style.display=hasFilter?'grid':'none';
   }
   const filt=filterPeople();
+  const globalSorted=sortPeople(state.people.slice());
+  const rankMap=new Map(globalSorted.map((person,idx)=>[person.id, idx+1]));
   const sorted=sortPeople(filt);
   const reorderEnabled=canManualReorder();
   body.classList.toggle('is-reorder-enabled',reorderEnabled);
@@ -2201,7 +2203,7 @@ function renderList(){
     return `<div class="row${isSelected?' is-selected':''}${reorderEnabled?' is-reorderable':''}" data-open="${p.id}" data-pid="${p.id}">
       <div class="row-rank" style="text-align:center;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center">
         ${reorderHandleHtml}
-        <span class="row-rank-num">${i+1}</span>
+        <span class="row-rank-num">${rankMap.get(p.id) || i+1}</span>
         <span class="row-check"${isSelected?' style="background:var(--coral);border-color:var(--coral)"':''}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"${isSelected?'':' style="opacity:0"'}><path d="M5 12l5 5 9-11"/></svg>
         </span>
