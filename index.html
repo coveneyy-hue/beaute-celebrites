@@ -1152,6 +1152,21 @@ function recompressDataUrl(originalDataUrl, targetBytes=40*1024, maxSize=480){
   });
 }
 
+function isLocalPhotoUrl(url){
+  return typeof url === 'string' && url.startsWith('data:image/');
+}
+function approxImageBytes(url){
+  return Math.round((url?.length || 0) * 0.75);
+}
+async function prepareImportedLocalPhoto(file){
+  const url = await fileToDataURL(file);
+  return {
+    url,
+    bytes: approxImageBytes(url),
+    kb: Math.max(1, Math.round(approxImageBytes(url)/1024))
+  };
+}
+
 /* ============ SHARED CARD PHOTO NAV (for duel & tournament cards) ============
    Generates the HTML for photo navigation controls overlaid on a card photo,
    and provides a wiring function so the parent can attach handlers in one line.
@@ -1323,7 +1338,20 @@ const $$ = (s,r=document)=>Array.from(r.querySelectorAll(s));
 function uid(){ return 'p_'+Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4); }
 function getUser(id){ return USERS.find(u=>u.id===id)||USERS[0]; }
 function esc(s){ if(s==null) return ''; return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function toast(msg,kind=''){ const t=$('#toast'); t.textContent=msg; t.className='show '+kind; clearTimeout(toast._tm); toast._tm=setTimeout(()=>{t.className='';},2400); }
+function toast(msg,kind=''){ const t=$('#toast'); t.textContent=msg; t.className='show '+kind; clearTimeout(toast._tm); toast._tm=setTimeout(()=>{t.className=''; t.innerHTML='';},2400); }
+function toastPhoto(msg, photoUrl, kind='ok'){
+  const t = $('#toast');
+  if(!t) return;
+  const safeMsg = esc(msg);
+  const safeUrl = esc(photoUrl||'');
+  t.innerHTML = `<div style="display:flex;align-items:center;gap:10px;max-width:min(86vw,360px)">
+    ${photoUrl ? `<img src="${safeUrl}" alt="photo" style="width:38px;height:52px;object-fit:cover;border-radius:8px;border:1px solid rgba(255,255,255,.12);flex:none">` : ''}
+    <div style="min-width:0;white-space:normal;line-height:1.35">${safeMsg}</div>
+  </div>`;
+  t.className = 'show ' + kind;
+  clearTimeout(toast._tm);
+  toast._tm = setTimeout(()=>{ t.className=''; t.innerHTML=''; }, 3200);
+}
 
 /* ====== Data management helpers ====== */
 function downloadJson(obj, filename){
@@ -2560,13 +2588,15 @@ function initAddOnce(){
     const f = e.target.files?.[0];
     if(!f) return;
     try {
-      toast('Traitement de l\'image...');
-      const dataUrl = await fileToDataURL(f);
-      mPhotoInput.value = dataUrl;
+      toast('Compression de la photo...');
+      const prepared = await prepareImportedLocalPhoto(f);
+      mPhotoInput.value = prepared.url;
       renderManualPreview();
-      toast('Photo prête','ok');
+      toast(`Photo prête et compressée (~${prepared.kb} Ko)`,'ok');
     } catch(err){
       toast('Erreur : '+err.message,'err');
+    } finally {
+      e.target.value='';
     }
   });
   $('#add-manual-save').addEventListener('click',()=>{
@@ -3036,15 +3066,18 @@ function renderDetails(){
     const f = e.target.files?.[0];
     if(!f) return;
     try {
-      toast("Traitement de l'image...");
-      const dataUrl = await fileToDataURL(f);
-      const imageBytes = dataUrl.length * 0.75;
+      toast("Compression de la photo...");
+      const prepared = await prepareImportedLocalPhoto(f);
+      const dataUrl = prepared.url;
+      const imageBytes = prepared.bytes;
+      const existingLocalPhotos = (p.photos || []).filter(isLocalPhotoUrl);
+      const bytesToFree = existingLocalPhotos.reduce((sum, url)=>sum + approxImageBytes(url), 0);
       const st = computeStorageStats();
-      const freeBytes = (st.quotaMB * 1024 * 1024) - st.bytes;
+      const freeBytes = (st.quotaMB * 1024 * 1024) - st.bytes + bytesToFree;
       if(imageBytes > freeBytes * 0.9){
         const needKb = Math.ceil(imageBytes/1024);
         const freeKb = Math.max(0, Math.floor(freeBytes/1024));
-        const msg = `Pas assez d'espace (besoin ${needKb} Ko, libre ${freeKb} Ko).
+        const msg = `Pas assez d'espace après remplacement (besoin ${needKb} Ko, libre ${freeKb} Ko).
 
 Tenter l'ajout quand même ?`;
         if(!confirm(msg)) { e.target.value=''; return; }
@@ -3052,13 +3085,21 @@ Tenter l'ajout quand même ?`;
       if(!p.photos) p.photos = p.mainPhoto?[p.mainPhoto]:[];
       const prevMain = p.mainPhoto;
       const prevPhotos = p.photos.slice();
+      const previousLocalMain = isLocalPhotoUrl(prevMain) ? prevMain : existingLocalPhotos[0] || null;
+      p.photos = (p.photos || []).filter(u => !isLocalPhotoUrl(u));
       p.photos.push(dataUrl);
       p.mainPhoto = dataUrl;
       ui.photoIdx = p.photos.length - 1;
       const ok = saveState();
       if(!ok){ p.photos = prevPhotos; p.mainPhoto = prevMain; ui.photoIdx = 0; renderDetails(); return; }
-      renderList(); renderDetails(); toast(`Photo ajoutée (${Math.round(imageBytes/1024)} Ko)`,'ok');
+      renderList(); renderDetails();
+      if(previousLocalMain){
+        toastPhoto(`Nouvelle photo importée et compressée (~${prepared.kb} Ko). L'ancienne photo locale a été supprimée.`, dataUrl, 'ok');
+      } else {
+        toastPhoto(`Photo importée et compressée (~${prepared.kb} Ko).`, dataUrl, 'ok');
+      }
     } catch(err){ toast('Erreur : '+err.message,'err'); }
+    finally { e.target.value=''; }
   });
   $('#delete-photo-btn')?.addEventListener('click',()=>{
     if(!photos.length || photos.length<=1) return;
