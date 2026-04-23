@@ -463,11 +463,12 @@ body.show-date .row{min-width:420px}
 .tour-opts button:disabled{opacity:.35;pointer-events:none}
 
 /* ---- Main list optional columns ---- */
-.col-date,.col-points{display:none}
+.col-date,.col-points,.col-size{display:none}
 body.show-date .col-date,
 body.show-points .col-points{display:block}
 .list-head .col-date,
-.list-head .col-points{display:none}
+.list-head .col-points,
+.list-head .col-size{display:none}
 body.show-date .list-head .col-date,
 body.show-points .list-head .col-points{display:flex}
 .list-head, .row{grid-template-columns:52px minmax(0,1fr)}
@@ -639,6 +640,7 @@ body.bulk-mode .list-head-check{display:flex}
       </div>
       <button class="sort-btn" id="sort-name" style="justify-self:start">PERSONNE</button>
       <button class="sort-btn col-points" id="sort-elo" style="justify-self:center">POINTS</button>
+      <button class="sort-btn col-size" id="sort-height" style="justify-self:center">TAILLE</button>
       <button class="sort-btn col-date" id="sort-added" style="justify-self:center">AJOUTÉ</button>
     </div>
     <div id="list-body"></div>
@@ -1821,7 +1823,7 @@ function formatHeight(cm, mode){
   const view=(mode||state.settings?.heightUnit||'metric');
   const metric=formatHeightMetric(n);
   const imperial=formatHeightImperial(n);
-  return view==='imperial' ? `${imperial} · ${metric}` : metric;
+  return view==='imperial' ? `${imperial} (${metric})` : `${metric} (${imperial})`;
 }
 function normalizeProfessionText(v){
   return String(v||'').toLowerCase()
@@ -2193,6 +2195,13 @@ function sortPeople(list){
   const c=list.slice();
   if(by==='name') c.sort((a,b)=>{ const r=a.name.localeCompare(b.name,'fr'); return asc?r:-r; });
   else if(by==='added') c.sort((a,b)=>{ const r=(a.addedAt||0)-(b.addedAt||0); return asc?r:-r; });
+  else if(by==='height') c.sort((a,b)=>{
+    const ah=Number(a.heightCm)||0;
+    const bh=Number(b.heightCm)||0;
+    const r=ah-bh;
+    if(r!==0) return asc?r:-r;
+    return a.name.localeCompare(b.name,'fr');
+  });
   else c.sort((a,b)=>{ const r=getElo(u,a.id)-getElo(u,b.id); return asc?r:-r; });
   return c;
 }
@@ -2211,7 +2220,7 @@ function renderList(){
   const sortBy=view.sortBy||'elo';
   const sortDir=view.sortDir||'desc';
   const arrowUp='↑', arrowDown='↓';
-  [['sort-name','name'],['sort-elo','elo'],['sort-added','added']].forEach(([id,key])=>{
+  [['sort-name','name'],['sort-elo','elo'],['sort-height','height'],['sort-added','added']].forEach(([id,key])=>{
     const btn=$('#'+id);
     if(!btn) return;
     const isActive=sortBy===key;
@@ -2270,8 +2279,9 @@ function renderList(){
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"${isSelected?'':' style="opacity:0"'}><path d="M5 12l5 5 9-11"/></svg>
         </span>
       </div>
-      <div class="row-main">${th}<div class="row-info"><div class="row-name">${esc(p.name)}</div>${p.heightCm?`<div class="row-sub">${esc(formatHeight(p.heightCm))}</div>`:''}</div></div>
+      <div class="row-main">${th}<div class="row-info"><div class="row-name">${esc(p.name)}</div>${p.heightCm?`<div class="row-sub">${esc(formatHeight(p.heightCm,'metric'))}</div>`:''}</div></div>
       <div class="row-elo col-points">${el}<small>POINTS</small></div>
+      <div class="col-size" data-height-cm="${Number(p.heightCm)||0}" aria-hidden="true">${p.heightCm?esc(formatHeight(p.heightCm,'metric')):''}</div>
       ${tsHtml}
     </div>`;
   }).join('');
@@ -5044,7 +5054,7 @@ function attachEvents(){
     renderList();
   }));
   // Sort buttons — same key again → flip direction; new key → default dir
-  const defaultDir={name:'asc', elo:'desc', added:'desc'};
+  const defaultDir={name:'asc', elo:'desc', height:'desc', added:'desc'};
   function handleSort(key){
     const view=listView();
     if(view.sortBy===key){
@@ -5057,6 +5067,7 @@ function attachEvents(){
   }
   $('#sort-name').addEventListener('click',()=>handleSort('name'));
   $('#sort-elo').addEventListener('click',()=>handleSort('elo'));
+  $('#sort-height')?.addEventListener('click',()=>handleSort('height'));
   $('#sort-added').addEventListener('click',()=>handleSort('added'));
   // list row — delegate clicks; in bulk mode toggle selection, otherwise open detail
   document.addEventListener('click',e=>{
