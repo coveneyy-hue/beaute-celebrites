@@ -465,20 +465,30 @@ body.show-date .row{min-width:420px}
 /* ---- Main list optional columns ---- */
 .col-date,.col-points,.col-size{display:none}
 body.show-date .col-date,
-body.show-points .col-points{display:block}
+body.show-points .col-points,
+body.show-size .col-size{display:block}
 .list-head .col-date,
 .list-head .col-points,
 .list-head .col-size{display:none}
 body.show-date .list-head .col-date,
-body.show-points .list-head .col-points{display:flex}
+body.show-points .list-head .col-points,
+body.show-size .list-head .col-size{display:flex}
 .list-head, .row{grid-template-columns:52px minmax(0,1fr)}
 body.show-points .list-head, body.show-points .row{grid-template-columns:52px minmax(0,1fr) 76px}
+body.show-size .list-head, body.show-size .row{grid-template-columns:52px minmax(0,1fr) 150px}
 body.show-date .list-head, body.show-date .row{grid-template-columns:52px minmax(0,1fr) 150px}
+body.show-points.show-size .list-head, body.show-points.show-size .row{grid-template-columns:52px minmax(0,1fr) 76px 150px}
 body.show-points.show-date .list-head, body.show-points.show-date .row{grid-template-columns:52px minmax(0,1fr) 76px 150px}
+body.show-size.show-date .list-head, body.show-size.show-date .row{grid-template-columns:52px minmax(0,1fr) 150px 150px}
+body.show-points.show-size.show-date .list-head, body.show-points.show-size.show-date .row{grid-template-columns:52px minmax(0,1fr) 76px 150px 150px}
 body.bulk-mode .list-head, body.bulk-mode .row{grid-template-columns:36px minmax(0,1fr)}
 body.bulk-mode.show-points .list-head, body.bulk-mode.show-points .row{grid-template-columns:36px minmax(0,1fr) 76px}
+body.bulk-mode.show-size .list-head, body.bulk-mode.show-size .row{grid-template-columns:36px minmax(0,1fr) 150px}
 body.bulk-mode.show-date .list-head, body.bulk-mode.show-date .row{grid-template-columns:36px minmax(0,1fr) 150px}
+body.bulk-mode.show-points.show-size .list-head, body.bulk-mode.show-points.show-size .row{grid-template-columns:36px minmax(0,1fr) 76px 150px}
 body.bulk-mode.show-points.show-date .list-head, body.bulk-mode.show-points.show-date .row{grid-template-columns:36px minmax(0,1fr) 76px 150px}
+body.bulk-mode.show-size.show-date .list-head, body.bulk-mode.show-size.show-date .row{grid-template-columns:36px minmax(0,1fr) 150px 150px}
+body.bulk-mode.show-points.show-size.show-date .list-head, body.bulk-mode.show-points.show-size.show-date .row{grid-template-columns:36px minmax(0,1fr) 76px 150px 150px}
 .sort-btn .sort-arrow{ font-size:10px; margin-left:3px; opacity:.7; display:inline-block }
 .tb-btn.is-active-eye{ background:rgba(245,158,11,.15); color:var(--amber-hi); border-color:rgba(245,158,11,.4) }
 
@@ -582,8 +592,8 @@ body.bulk-mode .list-head-check{display:flex}
     <button class="tb-btn is-primary" data-act="add" aria-label="Ajouter">
       <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
     </button>
-    <button class="tb-btn" data-act="consult" aria-label="Consulter">
-      <svg viewBox="0 0 24 24" fill="none"><path d="M2.5 12s3-7 9.5-7 9.5 7 9.5 7-3 7-9.5 7S2.5 12 2.5 12Z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+    <button class="tb-btn" data-act="consult" aria-label="Consulter la fiche personne">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.2" stroke="currentColor" stroke-width="1.8"/><path d="M5.5 19c.8-3.2 3.5-5 6.5-5s5.7 1.8 6.5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
     <button class="tb-btn" data-act="stats" aria-label="Statistiques">
       <svg viewBox="0 0 24 24" fill="none"><path d="M4 19V8M10 19V5M16 19v-6M22 19H2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
@@ -1324,6 +1334,7 @@ const state = {
     query: '',
     showDateCol: false,
     showPointsCol: false,
+    showSizeCol: false,
     userViews: {},
     consultSort: 'elo',
     compareA: 'lily',
@@ -1519,7 +1530,7 @@ function loadState(){
     const d=JSON.parse(r);
     Object.assign(state,d);
     USERS.forEach(u=>ensureBuckets(u.id));
-    state.settings=Object.assign({currentUser:'lily',tmdbKey:'',sortBy:'elo',sortDir:'desc',showDateCol:false,showPointsCol:false,filter:'all',query:'',userViews:{},consultSort:'elo',compareA:'lily',compareB:'victor',heightUnit:'metric',simulationMode:false},state.settings||{});
+    state.settings=Object.assign({currentUser:'lily',tmdbKey:'',sortBy:'elo',sortDir:'desc',showDateCol:false,showPointsCol:false,showSizeCol:false,filter:'all',query:'',userViews:{},consultSort:'elo',compareA:'lily',compareB:'victor',heightUnit:'metric',simulationMode:false},state.settings||{});
     ensureUserViewSettings(state.settings.currentUser);
   }catch(e){ console.warn(e); }
 }
@@ -2198,9 +2209,11 @@ function sortPeople(list){
   else if(by==='height') c.sort((a,b)=>{
     const ah=Number(a.heightCm)||0;
     const bh=Number(b.heightCm)||0;
+    if(!ah && !bh) return a.name.localeCompare(b.name,'fr');
+    if(!ah) return 1;
+    if(!bh) return -1;
     const r=ah-bh;
-    if(r!==0) return asc?r:-r;
-    return a.name.localeCompare(b.name,'fr');
+    return asc?r:-r;
   });
   else c.sort((a,b)=>{ const r=getElo(u,a.id)-getElo(u,b.id); return asc?r:-r; });
   return c;
@@ -2211,6 +2224,7 @@ function renderList(){
   const view=listView();
   document.body.classList.toggle('show-points', !!view.showPointsCol);
   document.body.classList.toggle('show-date', !!view.showDateCol);
+  document.body.classList.toggle('show-size', !!view.showSizeCol);
   // Sync search field with persisted state
   const searchEl=$('#search');
   if(searchEl && searchEl.value!==(view.query||'')) searchEl.value=view.query||'';
@@ -2279,9 +2293,9 @@ function renderList(){
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"${isSelected?'':' style="opacity:0"'}><path d="M5 12l5 5 9-11"/></svg>
         </span>
       </div>
-      <div class="row-main">${th}<div class="row-info"><div class="row-name">${esc(p.name)}</div>${p.heightCm?`<div class="row-sub">${esc(formatHeight(p.heightCm,'metric'))}</div>`:''}</div></div>
+      <div class="row-main">${th}<div class="row-info"><div class="row-name">${esc(p.name)}</div>${p.heightCm?`<div class="row-sub">${esc(formatHeight(p.heightCm))}</div>`:''}</div></div>
       <div class="row-elo col-points">${el}<small>POINTS</small></div>
-      <div class="col-size" data-height-cm="${Number(p.heightCm)||0}" aria-hidden="true">${p.heightCm?esc(formatHeight(p.heightCm,'metric')):''}</div>
+      <div class="col-size" style="font-size:12px;color:var(--text-2);text-align:center;line-height:1.35;font-variant-numeric:tabular-nums">${p.heightCm?esc(formatHeight(p.heightCm)):'—'}</div>
       ${tsHtml}
     </div>`;
   }).join('');
@@ -4286,7 +4300,7 @@ function renderSettings(){
     localStorage.removeItem(STORAGE_KEY);
     Object.assign(state,{
       people:[], favorites:{}, elo:{}, duels:{}, duelHistory:{}, tournaments:{},
-      settings:{ currentUser:'lily', tmdbKey:'', sortBy:'elo', sortDir:'desc', filter:'all', query:'', showDateCol:false, showPointsCol:false, userViews:{}, consultSort:'elo', compareA:'lily', compareB:'victor' }
+      settings:{ currentUser:'lily', tmdbKey:'', sortBy:'elo', sortDir:'desc', filter:'all', query:'', showDateCol:false, showPointsCol:false, showSizeCol:false, userViews:{}, consultSort:'elo', compareA:'lily', compareB:'victor' }
     });
     USERS.forEach(u=>ensureBuckets(u.id));
     saveState(); renderHeader(); renderList(); renderSettings();
@@ -5020,13 +5034,19 @@ function attachEvents(){
     else if(a==='settings') openSettings();
     else if(a==='toggle-date'){
       const view=listView();
-      view.showDateCol=!view.showDateCol;
+      const showAll=!(view.showPointsCol && view.showSizeCol && view.showDateCol);
+      view.showPointsCol=showAll;
+      view.showSizeCol=showAll;
+      view.showDateCol=showAll;
+      document.body.classList.toggle('show-points', view.showPointsCol);
+      document.body.classList.toggle('show-size', view.showSizeCol);
       document.body.classList.toggle('show-date', view.showDateCol);
       const eyeBtn=$('#tb-toggle-date');
-      if(eyeBtn) eyeBtn.classList.toggle('is-active-eye', view.showDateCol);
+      if(eyeBtn) eyeBtn.classList.toggle('is-active-eye', showAll);
       const slash=$('#eye-slash');
-      if(slash) slash.style.display=view.showDateCol?'none':'inline';
+      if(slash) slash.style.display=showAll?'none':'inline';
       saveState();
+      renderList();
     }
     else if(a==='bulk-delete'){ if(bulkMode) exitBulkMode(); else enterBulkMode(); }
   }));
@@ -5067,7 +5087,7 @@ function attachEvents(){
   }
   $('#sort-name').addEventListener('click',()=>handleSort('name'));
   $('#sort-elo').addEventListener('click',()=>handleSort('elo'));
-  $('#sort-height')?.addEventListener('click',()=>handleSort('height'));
+  $('#sort-height').addEventListener('click',()=>handleSort('height'));
   $('#sort-added').addEventListener('click',()=>handleSort('added'));
   // list row — delegate clicks; in bulk mode toggle selection, otherwise open detail
   document.addEventListener('click',e=>{
@@ -5122,18 +5142,16 @@ function registerSW(){
 function init(){
   try{ loadState(); }catch(e){}
   USERS.forEach(u=>ensureBuckets(u.id));
-  // Restore date column visibility from saved state
+  // Restore optional columns visibility from saved state
   const view=listView();
-  if(view.showDateCol){
-    document.body.classList.add('show-date');
-    const eyeBtn=$('#tb-toggle-date');
-    if(eyeBtn) eyeBtn.classList.add('is-active-eye');
-    const slash=$('#eye-slash');
-    if(slash) slash.style.display='none';
-  }
-  if(view.showPointsCol){
-    document.body.classList.add('show-points');
-  }
+  if(view.showDateCol) document.body.classList.add('show-date');
+  if(view.showPointsCol) document.body.classList.add('show-points');
+  if(view.showSizeCol) document.body.classList.add('show-size');
+  const eyeBtn=$('#tb-toggle-date');
+  const allShown=!!(view.showDateCol && view.showPointsCol && view.showSizeCol);
+  if(eyeBtn) eyeBtn.classList.toggle('is-active-eye', allShown);
+  const slash=$('#eye-slash');
+  if(slash) slash.style.display=allShown?'none':'inline';
   renderHeader();
   renderList();
   attachEvents();
