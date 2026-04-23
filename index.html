@@ -1661,8 +1661,9 @@ async function executeBulkImport(){
         const ph = (f.images?.profiles||[]).map(x=>TMDB_IMG+x.file_path);
         const main = f.profile_path ? (TMDB_IMG+f.profile_path) : (ph[0]||null);
         const yr = f.birthday ? parseInt(f.birthday.slice(0,4)) : null;
+        const newIdBulk = uid();
         state.people.push({
-          id: uid(), tmdbId: r.id, name: f.name, gender: g,
+          id: newIdBulk, tmdbId: r.id, name: f.name, gender: g,
           mainPhoto: main, photos: ph.length?ph:(main?[main]:[]),
           birthday: yr, nationality: f.place_of_birth||null,
           profession: f.known_for_department||null, bio: f.biography||null,
@@ -2065,13 +2066,15 @@ async function importPresetList(lst, triggerBtn){
       const ph=(f.images?.profiles||[]).map(x=>TMDB_IMG+x.file_path);
       const main=f.profile_path?(TMDB_IMG+f.profile_path):(ph[0]||null);
       const yr=f.birthday?parseInt(f.birthday.slice(0,4)):null;
+      const newIdPreset=uid();
       state.people.push({
-        id:uid(), tmdbId:resolvedId, name:f.name, gender:g,
+        id:newIdPreset, tmdbId:resolvedId, name:f.name, gender:g,
         mainPhoto:main, photos:ph.length?ph:(main?[main]:[]),
         birthday:yr, nationality:f.place_of_birth||null,
         profession:f.known_for_department||null, bio:f.biography||null,
         addedAt:Date.now()
       });
+      seedNewPersonPoints(newIdPreset, g);
       existingTmdbIds.add(resolvedId);
       added++;
       if(added%20===0){ const ok=saveState(); if(!ok){ toast('Stockage saturé après '+added+' personnes','err'); break; } }
@@ -2540,7 +2543,9 @@ function initAddOnce(){
     const pr=$('#m-prof').value.trim();
     const bo=$('#m-bio').value.trim();
     const newIdM=uid();
-    state.people.push({ id:newIdM, name, gender:g.getAttribute('data-g'), mainPhoto:ph||null, photos:ph?[ph]:[], birthday:yr, nationality:nt||null, profession:pr||null, bio:bo||null, addedAt:Date.now() });
+    const newGenderM=g.getAttribute('data-g');
+    state.people.push({ id:newIdM, name, gender:newGenderM, mainPhoto:ph||null, photos:ph?[ph]:[], birthday:yr, nationality:nt||null, profession:pr||null, bio:bo||null, addedAt:Date.now() });
+    seedNewPersonPoints(newIdM, newGenderM);
     saveState(); renderList(); closeAllModals();
     toast('Ajouté : '+name,'ok');
     setTimeout(()=>openDetails(newIdM),120);
@@ -2596,7 +2601,9 @@ function renderTmdbResults(results){
       const main=f.profile_path?(TMDB_IMG+f.profile_path):(ph[0]||null);
       const yr=f.birthday?parseInt(f.birthday.slice(0,4)):null;
       const newId1=uid();
-      state.people.push({ id:newId1, tmdbId:tid, name:f.name, gender:g==='?'?'F':g, mainPhoto:main, photos:ph.length?ph:(main?[main]:[]), birthday:yr, nationality:f.place_of_birth||null, profession:f.known_for_department||null, bio:f.biography||null, addedAt:Date.now() });
+      const newGender1=g==='?'?'F':g;
+      state.people.push({ id:newId1, tmdbId:tid, name:f.name, gender:newGender1, mainPhoto:main, photos:ph.length?ph:(main?[main]:[]), birthday:yr, nationality:f.place_of_birth||null, profession:f.known_for_department||null, bio:f.biography||null, addedAt:Date.now() });
+      seedNewPersonPoints(newId1, newGender1);
       saveState(); renderList(); closeAllModals();
       toast('Ajouté : '+f.name,'ok');
       setTimeout(()=>openDetails(newId1),120);
@@ -2610,13 +2617,15 @@ function addPersonFromTmdbData(f, fallbackGender){
   const ph = (f.images?.profiles||[]).map(x=>TMDB_IMG+x.file_path);
   const main = f.profile_path ? (TMDB_IMG+f.profile_path) : (ph[0]||null);
   const yr = f.birthday ? parseInt(f.birthday.slice(0,4)) : null;
+  const newId = uid();
   state.people.push({
-    id: uid(), tmdbId: f.id, name: f.name, gender: g,
+    id: newId, tmdbId: f.id, name: f.name, gender: g,
     mainPhoto: main, photos: ph.length ? ph : (main ? [main] : []),
     birthday: yr, nationality: f.place_of_birth||null,
     profession: f.known_for_department||null, bio: f.biography||null,
     addedAt: Date.now()
   });
+  seedNewPersonPoints(newId, g);
 }
 
 // Stage 1: list of movies / TV shows matching the search
